@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.nbt;
 
 import net.minecraft.nbt.NbtCompound;
-import net.superkat.flounderlib.api.annotation.nbt.FlounderNbtApi;
-import net.superkat.flounderlib.api.annotation.nbt.NbtRead;
-import net.superkat.flounderlib.api.annotation.nbt.NbtWrite;
+import net.superkat.flounderlib.api.nbt.FlounderNbtApi;
+import net.superkat.flounderlib.api.nbt.NbtRead;
+import net.superkat.flounderlib.api.nbt.NbtWrite;
 
 import java.util.UUID;
 

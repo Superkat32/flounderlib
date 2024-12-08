@@ -19,7 +19,7 @@ public class FlounderGame implements IFlounderGame {
 
     @Override
     public void tick() {
-
+        ticks++;
     }
 
     @Override

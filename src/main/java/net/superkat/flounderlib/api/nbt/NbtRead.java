@@ -1,8 +1,6 @@
-package net.superkat.flounderlib.api.annotation.nbt;
+package net.superkat.flounderlib.api.nbt;
 
 import net.minecraft.nbt.NbtCompound;
-
-import java.io.Serializable;
 
 @FunctionalInterface
 public interface NbtRead<T> {

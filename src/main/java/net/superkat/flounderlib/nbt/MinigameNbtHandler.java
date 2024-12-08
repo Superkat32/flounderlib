@@ -2,7 +2,7 @@ package net.superkat.flounderlib.nbt;
 
 import net.minecraft.nbt.NbtCompound;
 import net.superkat.flounderlib.api.annotation.MinigameNbt;
-import net.superkat.flounderlib.api.annotation.nbt.FlounderNbtApi;
+import net.superkat.flounderlib.api.nbt.FlounderNbtApi;
 import java.lang.reflect.Field;
 
 public class MinigameNbtHandler {
