@@ -1,36 +1,32 @@
 package net.superkat.flounderlib.api;
 
+import net.minecraft.util.Identifier;
+
 /**
  * The absolute bare minimum methods required for a minigame. It is recommended that you extend {@link net.superkat.flounderlib.minigame.FlounderGame} instead of just implementing this.
  */
 public interface IFlounderGame {
     /**
-     * Called right when a minigame has been created.
+     * Called when a minigame has been created.
      */
     void create();
 
     /**
-     * Called to start a minigame's actual gameplay.
-     */
-    void start();
-
-    /**
-     * Called every tick. This is where most of a minigame's processing is going to happen.
+     * Called every tick. This is your most important method, and where most of a minigame's processing is going to happen.
      */
     void tick();
 
     /**
-     * @return If the minigame should end(players won/lost, game over, etc.)
-     */
-    boolean shouldEnd();
-
-    /**
-     * Called when a minigame has ended. Winning or losing sequences should be started here. Does not necessary mean the minigame is ready to be removed right away.
-     */
-    void end();
-
-    /**
-     * Called when a minigame is to be removed.
+     * Called when the game should be removed. This can happen forcefully via {@link FlounderApi#endGame()} & commands, or can happen naturally through your {@link IFlounderGame#tick()} method.<br><br>
+     * Think of it as your last chance to clean up after yourself(e.g. remove entities, award players, etc.), because after this, the minigame will be removed and will no longer tick.
      */
     void invalidate();
+
+    /**
+     * Called every tick to see if a minigame is ready to be removed from the {@link net.superkat.flounderlib.minigame.FlounderGameManager}.<br>
+     * Return true if it should be removed, otherwise return false.
+     */
+    boolean shouldRemove();
+
+    Identifier getIdentifier();
 }

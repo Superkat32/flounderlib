@@ -1,10 +1,8 @@
 package net.superkat.flounderlib.minigame;
 
 import net.superkat.flounderlib.api.IFlounderGame;
-import net.superkat.flounderlib.api.annotation.MinigameNbt;
 
-public class FlounderGame implements IFlounderGame {
-    @MinigameNbt
+public abstract class FlounderGame implements IFlounderGame {
     public int ticks = 0;
 
     @Override
@@ -12,7 +10,6 @@ public class FlounderGame implements IFlounderGame {
 
     }
 
-    @Override
     public void start() {
 
     }
@@ -22,12 +19,10 @@ public class FlounderGame implements IFlounderGame {
         ticks++;
     }
 
-    @Override
     public boolean shouldEnd() {
         return false;
     }
 
-    @Override
     public void end() {
 
     }
@@ -35,5 +30,10 @@ public class FlounderGame implements IFlounderGame {
     @Override
     public void invalidate() {
 
+    }
+
+    @Override
+    public boolean shouldRemove() {
+        return false;
     }
 }
