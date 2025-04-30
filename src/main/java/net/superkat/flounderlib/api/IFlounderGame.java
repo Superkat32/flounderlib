@@ -17,7 +17,7 @@ public interface IFlounderGame {
     void tick();
 
     /**
-     * Called when the game should be removed. This can happen forcefully via {@link FlounderApi#endGame()} & commands, or can happen naturally through your {@link IFlounderGame#tick()} method.<br><br>
+     * Called when the game should be removed. This can happen forcefully via {@link FlounderApi#endGame(IFlounderGame)} & commands, or can happen naturally through your {@link IFlounderGame#tick()} method.<br><br>
      * Think of it as your last chance to clean up after yourself(e.g. remove entities, award players, etc.), because after this, the minigame will be removed and will no longer tick.
      */
     void invalidate();

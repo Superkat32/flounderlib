@@ -1,32 +1,40 @@
-package net.superkat.flounderlib.test;
+package net.superkat.flounderlibtest;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.gametype.PersistentGame;
 import net.superkat.flounderlib.minigame.FlounderGame;
 
-public class FakeMinigame extends FlounderGame implements PersistentGame {
+public class TestMinigame extends FlounderGame implements PersistentGame {
 
-    public static final Codec<FakeMinigame> CODEC = NbtCompound.CODEC.xmap(
-            FakeMinigame::new,
+    public static final Codec<TestMinigame> CODEC = NbtCompound.CODEC.xmap(
+            TestMinigame::new,
             game -> game.toNbt(new NbtCompound())
     );
 
-    public FakeMinigame(World world, BlockPos pos) {
+    public ServerWorld world;
 
+    public TestMinigame(ServerWorld world, BlockPos pos) {
+        this.world = world;
     }
 
-    public FakeMinigame(NbtCompound compound) {
+    public TestMinigame(NbtCompound compound) {
         this.ticks = compound.getInt("ticks", 0);
     }
 
     @Override
     public boolean shouldRemove() {
-        return this.ticks >= 300;
+        if(this.ticks >= 300) {
+            FlounderLibTest.LOGGER.info("Game ended!");
+            MinecraftClient.getInstance().player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value(), 0.2f, 1);
+            return true;
+        }
+        return false;
     }
 
     public NbtCompound toNbt(NbtCompound compound) {
@@ -54,12 +62,12 @@ public class FakeMinigame extends FlounderGame implements PersistentGame {
     }
 
     @Override
-    public Codec<FakeMinigame> getCodec() {
+    public Codec<TestMinigame> getCodec() {
         return CODEC;
     }
 
     @Override
     public Identifier getIdentifier() {
-        return FlounderLib.FAKE_MINIGAME_ID;
+        return FlounderLibTest.TEST_MINIGAME_ID;
     }
 }
