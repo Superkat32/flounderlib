@@ -3,15 +3,14 @@
 	"id": "flounderlib",
 	"version": "${version}",
 	"name": "FlounderLib",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Minigame library yay",
 	"authors": [
-		"Me!"
+		"Superkat32"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/Superkat32/flounderlib"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/flounderlib/icon.png",
 	"environment": "*",
 	"entrypoints": {

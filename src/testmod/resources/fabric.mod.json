@@ -3,15 +3,15 @@
   "id": "flounderlibtest",
   "version": "1.0.0",
   "name": "FlounderLib Test",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "description": "Floundering Minigames where which you flounder whilst playing them flounderestly",
   "authors": [
-    "Me!"
+    "Superkat32"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://www.youtube.com/watch?v=q4vy7BcAVJg",
+    "sources": "https://github.com/Superkat32/flounderlib"
   },
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/flounderlib/icon.png",
   "environment": "*",
   "entrypoints": {
