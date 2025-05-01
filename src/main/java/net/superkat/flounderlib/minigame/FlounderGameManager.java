@@ -11,14 +11,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
-import net.superkat.flounderlib.api.FlounderGameFactory;
-import net.superkat.flounderlib.api.FlounderGameType;
 import net.superkat.flounderlib.api.IFlounderGame;
-import net.superkat.flounderlib.api.nbt.FlounderNbtApi;
-import org.jetbrains.annotations.Nullable;
+import net.superkat.flounderlib.nbt.FlounderNbtHandler;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -45,7 +41,7 @@ public class FlounderGameManager extends PersistentState {
             @Override
             public <T> DataResult<T> encode(FlounderGameManager input, DynamicOps<T> ops, T prefix) {
                 NbtCompound nbt = new NbtCompound();
-                FlounderNbtApi.serializeMinigames(input.getGamesMap(), world, nbt);
+                FlounderNbtHandler.serializeMinigames(input.getGamesMap(), world, nbt);
                 nbt.putInt(NEXT_ID_ID, input.nextId);
                 nbt.putInt(TICKS_ID, input.ticks);
                 return DataResult.success((T) nbt);
@@ -54,7 +50,7 @@ public class FlounderGameManager extends PersistentState {
             @Override
             public <T> DataResult<Pair<FlounderGameManager, T>> decode(DynamicOps<T> ops, T input) {
                 NbtCompound nbt = (NbtCompound) ops.convertTo(NbtOps.INSTANCE, input);
-                Map<Integer, IFlounderGame> gameMap = FlounderNbtApi.deserializeMinigames(world, nbt);
+                Map<Integer, IFlounderGame> gameMap = FlounderNbtHandler.deserializeMinigames(world, nbt);
                 int next_id = nbt.getInt(NEXT_ID_ID, 0);
                 int ticks = nbt.getInt(TICKS_ID, 0);
                 return DataResult.success(Pair.of(new FlounderGameManager(gameMap, next_id, ticks), ops.empty()));
@@ -72,10 +68,12 @@ public class FlounderGameManager extends PersistentState {
     }
 
     public FlounderGameManager(Map<Integer, IFlounderGame> games, int nextId, int ticks) {
-        for (Map.Entry<Integer, IFlounderGame> entry : games.entrySet()) {
-            int intId = entry.getKey();
-            IFlounderGame game = entry.getValue();
-            this.games.put(intId, game);
+        if(games != null) {
+            for (Map.Entry<Integer, IFlounderGame> entry : games.entrySet()) {
+                int intId = entry.getKey();
+                IFlounderGame game = entry.getValue();
+                this.games.put(intId, game);
+            }
         }
         this.nextId = nextId;
         this.ticks = ticks;
@@ -101,19 +99,28 @@ public class FlounderGameManager extends PersistentState {
         }
     }
 
-    @Nullable
-    public <T extends IFlounderGame> T createGame(FlounderGameType<T> type, ServerWorld world, BlockPos pos) {
-        FlounderGameFactory<T> factory = type.factory();
-        if(factory == null) return null;
-
-        T game = factory.create(world, pos);
-        if(game == null) return null;
+    public void addGame(ServerWorld world, IFlounderGame game) {
+        game.setWorld(world);
 
         int id = this.getNextId();
         this.games.put(id, game);
         this.markDirty();
-        return game;
     }
+
+//    @Nullable
+//    public <T extends IFlounderGame> T createGame(FlounderGameType<T> type, ServerWorld world, BlockPos pos) {
+//        FlounderGameFactory<T> factory = type.factory();
+//        if(factory == null) return null;
+
+//        T game = factory.create();
+//        if(game == null) return null;
+//        game.setWorld(world);
+
+//        int id = this.getNextId();
+//        this.games.put(id, game);
+//        this.markDirty();
+//        return game;
+//    }
 
     private int getNextId() {
         return this.nextId++;

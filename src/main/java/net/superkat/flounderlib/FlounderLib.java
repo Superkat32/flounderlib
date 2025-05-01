@@ -13,6 +13,12 @@ public class FlounderLib implements ModInitializer {
 	public static final String MOD_ID = "flounderlib";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+//	@SuppressWarnings("UnstableApiUsage")
+//	public static final AttachmentType<Boolean> TEST_MINIGAME = AttachmentRegistry.createPersistent(
+//			Identifier.of(MOD_ID, "test_attachment"),
+//			Codec.BOOL
+//	);
+
     @Override
 	public void onInitialize() {
 		ServerTickEvents.END_WORLD_TICK.register(world -> {

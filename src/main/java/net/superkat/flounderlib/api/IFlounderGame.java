@@ -1,6 +1,8 @@
 package net.superkat.flounderlib.api;
 
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The absolute bare minimum methods required for a minigame. It is recommended that you extend {@link net.superkat.flounderlib.minigame.FlounderGame} instead of just implementing this.
@@ -28,5 +30,13 @@ public interface IFlounderGame {
      */
     boolean shouldRemove();
 
+    /**
+     * Sets the minigame's ServerWorld variable - most often called upon minigame creation
+     *
+     * @param world The ServerWorld to set the minigame world to
+     */
+    void setWorld(ServerWorld world);
+
+    @NotNull
     Identifier getIdentifier();
 }

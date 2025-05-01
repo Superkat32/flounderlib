@@ -3,28 +3,28 @@ package net.superkat.flounderlibtest;
 import com.mojang.serialization.Codec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.api.gametype.PersistentGame;
 import net.superkat.flounderlib.minigame.FlounderGame;
+import org.jetbrains.annotations.NotNull;
 
-public class TestMinigame extends FlounderGame implements PersistentGame {
-
+public class TestMinigame extends FlounderGame {
+    public static final Identifier TEST_MINIGAME_ID = Identifier.of(FlounderLibTest.MOD_ID, "fake_minigame");
     public static final Codec<TestMinigame> CODEC = NbtCompound.CODEC.xmap(
             TestMinigame::new,
             game -> game.toNbt(new NbtCompound())
     );
 
-    public ServerWorld world;
+    public final BlockPos pos;
 
-    public TestMinigame(ServerWorld world, BlockPos pos) {
-        this.world = world;
+    public TestMinigame(BlockPos startPos) {
+        this.pos = startPos;
     }
 
     public TestMinigame(NbtCompound compound) {
         this.ticks = compound.getInt("ticks", 0);
+        this.pos = compound.get("pos", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
     }
 
     @Override
@@ -39,6 +39,7 @@ public class TestMinigame extends FlounderGame implements PersistentGame {
 
     public NbtCompound toNbt(NbtCompound compound) {
         compound.putInt("ticks", this.ticks);
+        compound.put("pos", BlockPos.CODEC, this.pos);
 
         compound.putString("test", "What's up homie buddy");
         compound.putString("test1", "What's up homie buddy");
@@ -62,12 +63,7 @@ public class TestMinigame extends FlounderGame implements PersistentGame {
     }
 
     @Override
-    public Codec<TestMinigame> getCodec() {
-        return CODEC;
-    }
-
-    @Override
-    public Identifier getIdentifier() {
-        return FlounderLibTest.TEST_MINIGAME_ID;
+    public @NotNull Identifier getIdentifier() {
+        return TEST_MINIGAME_ID;
     }
 }

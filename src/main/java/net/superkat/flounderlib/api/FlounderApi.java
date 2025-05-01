@@ -4,10 +4,10 @@ import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.superkat.flounderlib.api.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
 import net.superkat.flounderlib.duck.FlounderWorld;
 import net.superkat.flounderlib.minigame.FlounderGameManager;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -21,20 +21,35 @@ public class FlounderApi {
     // Mapped to an Identifier for encoding/decoding NBT
     private static final Map<Identifier, FlounderGameType<?>> registry = Maps.newHashMap();
 
-    @Nullable
-    public static <T extends IFlounderGame> T createGame(FlounderGameType<T> type, ServerWorld world, BlockPos pos) {
+    /**
+     * Add a minigame to a world. This will begin ticking the minigame
+     *
+     * @param world The ServerWorld the minigame is in.
+     * @param game The minigame to add
+     */
+    // Called to add a minigame, starting it to tick & be managed by FlounderLib
+    public static void addGame(ServerWorld world, IFlounderGame game) {
         FlounderGameManager manager = getFlounderGameManager(world);
-        if(manager == null) return null;
 
-        return manager.createGame(type, world, pos);
+        manager.addGame(world, game);
     }
 
-    public static void endGame(IFlounderGame game) {
-        game.invalidate();
+    // The idea here is that FlounderGameTypeBuilder may get more options for building, and I can't create
+    // every combination of methods here, so instead you'd just manually register the built
+    // FlounderGameType using the Builder, while I provide the most common use cases (create & createPersistent)
+    public static <T extends IFlounderGame> FlounderGameType<T> registerType(FlounderGameType<T> type) {
+        if(type.isPersistent()) {
+            registry.put(type.id(), type);
+        }
+        return type;
     }
 
-    public static <T extends IFlounderGame> FlounderGameType<T> register(Identifier id, Codec<T> codec, FlounderGameFactory<T> factory) {
-        FlounderGameType<T> type = new FlounderGameType<>(id, codec, factory);
+    public static <T extends IFlounderGame> FlounderGameType<T> create(Identifier id) {
+        return new FlounderGameTypeBuilder<T>(id).build();
+    }
+
+    public static <T extends IFlounderGame> FlounderGameType<T> createPersistent(Identifier id, Codec<T> codec) {
+        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).setPersistentCodec(codec).build();
         registry.put(id, type);
         return type;
     }
