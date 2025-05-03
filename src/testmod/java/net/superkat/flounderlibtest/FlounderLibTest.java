@@ -7,6 +7,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvents;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
+import net.superkat.flounderlibtest.games.MoveQuicklyGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,11 @@ public class FlounderLibTest implements ModInitializer {
             CodecMinigame.CODEC
     );
 
+    public static final FlounderGameType<MoveQuicklyGame> MOVE_QUICKLY_GAME = FlounderApi.createPersistent(
+            MoveQuicklyGame.ID,
+            MoveQuicklyGame.CODEC
+    );
+
     @Override
     public void onInitialize() {
         ServerTickEvents.END_WORLD_TICK.register(world -> {
@@ -35,6 +41,11 @@ public class FlounderLibTest implements ModInitializer {
 
                     CodecMinigame alsoMyGame = new CodecMinigame(player.getBlockPos());
                     FlounderApi.addGame(world, alsoMyGame);
+
+                    if(player.isSneaking()) {
+                        MoveQuicklyGame moveQuicklyGame = new MoveQuicklyGame(world, player);
+                        FlounderApi.addGame(world, moveQuicklyGame);
+                    }
 
                     MinecraftClient.getInstance().player.playSound(SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE);
                     LOGGER.info("Game started!");
