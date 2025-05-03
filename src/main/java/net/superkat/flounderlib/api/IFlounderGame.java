@@ -8,10 +8,14 @@ import org.jetbrains.annotations.NotNull;
  * The absolute bare minimum methods required for a minigame. It is recommended that you extend {@link net.superkat.flounderlib.minigame.FlounderGame} instead of just implementing this.
  */
 public interface IFlounderGame {
+
     /**
-     * Called when a minigame has been created.
+     * Called upon minigame creation & re-creation from world save(reading nbt).<br><br>
+     * Most importantly, this gives you the server world! Make sure to save it, otherwise your "world" variable may be null!
+     *
+     * @param world The ServerWorld to set the minigame world to
      */
-    void create();
+    void create(ServerWorld world);
 
     /**
      * Called every tick. This is your most important method, and where most of a minigame's processing is going to happen.
@@ -20,9 +24,11 @@ public interface IFlounderGame {
 
     /**
      * Called when the game should be removed. This can happen forcefully via {@link FlounderApi#endGame(IFlounderGame)} & commands, or can happen naturally through your {@link IFlounderGame#tick()} method.<br><br>
-     * Think of it as your last chance to clean up after yourself(e.g. remove entities, award players, etc.), because after this, the minigame will be removed and will no longer tick.
+     * Think of it as your last chance to clean up after yourself(e.g. remove entities, teleport players, etc.), because after this, the minigame will be removed and will no longer tick.
      */
     void invalidate();
+
+    boolean isInvalidated();
 
     /**
      * Called every tick to see if a minigame is ready to be removed from the {@link net.superkat.flounderlib.minigame.FlounderGameManager}.<br>
@@ -30,13 +36,12 @@ public interface IFlounderGame {
      */
     boolean shouldRemove();
 
-    /**
-     * Sets the minigame's ServerWorld variable - most often called upon minigame creation
-     *
-     * @param world The ServerWorld to set the minigame world to
-     */
-    void setWorld(ServerWorld world);
 
+    /**
+     * The minigame's unique Identifier. This is used for tracking & saving the minigame(if it should be saved).
+     *
+     * @return The minigame's unique Identifier.
+     */
     @NotNull
     Identifier getIdentifier();
 }

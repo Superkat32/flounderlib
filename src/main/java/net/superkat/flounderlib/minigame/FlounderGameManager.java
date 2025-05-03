@@ -100,27 +100,12 @@ public class FlounderGameManager extends PersistentState {
     }
 
     public void addGame(ServerWorld world, IFlounderGame game) {
-        game.setWorld(world);
+        game.create(world);
 
         int id = this.getNextId();
         this.games.put(id, game);
         this.markDirty();
     }
-
-//    @Nullable
-//    public <T extends IFlounderGame> T createGame(FlounderGameType<T> type, ServerWorld world, BlockPos pos) {
-//        FlounderGameFactory<T> factory = type.factory();
-//        if(factory == null) return null;
-
-//        T game = factory.create();
-//        if(game == null) return null;
-//        game.setWorld(world);
-
-//        int id = this.getNextId();
-//        this.games.put(id, game);
-//        this.markDirty();
-//        return game;
-//    }
 
     private int getNextId() {
         return this.nextId++;

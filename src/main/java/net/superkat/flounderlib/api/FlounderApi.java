@@ -12,9 +12,10 @@ import net.superkat.flounderlib.minigame.FlounderGameManager;
 import java.util.Map;
 
 /**
- * Manages all minigame types, as well as helper methods for minigames.<br><br>
- * Registering, starting, finding, and removing minigames can be done here.<br><br>
- * Spawning/removing multiple entities in an area, spawning an entity from a list of entities, teleporting multiple players, rewarding multiple players items, and syncing data to multiple players can also be done here.
+ * Manages minigames.<br><br>
+ * Registering, starting, finding, and removing minigames can be done here.
+ *
+ * @see FlounderUtils
  */
 public class FlounderApi {
     // Known registered minigames - always available.
@@ -32,6 +33,15 @@ public class FlounderApi {
         FlounderGameManager manager = getFlounderGameManager(world);
 
         manager.addGame(world, game);
+    }
+
+    /**
+     * End a minigame. Calls the minigames {@link IFlounderGame#invalidate()} method.
+     *
+     * @param game The minigame to end
+     */
+    public static void endGame(IFlounderGame game) {
+        game.invalidate();
     }
 
     // The idea here is that FlounderGameTypeBuilder may get more options for building, and I can't create

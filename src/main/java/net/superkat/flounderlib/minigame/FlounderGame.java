@@ -6,10 +6,11 @@ import net.superkat.flounderlib.api.IFlounderGame;
 public abstract class FlounderGame implements IFlounderGame {
     public ServerWorld world = null;
     public int ticks = 0;
+    public boolean invalidated = false;
 
     @Override
-    public void create() {
-
+    public void create(ServerWorld world) {
+        this.world = world;
     }
 
     @Override
@@ -19,16 +20,17 @@ public abstract class FlounderGame implements IFlounderGame {
 
     @Override
     public void invalidate() {
+        this.invalidated = true;
+    }
 
+    @Override
+    public boolean isInvalidated() {
+        return this.invalidated;
     }
 
     @Override
     public boolean shouldRemove() {
-        return false;
+        return this.isInvalidated();
     }
 
-    @Override
-    public void setWorld(ServerWorld world) {
-        this.world = world;
-    }
 }
