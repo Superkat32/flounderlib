@@ -17,6 +17,9 @@
   "entrypoints": {
     "main": [
       "net.superkat.flounderlibtest.FlounderLibTest"
+    ],
+    "client": [
+      "net.superkat.flounderlibtest.FlounderLibTestClient"
     ]
   },
   "depends": {

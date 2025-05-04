@@ -18,6 +18,7 @@ import net.minecraft.world.Heightmap;
 import net.superkat.flounderlib.minigame.FlounderGame;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -46,6 +47,7 @@ public class MoveQuicklyGame extends FlounderGame {
 
     public int distance = 0;
     public int ticksSinceWithinRange = 0;
+    public int ticksWithoutPlayer = 0;
 
     public MoveQuicklyGame(ServerWorld world, ServerPlayerEntity player) {
         this.world = world;
@@ -65,7 +67,10 @@ public class MoveQuicklyGame extends FlounderGame {
     }
 
     public void startRound() {
-        this.start = getPlayer().getBlockPos();
+        ServerPlayerEntity player = getPlayer();
+        if(player == null) return;
+
+        this.start = player.getBlockPos();
 
         Random random = world.getRandom();
         int x = this.start.getX() + random.nextBetween(-100, 100);
@@ -73,7 +78,7 @@ public class MoveQuicklyGame extends FlounderGame {
         int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
         this.end = new BlockPos(x, y, z);
 
-        getPlayer().playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
+        player.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
         this.calcDistance();
 
         this.ticksRemaining = (int) (40 + (this.distance * 8.5));
@@ -84,6 +89,14 @@ public class MoveQuicklyGame extends FlounderGame {
     @Override
     public void tick() {
         super.tick();
+        ServerPlayerEntity player = getPlayer();
+        if(player == null) {
+            ticksWithoutPlayer++;
+            if(ticksWithoutPlayer >= 500) {
+                this.invalidate();
+            }
+            return;
+        };
 
         this.ticksRemaining--;
         if(!this.ended && this.ticks % 10 == 0) {
@@ -162,6 +175,10 @@ public class MoveQuicklyGame extends FlounderGame {
         return this.distance <= 5;
     }
 
+    // The player can be null either because they have died (even upon respawning, a new entity is created),
+    // or they have left the game.
+    // Null player entities must be accounted for, otherwise you'll have lots of issues!
+    @Nullable
     public ServerPlayerEntity getPlayer() {
         return (ServerPlayerEntity) this.world.getPlayerByUuid(this.playerUuid);
     }

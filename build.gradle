@@ -54,6 +54,8 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+	include modImplementation("io.github.0x3c50.renderer:renderer-fabric:2.0.2")
+
 	testmodImplementation sourceSets.main.output
 }
 
