@@ -35,6 +35,9 @@ public class FlounderLibTest implements ModInitializer {
         ServerTickEvents.END_WORLD_TICK.register(world -> {
             for (ServerPlayerEntity player : world.getPlayers()) {
                 if (player.getItemUseTime() == 20) {
+//                    if(true) {
+//                        return;
+//                    }
 
                     TestMinigame myGame = new TestMinigame(player.getBlockPos());
                     FlounderApi.addGame(world, myGame);

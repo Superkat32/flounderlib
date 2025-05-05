@@ -12,11 +12,6 @@ public class TargetMarker {
     public int guiScaleX, guiScaleY, guiPaddingX, guiPaddingY, guiHotbarPaddingY;
     public boolean smoothGuiRendering, useWorldRendering, worldRenderScaleWithDistance;
 
-//    @ApiStatus.Internal
-//    public int prevX = 0;
-//    @ApiStatus.Internal
-//    public int prevY = 0;
-
     public TargetMarker(
             Identifier guiIcon, Identifier backgroundGuiIcon, Identifier arrowGuiIcon,
             Supplier<Vec3d> targetSupplier,
@@ -87,25 +82,12 @@ public class TargetMarker {
         return useWorldRendering;
     }
 
-    public boolean isWorldRenderScaleWithDistance() {
+    public boolean shouldWorldRenderScaleWithDistance() {
         return worldRenderScaleWithDistance;
     }
 
-    //    public int getPrevX() {
-//        return prevX;
-//    }
-//
-//    public void setPrevX(int prevX) {
-//        this.prevX = prevX;
-//    }
-//
-//    public int getPrevY() {
-//        return prevY;
-//    }
-//
-//    public void setPrevY(int prevY) {
-//        this.prevY = prevY;
-//    }
+    // TODO - make this builder more reusable:
+    // Split up everything except icon + target into a "TargetMarkerSettings" class?
 
     public static class Builder {
         private Identifier guiIcon;

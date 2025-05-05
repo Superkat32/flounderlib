@@ -51,25 +51,32 @@ public class TargetMarkerRenderer {
         Identifier guiIcon = marker.getGuiIcon();
         float scale = marker.getWorldScale();
         float distance = (float) cameraPos.distanceTo(target);
-        float adjustedScale = scale * (distance * 0.05f + 0.25f);
+
+        if(marker.shouldWorldRenderScaleWithDistance()) {
+            scale = applyWorldRenderDistanceScaling(scale, distance);
+        }
 
         MatrixStack matrices = new MatrixStack();
         matrices.push();
 
         matrices.translate(transPos);
         matrices.multiply(camera.getRotation());
-        matrices.scale(-adjustedScale, adjustedScale, adjustedScale);
+        matrices.scale(-scale, scale, scale);
 
         Sprite sprite = getSprite(guiIcon);
         VertexConsumer buffer = context.consumers().getBuffer(RenderLayer.getGuiTexturedOverlay(sprite.getAtlasId()));
-        int light = LightmapTextureManager.pack(15, 15);
-
-        worldRenderQuad(buffer, matrices, sprite, light);
+        drawWorldIcon(buffer, matrices, sprite);
 
         matrices.pop();
     }
 
-    protected void worldRenderQuad(VertexConsumer buffer, MatrixStack matrices, Sprite sprite, int light) {
+    protected float applyWorldRenderDistanceScaling(float scale, float distance) {
+        return scale * (distance * 0.05f + 0.25f);
+    }
+
+    protected void drawWorldIcon(VertexConsumer buffer, MatrixStack matrices, Sprite sprite) {
+        int light = LightmapTextureManager.pack(15, 15);
+
         Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         buffer.vertex(matrix4f, -1, -1, 0)
                 .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMaxV()).light(light);
@@ -84,6 +91,10 @@ public class TargetMarkerRenderer {
                 .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMaxV()).light(light);
     }
 
+    protected void drawWorldBackground() {
+
+    }
+
 
 
     public void renderGui(DrawContext context, RenderTickCounter counter) {
@@ -93,85 +104,65 @@ public class TargetMarkerRenderer {
     }
 
     public void renderGuiMarker(DrawContext context, RenderTickCounter counter, TargetMarker marker) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        Camera camera = client.gameRenderer.getCamera();
-
         Vec3d target = marker.getTarget();
         Identifier guiIcon = marker.getGuiIcon();
         int scaleX = marker.getGuiScaleX();
         int scaleY = marker.getGuiScaleY();
         int paddingX = marker.getGuiPaddingX();
         int paddingY = marker.getGuiPaddingY();
-
-        float centerX = (float) (context.getScaledWindowWidth() - scaleX) / 2;
-        float centerY = (float) (context.getScaledWindowHeight() - scaleY) / 2;
-
-
-//        Vec3d screenCoords = RenderUtils.worldSpaceToScreenSpace(target);
-//        boolean onScreen = RenderUtils.screenSpaceCoordinateIsVisible(screenCoords);
-//        int halfScaleX = scaleX / 2;
-//        int halfScaleY = scaleY / 2;
-//        int x = (int) MathHelper.clamp(screenCoords.getX() - halfScaleX, paddingX, context.getScaledWindowWidth() - paddingX * 2);
-//        int y = (int) MathHelper.clamp(screenCoords.getY() - halfScaleY, paddingY, context.getScaledWindowHeight() - paddingY * 2);
-
-
-//        float relativeYaw = getRelativeYaw(camera, target);
-//        int extraX = (int) (relativeYaw * 2f);
-//        extraX = MathHelper.clamp(extraX, -centerX + paddingX, centerX - paddingX);
-//        int x = centerX + extraX;
+        int hotbarPadding = marker.getGuiHotbarPaddingY();
 
         Vec3d projectedPos = FlounderRenderUtils.projectGameRenderer(target);
         if (marker.useWorldRendering() && projectedPosOnScreen(projectedPos)) return;
 
-        boolean behindCamera = projectedPos.getZ() > 1.0;
+        float centerX = (float) (context.getScaledWindowWidth() - scaleX) / 2;
+        float centerY = (float) (context.getScaledWindowHeight() - scaleY) / 2;
 
+        boolean behindCamera = projectedPos.getZ() > 1.0;
+        boolean useHotbarPadding = behindCamera ? (projectedPos.getY() > 0) : (projectedPos.getY() < 0);
+
+        float paddedX = paddingX / centerX;
+        float paddedY = (paddingY + (useHotbarPadding ? hotbarPadding : 0)) / centerY;
         float absProjectedX = (float) Math.abs(projectedPos.getX());
         float absProjectedY = (float) Math.abs(projectedPos.getY());
-        float clampedProjectedX = (float) MathHelper.clamp(projectedPos.getX(), -1f, 1f);
-        float clampedProjectedY = (float) MathHelper.clamp(projectedPos.getY(), -1f, 1f);
+        float clampedProjectedX = (float) MathHelper.clamp(projectedPos.getX(), -1f + paddedX, 1f - paddedX);
+        float clampedProjectedY = (float) MathHelper.clamp(projectedPos.getY(), -1f + paddedY, 1f - paddedY);
+
         if(behindCamera) {
             if(absProjectedX > absProjectedY) {
-                clampedProjectedX = 1f * (clampedProjectedX > 0 ? -1 : 1);
+                clampedProjectedX = (1f - paddedX) * (clampedProjectedX > 0 ? -1 : 1);
                 clampedProjectedY = -clampedProjectedY;
             } else {
                 clampedProjectedX = -clampedProjectedX;
-                clampedProjectedY = 1f * (clampedProjectedY > 0 ? -1 : 1);
+                clampedProjectedY = (1f - paddedY) * (clampedProjectedY > 0 ? -1 : 1);
             }
         }
 
+
         float x = clampedProjectedX * centerX + centerX;
         float y = clampedProjectedY * -centerY + centerY;
-//        float newX = clampedProjectedX * centerX + centerX;
-//        float newY = clampedProjectedY * -centerY + centerY;
-//        float prevX = marker.getPrevX();
-//        float prevY = marker.getPrevY();
 
-//        float diffX = newX - prevX;
-//        float diffY = newY - prevY;
+//        float angle = (float) MathHelper.atan2(y - centerY, x - centerX);
+//        context.getMatrices().push();
+//        context.getMatrices().multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) Math.toDegrees(angle)), x, y, 0);
 
-//        float x = newX;
-//        float y = newY;
-//        if(Math.abs(diffX) > 50 || Math.abs(diffY) > 50) {
-//            float lerpAmount = (float) (client.world.getTime() % 80) / 80;
-//            x = MathHelper.lerp(lerpAmount, newX, prevX);
-//            y = MathHelper.lerp(lerpAmount, newY, prevY);
-//            System.out.println(diffX + " - " + diffY);
-//        }
-//        marker.setPrevX((int) newX);
-//        marker.setPrevY((int) newY);
-
-        context.getMatrices().push();
-        if(marker.smoothGuiRendering) {
-            guiRenderQuad(context, guiIcon, x, y, scaleX, scaleY);
-        } else {
-            context.drawGuiTexture(RenderLayer::getGuiTextured, guiIcon, (int) x, (int) y, scaleX, scaleY);
-        }
-        context.getMatrices().pop();
+        drawGuiIcon(marker, context, counter, x, y, scaleX, scaleY);
+//        context.getMatrices().pop();
     }
 
-    protected void guiRenderQuad(DrawContext context, Identifier guiIcon, float x, float y, float width, float height) {
+    protected void drawGuiIcon(TargetMarker marker, DrawContext context, RenderTickCounter counter, float x, float y, int width, int height) {
+        Identifier guiIcon = marker.getGuiIcon();
+
+        if(marker.smoothGuiRendering) {
+            guiQuad(context, guiIcon, x, y, width, height);
+        } else {
+            context.drawGuiTexture(RenderLayer::getGuiTextured, guiIcon, (int) x, (int) y, width, height);
+        }
+    }
+
+    protected void guiQuad(DrawContext context, Identifier texture, float x, float y, int width, int height) {
         int color = -1;
-        Sprite sprite = getSprite(guiIcon);
+        Sprite sprite = getSprite(texture);
 
         RenderLayer renderLayer = RenderLayer.getGuiTextured(sprite.getAtlasId());
         VertexConsumer vertexConsumer = context.vertexConsumers.getBuffer(renderLayer);
@@ -181,6 +172,14 @@ public class TargetMarkerRenderer {
         vertexConsumer.vertex(matrix4f, x, y + height, 0.0F).texture(sprite.getMinU(), sprite.getMaxV()).color(color);
         vertexConsumer.vertex(matrix4f, x + width, y + height, 0.0F).texture(sprite.getMaxU(), sprite.getMaxV()).color(color);
         vertexConsumer.vertex(matrix4f, x + width, y, 0.0F).texture(sprite.getMaxU(), sprite.getMinV()).color(color);
+    }
+
+    protected void drawGuiBackground() {
+
+    }
+
+    protected void drawGuiArrow(TargetMarker marker, DrawContext context, float angle, float x, float y, int width, int height) {
+
     }
 
     protected boolean projectedPosOnScreen(Vec3d projectedPos) {
