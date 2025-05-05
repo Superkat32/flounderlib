@@ -1,6 +1,6 @@
 package net.superkat.flounderlib.render;
 
-import me.x150.renderer.util.RenderUtils;
+import com.google.common.collect.Lists;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -9,28 +9,49 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.superkat.flounderlib.api.render.FlounderRenderUtils;
 import org.joml.Matrix4f;
+
+import java.util.List;
 
 public class TargetMarkerRenderer {
 
     public static final TargetMarkerRenderer INSTANCE = new TargetMarkerRenderer();
 
-    public void renderWorld(WorldRenderContext context, Identifier icon, Vec3d target) {
-        MinecraftClient client = MinecraftClient.getInstance();
+    public List<TargetMarker> markers = Lists.newArrayList();
+
+    public void addTargetMarker(TargetMarker marker) {
+        this.markers.add(marker);
+    }
+
+    public void removeTargetMarker(TargetMarker marker) {
+        this.markers.remove(marker);
+    }
+
+
+
+    public void renderWorld(WorldRenderContext context) {
+        for (TargetMarker marker : markers) {
+            if(!marker.useWorldRendering()) continue;
+            renderWorldMarker(context, marker);
+        }
+    }
+
+    public void renderWorldMarker(WorldRenderContext context, TargetMarker marker) {
         Camera camera = context.camera();
         Vec3d cameraPos = camera.getPos();
+        Vec3d target = marker.getTarget();
         Vec3d transPos = target.subtract(cameraPos);
 
-        float scale = 1f;
+        Identifier guiIcon = marker.getGuiIcon();
+        float scale = marker.getWorldScale();
         float distance = (float) cameraPos.distanceTo(target);
-//        float adjustedScale = scale * (distance * 0.05f + 0.25f);
-        float adjustedScale = scale + (1 / (distance * distance));
+        float adjustedScale = scale * (distance * 0.05f + 0.25f);
 
         MatrixStack matrices = new MatrixStack();
         matrices.push();
@@ -39,12 +60,17 @@ public class TargetMarkerRenderer {
         matrices.multiply(camera.getRotation());
         matrices.scale(-adjustedScale, adjustedScale, adjustedScale);
 
-        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-
-        Sprite sprite = MinecraftClient.getInstance().getGuiAtlasManager().getSprite(icon);
+        Sprite sprite = getSprite(guiIcon);
         VertexConsumer buffer = context.consumers().getBuffer(RenderLayer.getGuiTexturedOverlay(sprite.getAtlasId()));
         int light = LightmapTextureManager.pack(15, 15);
 
+        worldRenderQuad(buffer, matrices, sprite, light);
+
+        matrices.pop();
+    }
+
+    protected void worldRenderQuad(VertexConsumer buffer, MatrixStack matrices, Sprite sprite, int light) {
+        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
         buffer.vertex(matrix4f, -1, -1, 0)
                 .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMaxV()).light(light);
 
@@ -56,165 +82,114 @@ public class TargetMarkerRenderer {
 
         buffer.vertex(matrix4f, 1, -1, 0)
                 .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMaxV()).light(light);
-
-        matrices.pop();
-
-        DrawContext drawContext = new DrawContext(client, (VertexConsumerProvider.Immediate) context.consumers());
-
-        int centerX = drawContext.getScaledWindowWidth() / 2;
-        int centerY = drawContext.getScaledWindowHeight() / 2;
-        int scaleX = 16;
-        int scaleY = 16;
-        drawContext.drawGuiTexture(RenderLayer::getGuiTextured, icon, centerX, centerY, scaleX, scaleY);
-        drawContext.draw();
-
-//        MatrixStack guiMatrices = new MatrixStack();
-//        guiMatrices.push();
-//        int x = client.getWindow().getScaledWidth() / 2;
-//        int y = client.getWindow().getScaledHeight() / 2;
-//        int width = 16;
-//        int height = 16;
-//        guiMatrices.translate(0, 0, 200);
-//
-//        Matrix4f guiMatrix4f = guiMatrices.peek().getPositionMatrix();
-//        buffer.vertex(guiMatrix4f, x, y, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMaxV()).light(light);
-//
-//        buffer.vertex(guiMatrix4f, x, y + height, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMinV()).light(light);
-//
-//        buffer.vertex(guiMatrix4f, x + width, y + height, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMinV()).light(light);
-//
-//        buffer.vertex(guiMatrix4f, x + width, y, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMaxV()).light(light);
-
-//        guiMatrices.pop();
     }
 
-    public void renderGui(DrawContext context, RenderTickCounter counter, Identifier guiIcon, Vec3d target) {
+
+
+    public void renderGui(DrawContext context, RenderTickCounter counter) {
+        for (TargetMarker marker : markers) {
+            renderGuiMarker(context, counter, marker);
+        }
+    }
+
+    public void renderGuiMarker(DrawContext context, RenderTickCounter counter, TargetMarker marker) {
         MinecraftClient client = MinecraftClient.getInstance();
         Camera camera = client.gameRenderer.getCamera();
-        int scaleX = 16;
-        int scaleY = 16;
-        int paddingX = 15;
-        int paddingY = 15;
 
-        Vec3d screenCoords = RenderUtils.worldSpaceToScreenSpace(target);
+        Vec3d target = marker.getTarget();
+        Identifier guiIcon = marker.getGuiIcon();
+        int scaleX = marker.getGuiScaleX();
+        int scaleY = marker.getGuiScaleY();
+        int paddingX = marker.getGuiPaddingX();
+        int paddingY = marker.getGuiPaddingY();
 
-//        MatrixStack matrixStack = new MatrixStack();
-//        Quaternionf quaternionf = camera.getRotation().conjugate(new Quaternionf());
-//        Matrix4f positionMatrix = new Matrix4f().rotation(quaternionf);
-//        matrixStack.multiplyPositionMatrix(positionMatrix);
-//        Matrix4f worldPositionMatrix = matrixStack.peek().getPositionMatrix();
-//
-//        Vec3d transPos = target.subtract(camera.getPos());
-//        Vector4f transCoords = new Vector4f((float) transPos.getX(), (float) transPos.getY(), (float) transPos.getZ(), 1.f).mul(worldPositionMatrix);
-//
-//        Matrix4f matrixProj = new Matrix4f(RenderSystem.getProjectionMatrix());
-//        Matrix4f matrixModel = new Matrix4f(RenderSystem.getModelViewMatrix());
-//
-//        int[] lastViewport = new int[4];
-//        GL11.glGetIntegerv(GL11.GL_VIEWPORT, lastViewport);
-//
-//        matrixProj.mul(matrixModel).project(transCoords.x(), transCoords.y(), transCoords.z(), lastViewport, target.toVector3f());
-//        Vec3d screenCoords = new Vec3d(target.getX() / client.getWindow().getScaleFactor(), (client.getWindow().getHeight() - target.getY()) / client.getWindow().getScaleFactor(), target.z);
+        float centerX = (float) (context.getScaledWindowWidth() - scaleX) / 2;
+        float centerY = (float) (context.getScaledWindowHeight() - scaleY) / 2;
 
-        int centerX = (int) MathHelper.clamp(screenCoords.getX(), paddingX, context.getScaledWindowWidth() - paddingX * 2);
-        int centerY = (int) MathHelper.clamp(screenCoords.getY(), paddingY, context.getScaledWindowHeight() - paddingY * 2);
-//        int centerX = (int) screenCoords.getX();
-//        int centerY = (int) screenCoords.getY();
+
+//        Vec3d screenCoords = RenderUtils.worldSpaceToScreenSpace(target);
+//        boolean onScreen = RenderUtils.screenSpaceCoordinateIsVisible(screenCoords);
+//        int halfScaleX = scaleX / 2;
+//        int halfScaleY = scaleY / 2;
+//        int x = (int) MathHelper.clamp(screenCoords.getX() - halfScaleX, paddingX, context.getScaledWindowWidth() - paddingX * 2);
+//        int y = (int) MathHelper.clamp(screenCoords.getY() - halfScaleY, paddingY, context.getScaledWindowHeight() - paddingY * 2);
+
+
+//        float relativeYaw = getRelativeYaw(camera, target);
+//        int extraX = (int) (relativeYaw * 2f);
+//        extraX = MathHelper.clamp(extraX, -centerX + paddingX, centerX - paddingX);
+//        int x = centerX + extraX;
+
+        Vec3d projectedPos = FlounderRenderUtils.projectGameRenderer(target);
+        if (marker.useWorldRendering() && projectedPosOnScreen(projectedPos)) return;
+
+        boolean behindCamera = projectedPos.getZ() > 1.0;
+
+        float absProjectedX = (float) Math.abs(projectedPos.getX());
+        float absProjectedY = (float) Math.abs(projectedPos.getY());
+        float clampedProjectedX = (float) MathHelper.clamp(projectedPos.getX(), -1f, 1f);
+        float clampedProjectedY = (float) MathHelper.clamp(projectedPos.getY(), -1f, 1f);
+        if(behindCamera) {
+            if(absProjectedX > absProjectedY) {
+                clampedProjectedX = 1f * (clampedProjectedX > 0 ? -1 : 1);
+                clampedProjectedY = -clampedProjectedY;
+            } else {
+                clampedProjectedX = -clampedProjectedX;
+                clampedProjectedY = 1f * (clampedProjectedY > 0 ? -1 : 1);
+            }
+        }
+
+        float x = clampedProjectedX * centerX + centerX;
+        float y = clampedProjectedY * -centerY + centerY;
+//        float newX = clampedProjectedX * centerX + centerX;
+//        float newY = clampedProjectedY * -centerY + centerY;
+//        float prevX = marker.getPrevX();
+//        float prevY = marker.getPrevY();
+
+//        float diffX = newX - prevX;
+//        float diffY = newY - prevY;
+
+//        float x = newX;
+//        float y = newY;
+//        if(Math.abs(diffX) > 50 || Math.abs(diffY) > 50) {
+//            float lerpAmount = (float) (client.world.getTime() % 80) / 80;
+//            x = MathHelper.lerp(lerpAmount, newX, prevX);
+//            y = MathHelper.lerp(lerpAmount, newY, prevY);
+//            System.out.println(diffX + " - " + diffY);
+//        }
+//        marker.setPrevX((int) newX);
+//        marker.setPrevY((int) newY);
+
         context.getMatrices().push();
-//        context.getMatrices().translate(0, 0, screenCoords.getZ());
-//        int centerY = context.getScaledWindowHeight() / 2;
-
-//        int centerX = (context.getScaledWindowWidth() - scaleX) / 2;
-//        int centerY = (context.getScaledWindowHeight() - scaleY) / 2;
-//
-//        Vec3d cameraPos = camera.getPos();
-//        Vec3d transPos = cameraPos.subtract(target);
-//        float atan2 = (float) (MathHelper.atan2(transPos.getX(), -transPos.getZ()) * (180f / Math.PI));
-//        float relativeYaw = MathHelper.subtractAngles(camera.getYaw(), atan2);
-////        int extraX = (int) (relativeYaw * 173 / 2 / 60);
-//        int extraX = (int) MathHelper.clamp(relativeYaw * Math.PI / 2, -centerX + paddingX, centerX - paddingX);
-
-        context.drawGuiTexture(RenderLayer::getGuiTextured, guiIcon, centerX, centerY, scaleX, scaleY);
+        if(marker.smoothGuiRendering) {
+            guiRenderQuad(context, guiIcon, x, y, scaleX, scaleY);
+        } else {
+            context.drawGuiTexture(RenderLayer::getGuiTextured, guiIcon, (int) x, (int) y, scaleX, scaleY);
+        }
         context.getMatrices().pop();
     }
 
-//    public void render(WorldRenderContext context, Identifier icon, Vec3d target) {
-//        MinecraftClient client = MinecraftClient.getInstance();
-//        Camera camera = context.camera();
-//        Vec3d cameraPos = camera.getPos();
-//        Vec3d transPos = target.subtract(cameraPos);
-//        Vec3d altTransPos = cameraPos.subtract(target);
-//        Vec3d rotated = new Vec3d(-altTransPos.getZ(), altTransPos.getY(), altTransPos.getX());
-//
-//        float atan = (float) (MathHelper.atan2(rotated.getZ(), rotated.getX()) * (180f / Math.PI));
-//        double relativeYaw = MathHelper.subtractAngles(camera.getYaw(), atan);
-////        Vector4f transformedCoords = new Vector4f((float) transPos.getX(), (float) transPos.getY(), (float) transPos.getZ(), 1f).mul(context.matrixStack().peek().getPositionMatrix());
-////
-////        Matrix4f matrixProj = new Matrix4f(RenderSystem.getProjectionMatrix());
-////        Matrix4f matrixModel = new Matrix4f(RenderSystem.getModelViewMatrix());
-////        int[] lastViewport = new int[4];
-////        GL11.glGetIntegerv(GL11.GL_VIEWPORT, lastViewport);
-////
-////        matrixProj.mul(matrixModel).project(transformedCoords.x(), transformedCoords.y(), transformedCoords.z(), lastViewport, target.toVector3f());
-////        Vec3d screenCoords = new Vec3d(target.x / client.getWindow().getScaleFactor(), (client.getWindow().getHeight() - target.y) / client.getWindow().getScaleFactor(), target.z);
-//
-//        MatrixStack matrices = new MatrixStack();
-//        matrices.push();
-//        matrices.multiply(new Quaternionf(camera.getRotation().z, -camera.getRotation().w, -camera.getRotation().x, camera.getRotation().y));
-////        matrices.translate(transPos);
-//        matrices.translate(relativeYaw, 0, 1);
-//        Matrix4f matrix4f = matrices.peek().getPositionMatrix();
-//
-//        Sprite sprite = MinecraftClient.getInstance().getGuiAtlasManager().getSprite(icon);
-//        VertexConsumer buffer = context.consumers().getBuffer(RenderLayer.getGuiTexturedOverlay(sprite.getAtlasId()));
-//        int light = LightmapTextureManager.pack(15, 15);
-//
-//        buffer.vertex(matrix4f, 0, 0, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMaxV()).light(light);
-//
-//        buffer.vertex(matrix4f, 0, 1, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMinU(), sprite.getMinV()).light(light);
-//
-//        buffer.vertex(matrix4f, 1, 1, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMinV()).light(light);
-//
-//        buffer.vertex(matrix4f, 1, 0, 0)
-//                .color(1f, 1f, 1f, 1f).texture(sprite.getMaxU(), sprite.getMaxV()).light(light);
-//    }
+    protected void guiRenderQuad(DrawContext context, Identifier guiIcon, float x, float y, float width, float height) {
+        int color = -1;
+        Sprite sprite = getSprite(guiIcon);
 
-    public void drawBackgroundScreen() {
+        RenderLayer renderLayer = RenderLayer.getGuiTextured(sprite.getAtlasId());
+        VertexConsumer vertexConsumer = context.vertexConsumers.getBuffer(renderLayer);
+        Matrix4f matrix4f = context.getMatrices().peek().getPositionMatrix();
 
+        vertexConsumer.vertex(matrix4f, x, y, 0.0F).texture(sprite.getMinU(), sprite.getMinV()).color(color);
+        vertexConsumer.vertex(matrix4f, x, y + height, 0.0F).texture(sprite.getMinU(), sprite.getMaxV()).color(color);
+        vertexConsumer.vertex(matrix4f, x + width, y + height, 0.0F).texture(sprite.getMaxU(), sprite.getMaxV()).color(color);
+        vertexConsumer.vertex(matrix4f, x + width, y, 0.0F).texture(sprite.getMaxU(), sprite.getMinV()).color(color);
     }
 
-    public void drawBackgroundWorld() {
-
+    protected boolean projectedPosOnScreen(Vec3d projectedPos) {
+        return Math.abs(projectedPos.getX()) < 1 && Math.abs(projectedPos.getY()) < 1 && Math.abs(projectedPos.getZ()) < 1;
     }
 
-    public void drawIconScreen() {
 
-    }
 
-    public void drawIconWorld() {
-
-    }
-
-    public void drawArrowScreen() {
-
-    }
-
-    public void drawArrowWorld() {
-
-    }
-
-    public Identifier backgroundTexture() {
-        return null;
-    }
-
-    public Identifier arrowTexture() {
-        return null;
+    protected Sprite getSprite(Identifier icon) {
+        return MinecraftClient.getInstance().getGuiAtlasManager().getSprite(icon);
     }
 }

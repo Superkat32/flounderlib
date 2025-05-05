@@ -18,6 +18,9 @@ sourceSets {
 }
 
 loom {
+
+	accessWidenerPath = getRootProject().file("src/main/resources/flounderlib.accesswidener")
+
 	runs {
 
 		testmodClient {
