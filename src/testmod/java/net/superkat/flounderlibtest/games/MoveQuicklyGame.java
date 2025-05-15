@@ -116,9 +116,9 @@ public class MoveQuicklyGame extends FlounderGame {
 
             if(withinDistance()) {
                 this.ticksSinceWithinRange++;
-                if(this.ticksSinceWithinRange >= 20) {
+                if(this.ticksSinceWithinRange >= 10) {
                     this.ticksRemaining -= 5;
-                    if(this.ticksSinceWithinRange >= 60) {
+                    if(this.ticksSinceWithinRange >= 20) {
                         this.ticksRemaining -= 20;
                     }
                     if(this.ticksRemaining < 0) ticksRemaining = 0;
