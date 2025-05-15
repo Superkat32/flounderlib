@@ -6,11 +6,9 @@ import java.util.function.Function;
 
 public class TargetMarkerSettings {
     public Identifier guiBackground = Identifier.ofVanilla("advancements/challenge_frame_obtained");
-//    public Identifier guiArrow = Identifier.ofVanilla("recipe_book/page_forward");
     public RenderMode renderMode = RenderMode.WORLD;
 
     public boolean scaleWithDistance = true;
-//    public float guiArrowRotation = 0f;
 
     public float worldBackgroundPadding = 1.25f;
     public int guiBackgroundPaddingX = 4;
@@ -20,16 +18,11 @@ public class TargetMarkerSettings {
     public int guiPaddingY = 8;
     public int guiHotbarPaddingY = 24;
 
-
-//    public int guiArrowScaleX = 4;
-//    public int guiArrowScaleY = 4;
-//    public int guiArrowPaddingX = 4;
-//    public int guiArrowPaddingY = 4;
-
     public Identifier getGuiBackground() {
         return guiBackground;
     }
 
+    // TODO - Replace with builder-like system instead?
     public void setGuiBackground(Identifier guiBackground) {
         this.guiBackground = guiBackground;
     }

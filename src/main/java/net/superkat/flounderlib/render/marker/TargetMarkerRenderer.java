@@ -22,6 +22,7 @@ import java.util.List;
 
 public class TargetMarkerRenderer {
 
+    // TODO - make this the main renderer usage instead of needing to create your own
     public static final TargetMarkerRenderer INSTANCE = new TargetMarkerRenderer();
 
     public List<TargetMarker> markers = Lists.newArrayList();
@@ -32,6 +33,10 @@ public class TargetMarkerRenderer {
 
     public void removeTargetMarker(TargetMarker marker) {
         this.markers.remove(marker);
+    }
+
+    public void removeAllTargetMarkers() {
+        this.markers.clear();
     }
 
 
