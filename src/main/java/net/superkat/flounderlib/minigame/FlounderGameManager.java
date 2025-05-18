@@ -100,11 +100,20 @@ public class FlounderGameManager extends PersistentState {
     }
 
     public void addGame(ServerWorld world, IFlounderGame game) {
-        game.create(world);
 
         int id = this.getNextId();
+        game.initialize(world, id);
         this.games.put(id, game);
         this.markDirty();
+    }
+
+    public int getMinigameIntId(IFlounderGame game) {
+        for (Int2ObjectMap.Entry<IFlounderGame> entry : this.games.int2ObjectEntrySet()) {
+            IFlounderGame entryGame = entry.getValue();
+            if(!entryGame.equals(game)) continue;
+            return entry.getIntKey();
+        }
+        return -1;
     }
 
     private int getNextId() {

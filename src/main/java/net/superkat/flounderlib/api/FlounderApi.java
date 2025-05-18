@@ -44,6 +44,15 @@ public class FlounderApi {
         game.invalidate();
     }
 
+    public static int getMinigameIntId(IFlounderGame game) {
+        return game.getMinigameId();
+    }
+
+    public static int bruteForceGetMinigameIntId(ServerWorld world, IFlounderGame game) {
+        FlounderGameManager manager = getFlounderGameManager(world);
+        return manager.getMinigameIntId(game);
+    }
+
     // The idea here is that FlounderGameTypeBuilder may get more options for building, and I can't create
     // every combination of methods here, so instead you'd just manually register the built
     // FlounderGameType using the Builder, while I provide the most common use cases (create & createPersistent)

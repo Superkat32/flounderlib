@@ -113,7 +113,7 @@ public class FlounderNbtHandler {
                         }).ifSuccess(deserialized -> {
                             int optionalIntId = compound.getInt(GAME_INT_ID_ID, 0);
                             IFlounderGame game = (IFlounderGame) deserialized;
-                            game.create(world);
+                            game.initialize(world, optionalIntId);
                             gameMap.put(optionalIntId, game);
                         });
             }

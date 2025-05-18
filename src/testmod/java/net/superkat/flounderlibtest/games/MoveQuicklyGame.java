@@ -15,7 +15,7 @@ import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
-import net.superkat.flounderlib.minigame.FlounderGame;
+import net.superkat.flounderlib.api.minigame.FlounderGame;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

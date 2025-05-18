@@ -1,12 +1,11 @@
-package net.superkat.flounderlibtest;
+package net.superkat.flounderlibtest.testgames;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.minigame.FlounderGame;
+import net.superkat.flounderlib.api.minigame.FlounderGame;
+import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
 public class TestMinigame extends FlounderGame {
@@ -31,7 +30,7 @@ public class TestMinigame extends FlounderGame {
     public boolean shouldRemove() {
         if(this.ticks >= 300) {
             FlounderLibTest.LOGGER.info("Game ended!");
-            MinecraftClient.getInstance().player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value(), 0.2f, 1);
+//            MinecraftClient.getInstance().player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value(), 0.2f, 1);
             return true;
         }
         return false;

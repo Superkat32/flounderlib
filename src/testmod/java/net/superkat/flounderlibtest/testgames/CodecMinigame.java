@@ -1,10 +1,11 @@
-package net.superkat.flounderlibtest;
+package net.superkat.flounderlibtest.testgames;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.minigame.FlounderGame;
+import net.superkat.flounderlib.api.minigame.FlounderGame;
+import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
 public class CodecMinigame extends FlounderGame {
@@ -39,12 +40,12 @@ public class CodecMinigame extends FlounderGame {
     public void tick() {
         super.tick();
 
-        if (this.ticks == 200) {
-            this.test = "what's up homie buddie";
-        }
-
         if(this.ticks == 100) {
             this.myBool = false;
+        }
+
+        if (this.ticks == 200) {
+            this.test = "what's up homie buddie";
         }
     }
 

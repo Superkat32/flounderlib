@@ -1,16 +1,18 @@
-package net.superkat.flounderlib.minigame;
+package net.superkat.flounderlib.api.minigame;
 
 import net.minecraft.server.world.ServerWorld;
 import net.superkat.flounderlib.api.IFlounderGame;
 
 public abstract class FlounderGame implements IFlounderGame {
     public ServerWorld world = null;
+    public int minigameId;
     public int ticks = 0;
     public boolean invalidated = false;
 
     @Override
-    public void create(ServerWorld world) {
+    public void initialize(ServerWorld world, int minigameId) {
         this.world = world;
+        this.minigameId = minigameId;
     }
 
     @Override
@@ -33,4 +35,8 @@ public abstract class FlounderGame implements IFlounderGame {
         return this.isInvalidated();
     }
 
+    @Override
+    public final int getMinigameId() {
+        return this.minigameId;
+    }
 }

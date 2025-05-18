@@ -17,6 +17,9 @@
 		"main": [
 			"net.superkat.flounderlib.FlounderLib"
 		],
+		"client": [
+			"net.superkat.flounderlib.FlounderLibClient"
+		],
 		"fabric-datagen": [
 			"net.superkat.flounderlib.FlounderLibDataGenerator"
 		]
