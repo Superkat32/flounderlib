@@ -15,9 +15,15 @@ public interface SyncedFlounderGame extends IFlounderGame {
         return builder.build();
     }
 
-    default void tickDataTracker() {
+    default void tickDataTracker(boolean onClient) {
+        if(onClient) return;
         FlounderDataTracker dataTracker = this.getFlounderDataTracker();
         dataTracker.tick();
+    }
+
+    default void removeAllListeners() {
+        FlounderDataTracker dataTracker = this.getFlounderDataTracker();
+        dataTracker.removeAllListeners();
     }
 
 }

@@ -2,12 +2,15 @@ package net.superkat.flounderlib.api;
 
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
-import net.superkat.flounderlib.duck.FlounderWorld;
-import net.superkat.flounderlib.minigame.FlounderGameManager;
+import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
+import net.superkat.flounderlib.duck.FlounderServerWorld;
+import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 
 import java.util.Map;
 
@@ -30,7 +33,7 @@ public class FlounderApi {
      */
     // Called to add a minigame, starting it to tick & be managed by FlounderLib
     public static void addGame(ServerWorld world, IFlounderGame game) {
-        FlounderGameManager manager = getFlounderGameManager(world);
+        FlounderServerGameManager manager = getFlounderGameManager(world);
 
         manager.addGame(world, game);
     }
@@ -49,36 +52,53 @@ public class FlounderApi {
     }
 
     public static int bruteForceGetMinigameIntId(ServerWorld world, IFlounderGame game) {
-        FlounderGameManager manager = getFlounderGameManager(world);
+        FlounderServerGameManager manager = getFlounderGameManager(world);
         return manager.getMinigameIntId(game);
     }
 
     // The idea here is that FlounderGameTypeBuilder may get more options for building, and I can't create
     // every combination of methods here, so instead you'd just manually register the built
-    // FlounderGameType using the Builder, while I provide the most common use cases (create & createPersistent)
+    // FlounderGameType using the Builder, while I provide the most common use cases (non-persistent, persistent, & synced)
     public static <T extends IFlounderGame> FlounderGameType<T> registerType(FlounderGameType<T> type) {
-        if(type.isPersistent()) {
-            registry.put(type.id(), type);
-        }
+        registry.put(type.id(), type);
         return type;
     }
 
+    // TODO - check if this breaks anything
     public static <T extends IFlounderGame> FlounderGameType<T> create(Identifier id) {
-        return new FlounderGameTypeBuilder<T>(id).build();
+        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).build();
+        return registerType(type);
     }
 
-    public static <T extends IFlounderGame> FlounderGameType<T> createPersistent(Identifier id, Codec<T> codec) {
-        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).setPersistentCodec(codec).build();
-        registry.put(id, type);
-        return type;
+    public static <T extends IFlounderGame> FlounderGameType<T> createPersistent(Identifier id, Codec<T> persistentCodec) {
+        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).setPersistentCodec(persistentCodec).build();
+        return registerType(type);
+    }
+
+    public static <T extends SyncedFlounderGame> FlounderGameType<T> createSynced(
+            Identifier id,
+            PacketCodec<RegistryByteBuf, T> packetCodec
+    ) {
+        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).setPacketCodec(packetCodec).build();
+        return registerType(type);
+    }
+
+    public static <T extends SyncedFlounderGame> FlounderGameType<T> createPersistentSynced(
+            Identifier id, Codec<T> persistentCodec,
+            PacketCodec<RegistryByteBuf, T> packetCodec
+    ) {
+        FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id)
+                .setPersistentCodec(persistentCodec)
+                .setPacketCodec(packetCodec).build();
+        return registerType(type);
     }
 
     public static Map<Identifier, FlounderGameType<?>> getRegistry() {
         return registry;
     }
 
-    public static FlounderGameManager getFlounderGameManager(ServerWorld serverWorld) {
-        return ((FlounderWorld) serverWorld).flounderlib$getFlounderGameManager();
+    public static FlounderServerGameManager getFlounderGameManager(ServerWorld serverWorld) {
+        return ((FlounderServerWorld) serverWorld).flounderlib$getFlounderGameManager();
     }
 
 }

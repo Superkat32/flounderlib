@@ -13,7 +13,7 @@ import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.IFlounderGame;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlib.minigame.FlounderGameManager;
+import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -27,7 +27,7 @@ public class FlounderNbtHandler {
 
     @SuppressWarnings("unchecked")
     public static void serializeMinigames(Map<Integer, IFlounderGame> games, ServerWorld world, NbtCompound nbt) {
-        FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
         if(manager == null) {
             FlounderLib.LOGGER.warn("Could not serialize minigames - FlounderGameManager was null!");
             return;
@@ -47,6 +47,7 @@ public class FlounderNbtHandler {
                 FlounderLib.LOGGER.warn("Could not serialize minigame {} - its FlounderGameType was null!", gameId);
                 continue;
             }
+
             // Skip serializing minigame if it shouldn't be persistent(this being false also means there isn't a codec)
             if (!gameType.isPersistent()) continue;
 

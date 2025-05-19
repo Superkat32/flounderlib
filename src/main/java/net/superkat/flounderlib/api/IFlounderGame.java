@@ -1,8 +1,9 @@
 package net.superkat.flounderlib.api;
 
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
+import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,12 +13,14 @@ public interface IFlounderGame {
 
     /**
      * Called upon minigame creation & re-creation from world save(reading nbt).<br><br>
-     * More importantly, this gives you the server world! Make sure to save it, otherwise your "world" variable may be null!
+     * More importantly, this gives you the world! Make sure to save it, otherwise your "world" variable may be null!<br><br>
      *
-     * @param world The ServerWorld to set the minigame world to
+     * World is {@link net.minecraft.server.world.ServerWorld} when server-side, and {@link net.minecraft.client.world.ClientWorld} when (and if) on client-side.
+     *
+     * @param world The World to set the minigame world to.
      * @param id The minigame's integer id for saving the minigame & syncing the minigame (if either are needed)
      */
-    void initialize(ServerWorld world, int id);
+    void initialize(World world, int id);
 
     /**
      * Called every tick. This is your most important method, and where most of a minigame's processing is going to happen.
@@ -30,19 +33,12 @@ public interface IFlounderGame {
      */
     void invalidate();
 
-    // TODO - replace shouldRemove with isInvalidated???
     /**
-     * Checks if this minigame is invalid, and ready to be removed.
-     *
-     * @return If this minigame is ready to be removed(stop ticking)
-     */
-    boolean isInvalidated();
-
-    /**
-     * Called every tick to see if a minigame is ready to be removed from the {@link net.superkat.flounderlib.minigame.FlounderGameManager}.<br>
+     * Called every tick to see if this minigame is ready to be removed from the {@link FlounderServerGameManager}.<br>
+     * Once removed, your game will stop ticking and will be assumed as finished.<br>
      * Return true if it should be removed, otherwise return false.
      */
-    boolean shouldRemove();
+    boolean isInvalidated();
 
     /**
      * The minigame's unique Identifier. This is used for tracking & saving the minigame(if it should be saved).

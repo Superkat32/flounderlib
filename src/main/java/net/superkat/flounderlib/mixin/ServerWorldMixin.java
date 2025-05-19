@@ -9,8 +9,8 @@ import net.minecraft.world.PersistentStateManager;
 import net.minecraft.world.dimension.DimensionOptions;
 import net.minecraft.world.level.ServerWorldProperties;
 import net.minecraft.world.level.storage.LevelStorage;
-import net.superkat.flounderlib.duck.FlounderWorld;
-import net.superkat.flounderlib.minigame.FlounderGameManager;
+import net.superkat.flounderlib.duck.FlounderServerWorld;
+import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -22,21 +22,21 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 @Mixin(ServerWorld.class)
-public abstract class ServerWorldMixin implements FlounderWorld {
+public abstract class ServerWorldMixin implements FlounderServerWorld {
 
 	@Shadow public abstract PersistentStateManager getPersistentStateManager();
 
 	@Unique
-	public FlounderGameManager flounderGameManager = null;
+	public FlounderServerGameManager flounderGameManager = null;
 
 	@Inject(method = "<init>", at = @At("TAIL"))
 	public void flounderlib$createFlounderGameManager(MinecraftServer server, Executor workerExecutor, LevelStorage.Session session, ServerWorldProperties properties, RegistryKey worldKey, DimensionOptions dimensionOptions, WorldGenerationProgressListener worldGenerationProgressListener, boolean debugWorld, long seed, List spawners, boolean shouldTickTime, RandomSequencesState randomSequencesState, CallbackInfo ci) {
 		ServerWorld world = (ServerWorld) (Object) this;
-		this.flounderGameManager = this.getPersistentStateManager().getOrCreate(FlounderGameManager.getPersistentStateType(world));
+		this.flounderGameManager = this.getPersistentStateManager().getOrCreate(FlounderServerGameManager.getPersistentStateType(world));
 	}
 
 	@Override
-	public FlounderGameManager flounderlib$getFlounderGameManager() {
+	public FlounderServerGameManager flounderlib$getFlounderGameManager() {
 		return this.flounderGameManager;
 	}
 }

@@ -16,7 +16,7 @@ import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.IFlounderGame;
-import net.superkat.flounderlib.minigame.FlounderGameManager;
+import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 
 import java.util.Map;
 import java.util.Set;
@@ -90,8 +90,8 @@ public class FlounderGameCommand {
 
     public static int executeList(ServerCommandSource source) {
         ServerWorld world = source.getWorld();
-        FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
-        Map<Integer, IFlounderGame> map = manager.getGamesMap();
+        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        Map<Integer, IFlounderGame> map = manager.getGames();
 
         if(map == null || map.isEmpty()) {
             source.sendFeedback(() -> Text.literal("No active minigames found!"), false);
@@ -116,8 +116,8 @@ public class FlounderGameCommand {
 
     public static int executeStop(ServerCommandSource source, int intId) {
         ServerWorld world = source.getWorld();
-        FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
-        Map<Integer, IFlounderGame> map = manager.getGamesMap();
+        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        Map<Integer, IFlounderGame> map = manager.getGames();
 
         if(map == null || map.isEmpty()) {
             return noGamesActive(source);
@@ -141,8 +141,8 @@ public class FlounderGameCommand {
 
     public static int stopAll(ServerCommandSource source) {
         ServerWorld world = source.getWorld();
-        FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
-        Map<Integer, IFlounderGame> games = manager.getGamesMap();
+        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        Map<Integer, IFlounderGame> games = manager.getGames();
 
         if(games == null || games.isEmpty()) {
             return noGamesActive(source);
@@ -159,10 +159,10 @@ public class FlounderGameCommand {
 
     public static int stopAll(ServerCommandSource source, Identifier id) {
         ServerWorld world = source.getWorld();
-        FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
 
         int gameCount = 0;
-        Map<Integer, IFlounderGame> games = manager.getGamesMap();
+        Map<Integer, IFlounderGame> games = manager.getGames();
         if(games == null || games.isEmpty()) {
             return noGamesActive(source);
         }

@@ -17,23 +17,24 @@ public class TestMinigame extends FlounderGame {
 
     public final BlockPos pos;
 
+    // The main constructor when we want to start this minigame
     public TestMinigame(BlockPos startPos) {
         this.pos = startPos;
     }
 
+    // The persistent constructor when the minigame is reloaded upon world rejoin
     public TestMinigame(NbtCompound compound) {
         this.ticks = compound.getInt("ticks", 0);
         this.pos = compound.get("pos", BlockPos.CODEC).orElse(BlockPos.ORIGIN);
     }
 
     @Override
-    public boolean shouldRemove() {
+    public void tick() {
+        super.tick();
         if(this.ticks >= 300) {
             FlounderLibTest.LOGGER.info("Game ended!");
-//            MinecraftClient.getInstance().player.playSound(SoundEvents.ITEM_SHIELD_BLOCK.value(), 0.2f, 1);
-            return true;
+            this.invalidate();
         }
-        return false;
     }
 
     public NbtCompound toNbt(NbtCompound compound) {

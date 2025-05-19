@@ -1,7 +1,6 @@
 package net.superkat.flounderlib.render.fun;
 
 import com.google.common.collect.Queues;
-import com.mojang.text2speech.Narrator;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.LayeredDrawer;
 import net.minecraft.client.render.RenderTickCounter;
@@ -37,7 +36,8 @@ public class RepoTextRenderer implements LayeredDrawer.Layer {
         } else {
             if(texts.isEmpty()) return;
             currentText = texts.poll();
-            Narrator.getNarrator().say(currentText.text.getLiteralString(), false, 0.7f);
+            // this was just a joke but its sorta funny
+//            Narrator.getNarrator().say(currentText.text.getLiteralString(), false, 0.7f);
         }
     }
 

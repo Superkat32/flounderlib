@@ -3,7 +3,6 @@ package net.superkat.flounderlibtest.games;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.packet.s2c.play.TitleS2CPacket;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
@@ -104,15 +103,15 @@ public class MoveQuicklyGame extends FlounderGame {
         }
 
         if(!this.ended && this.ticks % 5 == 0) {
-            this.world.spawnParticles(
-                    getPlayer(),
-                    ParticleTypes.TRIAL_SPAWNER_DETECTION,
-                    false, true, //don't force, but are important
-                    this.end.getX(), this.end.getY(), this.end.getZ(),
-                    this.world.getRandom().nextBetween(1, 7),
-                    0.5, 0.5, 0.5,
-                    0
-            );
+//            this.world.spawnParticles(
+//                    getPlayer(),
+//                    ParticleTypes.TRIAL_SPAWNER_DETECTION,
+//                    false, true, //don't force, but are important
+//                    this.end.getX(), this.end.getY(), this.end.getZ(),
+//                    this.world.getRandom().nextBetween(1, 7),
+//                    0.5, 0.5, 0.5,
+//                    0
+//            );
 
             if(withinDistance()) {
                 this.ticksSinceWithinRange++;

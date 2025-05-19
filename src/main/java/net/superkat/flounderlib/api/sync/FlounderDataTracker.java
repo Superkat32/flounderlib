@@ -12,8 +12,11 @@ import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
 import net.superkat.flounderlib.network.sync.FlTrackedDataHandler;
 import net.superkat.flounderlib.network.sync.FlTrackedDataHandlerRegistry;
 import net.superkat.flounderlib.network.sync.packets.FlounderDataTrackerUpdateS2CPacket;
+import net.superkat.flounderlib.network.sync.packets.FlounderGameCreationS2CPacket;
+import net.superkat.flounderlib.network.sync.packets.FlounderGameDestroyS2CPacket;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.VisibleForTesting;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +45,49 @@ public class FlounderDataTracker {
         }
     }
 
-    public boolean addPlayerListener(ServerPlayerEntity player) {
-        return this.listeners.add(player.networkHandler);
+    public void addPlayerListener(ServerPlayerEntity player) {
+        this.sendPacketsToNewPlayer(player);
+        this.listeners.add(player.networkHandler);
     }
 
-    public boolean removePlayerListener(ServerPlayerEntity player) {
-        return this.listeners.remove(player.networkHandler);
+    public void removePlayerListener(ServerPlayerEntity player) {
+        FlounderGameDestroyS2CPacket packet = new FlounderGameDestroyS2CPacket(this.trackedGame.getMinigameId());
+        sendPacket(player.networkHandler, packet);
+        this.listeners.remove(player.networkHandler);
+    }
+
+    public void removeAllListeners() {
+        for (PlayerAssociatedNetworkHandler listener : this.listeners) {
+            this.removePlayerListener(listener.getPlayer());
+        }
     }
 
     public void tick() {
         if(!this.isDirty()) return;
         this.syncData();
+    }
+
+    public void sendPacketsToNewPlayer(ServerPlayerEntity player) {
+        int minigameId = this.trackedGame.getMinigameId();
+        FlounderGameCreationS2CPacket creationPacket = new FlounderGameCreationS2CPacket(minigameId, this.trackedGame);
+        this.sendPacket(player.networkHandler, creationPacket);
+
+        List<SerializedEntry<?>> changedEntries = getChangedEntries();
+        if(changedEntries == null) return;
+
+        CustomPayload packet = new FlounderDataTrackerUpdateS2CPacket(minigameId, changedEntries);
+        this.sendPacket(player.networkHandler, packet);
+    }
+
+    public void syncData() {
+        List<SerializedEntry<?>> dirtyEntries = getDirtyEntries();
+        if(dirtyEntries == null) return;
+
+        int minigameId = this.trackedGame.getMinigameId();
+        CustomPayload packet = new FlounderDataTrackerUpdateS2CPacket(minigameId, dirtyEntries);
+        for (PlayerAssociatedNetworkHandler listener : this.listeners) {
+            this.sendPacket(listener, packet);
+        }
     }
 
     @Nullable
@@ -65,15 +100,43 @@ public class FlounderDataTracker {
         for (FlounderDataTracker.Entry<?> entry : this.entries) {
             if(entry.isDirty()) {
                 entry.setDirty(false);
-                list.add(entry.toDataEntry());
+                list.add(entry.toSerialized());
             }
         }
 
+        if(list.isEmpty()) return null;
         return list;
     }
 
-    private <T> FlounderDataTracker.Entry<T> getEntry(FlTrackedData<T> key) {
-        return (FlounderDataTracker.Entry<T>) this.entries[key.dataId()];
+    @Nullable
+    public List<SerializedEntry<?>> getChangedEntries() {
+        List<SerializedEntry<?>> list = new ArrayList<>();
+
+        for (Entry<?> entry : this.entries) {
+            if(entry.isUnchanged()) continue;
+            list.add(entry.toSerialized());
+        }
+
+        if(list.isEmpty()) return null;
+        return list;
+    }
+
+    public void sendPacket(PlayerAssociatedNetworkHandler player, CustomPayload payload) {
+        ServerPlayerEntity serverPlayer = player.getPlayer();
+        ServerPlayNetworking.send(serverPlayer, payload);
+    }
+
+    public void writeUpdatedEntries(List<SerializedEntry<?>> entries) {
+        for (FlounderDataTracker.SerializedEntry<?> serializedEntry : entries) {
+            copyEntry(serializedEntry);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> void copyEntry(SerializedEntry<T> serializedEntry) {
+        // yeah sure okay that's very safe
+        FlounderDataTracker.Entry<T> entry = (Entry<T>) this.entries[serializedEntry.entryId];
+        entry.set(serializedEntry.value);
     }
 
     public <T> T get(FlTrackedData<T> data) {
@@ -93,20 +156,8 @@ public class FlounderDataTracker {
         }
     }
 
-    public void syncData() {
-        List<SerializedEntry<?>> dirtyEntries = getDirtyEntries();
-        if(dirtyEntries == null) return;
-
-        int minigameId = this.trackedGame.getMinigameId();
-        CustomPayload packet = new FlounderDataTrackerUpdateS2CPacket(minigameId, dirtyEntries);
-        for (PlayerAssociatedNetworkHandler listener : this.listeners) {
-            this.sendPacket(listener, packet);
-        }
-    }
-
-    public void sendPacket(PlayerAssociatedNetworkHandler player, CustomPayload payload) {
-        ServerPlayerEntity serverPlayer = player.getPlayer();
-        ServerPlayNetworking.send(serverPlayer, payload);
+    private <T> FlounderDataTracker.Entry<T> getEntry(FlTrackedData<T> key) {
+        return (FlounderDataTracker.Entry<T>) this.entries[key.dataId()];
     }
 
     public boolean isDirty() {
@@ -115,6 +166,11 @@ public class FlounderDataTracker {
 
     public void setDirty(boolean dirty) {
         this.dirty = dirty;
+    }
+
+    @VisibleForTesting
+    public Entry<?>[] getEntries() {
+        return entries;
     }
 
     public static class Builder {
@@ -172,7 +228,11 @@ public class FlounderDataTracker {
             return this.dirty;
         }
 
-        public SerializedEntry<?> toDataEntry() {
+        public boolean isUnchanged() {
+            return this.initValue.equals(this.value);
+        }
+
+        public SerializedEntry<?> toSerialized() {
             return SerializedEntry.of(this.data, this.get());
         }
     }

@@ -25,10 +25,12 @@ public class CodecMinigame extends FlounderGame {
     public String test = "";
     public boolean myBool = false;
 
+    // The main constructor when we want to start this minigame
     public CodecMinigame(BlockPos pos) {
         this.pos = pos;
     }
 
+    // The persistent constructor when the minigame is reloaded upon world rejoin
     public CodecMinigame(int ticks, BlockPos pos, String test, boolean myBool) {
         this(pos);
         this.ticks = ticks;
@@ -47,13 +49,11 @@ public class CodecMinigame extends FlounderGame {
         if (this.ticks == 200) {
             this.test = "what's up homie buddie";
         }
-    }
 
-    @Override
-    public boolean shouldRemove() {
-        return this.ticks >= 300;
+        if(this.ticks >= 300) {
+            this.invalidate();
+        }
     }
-
     @Override
     public @NotNull Identifier getIdentifier() {
         return ID;

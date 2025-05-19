@@ -28,9 +28,10 @@ public class FlounderLibTest implements ModInitializer {
             CodecMinigame.CODEC
     );
 
-    public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.createPersistent(
+    public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
             TestSyncedMinigame.ID,
-            TestSyncedMinigame.CODEC
+            TestSyncedMinigame.CODEC,
+            TestSyncedMinigame.PACKET_CODEC
     );
 
     public static final FlounderGameType<MoveQuicklyGame> MOVE_QUICKLY_GAME = FlounderApi.createPersistent(
