@@ -8,6 +8,7 @@ import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
 import net.superkat.flounderlib.api.sync.FlounderDataTracker;
 import net.superkat.flounderlib.duck.FlounderClientWorld;
 import net.superkat.flounderlib.minigame.FlounderClientGameManager;
+import net.superkat.flounderlib.minigame.listener.FlounderGameListenerRegistry;
 import net.superkat.flounderlib.network.fun.packets.RepoTextS2CPacket;
 import net.superkat.flounderlib.network.sync.packets.FlounderDataTrackerUpdateS2CPacket;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameCreationS2CPacket;
@@ -35,6 +36,8 @@ public class FlounderClientNetworkHandler {
             FlounderClientWorld flWorld = (FlounderClientWorld) world;
             FlounderClientGameManager manager = flWorld.flounderlib$getFlounderClientGameManager();
             manager.addGame(minigameId, game);
+
+            FlounderGameListenerRegistry.onMinigameAdd(game);
         }
     }
 

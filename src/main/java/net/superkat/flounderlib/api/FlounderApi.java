@@ -10,10 +10,12 @@ import net.minecraft.world.World;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
 import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
+import net.superkat.flounderlib.api.minigame.listener.FlounderGameListener;
 import net.superkat.flounderlib.duck.FlounderClientWorld;
 import net.superkat.flounderlib.duck.FlounderServerWorld;
 import net.superkat.flounderlib.minigame.FlounderGameManager;
 import net.superkat.flounderlib.minigame.FlounderServerGameManager;
+import net.superkat.flounderlib.minigame.listener.FlounderGameListenerRegistry;
 import net.superkat.flounderlib.minigame.registry.FlounderGameTypeRegistry;
 
 /**
@@ -89,6 +91,10 @@ public class FlounderApi {
                 .setPersistentCodec(persistentCodec)
                 .setPacketCodec(packetCodec).build();
         return registerType(type);
+    }
+
+    public static <T extends IFlounderGame> FlounderGameListener<T> registerListener(FlounderGameType<T> gameType) {
+        return FlounderGameListenerRegistry.registerListener(gameType);
     }
 
     public static Registry<FlounderGameType<?>> getRegistry() {

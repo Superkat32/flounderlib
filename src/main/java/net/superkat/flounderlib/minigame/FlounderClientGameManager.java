@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.client.world.ClientWorld;
 import net.superkat.flounderlib.api.IFlounderGame;
+import net.superkat.flounderlib.minigame.listener.FlounderGameListenerRegistry;
 
 import java.util.Map;
 
@@ -28,6 +29,9 @@ public class FlounderClientGameManager implements FlounderGameManager {
     }
 
     public void removeGame(int intId) {
+        IFlounderGame game = this.games.get(intId);
+        FlounderGameListenerRegistry.onMinigameDestroy(game);
+
         this.games.remove(intId);
     }
 

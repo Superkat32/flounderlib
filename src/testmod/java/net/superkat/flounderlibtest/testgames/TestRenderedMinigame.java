@@ -12,7 +12,6 @@ import net.minecraft.util.Uuids;
 import net.minecraft.world.World;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
 import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
-import net.superkat.flounderlib.api.render.FlounderGameListener;
 import net.superkat.flounderlib.api.sync.FlounderDataTracker;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
@@ -33,8 +32,6 @@ public class TestRenderedMinigame extends FlounderGame implements SyncedFlounder
             Uuids.PACKET_CODEC, game -> game.playerUuid,
             TestRenderedMinigame::new
     );
-
-    public static final FlounderGameListener<TestRenderedMinigame> GAME_LISTENER = new FlounderGameListener<>(FlounderLibTest.TEST_RENDERED_MINIGAME);
 
     public final FlounderDataTracker dataTracker = this.createDataTracker();
     public final UUID playerUuid;
@@ -57,6 +54,11 @@ public class TestRenderedMinigame extends FlounderGame implements SyncedFlounder
     }
 
     @Override
+    public void initDataTracker(FlounderDataTracker.Builder builder) {
+
+    }
+
+    @Override
     public void tick() {
         super.tick();
 
@@ -66,8 +68,9 @@ public class TestRenderedMinigame extends FlounderGame implements SyncedFlounder
     }
 
     @Override
-    public void initDataTracker(FlounderDataTracker.Builder builder) {
-
+    public void invalidate() {
+        super.invalidate();
+        this.removeAllListeners();
     }
 
     @Override
