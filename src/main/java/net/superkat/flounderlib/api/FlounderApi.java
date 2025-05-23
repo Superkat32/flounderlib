@@ -1,18 +1,20 @@
 package net.superkat.flounderlib.api;
 
-import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.registry.Registry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
 import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
+import net.superkat.flounderlib.duck.FlounderClientWorld;
 import net.superkat.flounderlib.duck.FlounderServerWorld;
+import net.superkat.flounderlib.minigame.FlounderGameManager;
 import net.superkat.flounderlib.minigame.FlounderServerGameManager;
-
-import java.util.Map;
+import net.superkat.flounderlib.minigame.registry.FlounderGameTypeRegistry;
 
 /**
  * Manages minigames.<br><br>
@@ -21,10 +23,6 @@ import java.util.Map;
  * @see FlounderUtils
  */
 public class FlounderApi {
-    // Known registered minigames - always available.
-    // Mapped to an Identifier for encoding/decoding NBT
-    private static final Map<Identifier, FlounderGameType<?>> registry = Maps.newHashMap();
-
     /**
      * Add a minigame to a world. This will begin ticking the minigame
      *
@@ -33,7 +31,7 @@ public class FlounderApi {
      */
     // Called to add a minigame, starting it to tick & be managed by FlounderLib
     public static void addGame(ServerWorld world, IFlounderGame game) {
-        FlounderServerGameManager manager = getFlounderGameManager(world);
+        FlounderServerGameManager manager = getFlounderServerGameManager(world);
 
         manager.addGame(world, game);
     }
@@ -52,19 +50,19 @@ public class FlounderApi {
     }
 
     public static int bruteForceGetMinigameIntId(ServerWorld world, IFlounderGame game) {
-        FlounderServerGameManager manager = getFlounderGameManager(world);
+        FlounderGameManager manager = getFlounderGameManager(world);
         return manager.getMinigameIntId(game);
     }
+
+
 
     // The idea here is that FlounderGameTypeBuilder may get more options for building, and I can't create
     // every combination of methods here, so instead you'd just manually register the built
     // FlounderGameType using the Builder, while I provide the most common use cases (non-persistent, persistent, & synced)
     public static <T extends IFlounderGame> FlounderGameType<T> registerType(FlounderGameType<T> type) {
-        registry.put(type.id(), type);
-        return type;
+        return FlounderGameTypeRegistry.register(type);
     }
 
-    // TODO - check if this breaks anything
     public static <T extends IFlounderGame> FlounderGameType<T> create(Identifier id) {
         FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id).build();
         return registerType(type);
@@ -93,11 +91,19 @@ public class FlounderApi {
         return registerType(type);
     }
 
-    public static Map<Identifier, FlounderGameType<?>> getRegistry() {
-        return registry;
+    public static Registry<FlounderGameType<?>> getRegistry() {
+        return FlounderGameTypeRegistry.getRegistry();
     }
 
-    public static FlounderServerGameManager getFlounderGameManager(ServerWorld serverWorld) {
+    public static FlounderGameManager getFlounderGameManager(World world) {
+        if(world.isClient) {
+            return ((FlounderClientWorld) world).flounderlib$getFlounderClientGameManager();
+        } else {
+            return ((FlounderServerWorld) world).flounderlib$getFlounderGameManager();
+        }
+    }
+
+    public static FlounderServerGameManager getFlounderServerGameManager(ServerWorld serverWorld) {
         return ((FlounderServerWorld) serverWorld).flounderlib$getFlounderGameManager();
     }
 

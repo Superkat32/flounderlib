@@ -244,7 +244,7 @@ public class FlounderDataTracker {
         }
 
         public void write(RegistryByteBuf buf) {
-            int handlerId = FlTrackedDataHandlerRegistry.handlerRegistry.getRawId(this.handler);
+            int handlerId = FlTrackedDataHandlerRegistry.HANDLER_REGISTRY.getRawId(this.handler);
             buf.writeByte(this.entryId);
             buf.writeVarInt(handlerId);
             this.handler().codec().encode(buf, this.value);
@@ -252,7 +252,7 @@ public class FlounderDataTracker {
 
         public static SerializedEntry<?> fromBuf(RegistryByteBuf buf, int entryId) {
             int handlerId = buf.readVarInt();
-            FlTrackedDataHandler<?> handler = FlTrackedDataHandlerRegistry.handlerRegistry.get(handlerId);
+            FlTrackedDataHandler<?> handler = FlTrackedDataHandlerRegistry.HANDLER_REGISTRY.get(handlerId);
             if(handler == null) {
                 throw new DecoderException("Unknown FlTrackedDataHandler type " + handlerId);
             } else {

@@ -10,4 +10,15 @@ public interface FlounderGameManager {
 
     Map<Integer, IFlounderGame> getGames();
 
+    boolean isClient();
+
+    default int getMinigameIntId(IFlounderGame game) {
+        for (Map.Entry<Integer, IFlounderGame> entry : this.getGames().entrySet()) {
+            IFlounderGame entryGame = entry.getValue();
+            if(!entryGame.equals(game)) continue;
+            return entry.getKey();
+        }
+        return -1;
+    }
+
 }

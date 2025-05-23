@@ -7,7 +7,7 @@ import net.superkat.flounderlib.api.IFlounderGame;
 
 import java.util.Map;
 
-public class FlounderClientGameManager {
+public class FlounderClientGameManager implements FlounderGameManager {
     public final ClientWorld world;
     public final Int2ObjectMap<IFlounderGame> games = new Int2ObjectOpenHashMap<>();
 
@@ -20,28 +20,24 @@ public class FlounderClientGameManager {
         this.games.put(intId, game);
     }
 
+    @Override
     public void tick() {
         for (IFlounderGame game : this.games.values()) {
             game.tick();
         }
-//        Iterator<IFlounderGame> iterator = this.games.values().iterator();
-//        while(iterator.hasNext()) {
-//            IFlounderGame game = iterator.next();
-//
-//            if(game.isInvalidated()) {
-//                iterator.remove();
-//            } else {
-//                game.tick();
-//            }
-//        }
     }
 
     public void removeGame(int intId) {
         this.games.remove(intId);
     }
 
+    @Override
     public Map<Integer, IFlounderGame> getGames() {
         return this.games;
     }
 
+    @Override
+    public boolean isClient() {
+        return true;
+    }
 }

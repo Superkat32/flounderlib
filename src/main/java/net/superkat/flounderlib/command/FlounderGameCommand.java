@@ -26,7 +26,7 @@ public class FlounderGameCommand {
     public static final SuggestionProvider<ServerCommandSource> AVAILABLE_MINIGAME_IDS = SuggestionProviders.register(
             Identifier.of(FlounderLib.MOD_ID, "available_minigame_ids"),
             (commandContext, suggestionsBuilder) -> {
-                Set<Identifier> idSet = FlounderApi.getRegistry().keySet();
+                Set<Identifier> idSet = FlounderApi.getRegistry().getIds();
                 return CommandSource.suggestIdentifiers(idSet, suggestionsBuilder);
             }
     );
@@ -90,7 +90,7 @@ public class FlounderGameCommand {
 
     public static int executeList(ServerCommandSource source) {
         ServerWorld world = source.getWorld();
-        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderServerGameManager(world);
         Map<Integer, IFlounderGame> map = manager.getGames();
 
         if(map == null || map.isEmpty()) {
@@ -116,7 +116,7 @@ public class FlounderGameCommand {
 
     public static int executeStop(ServerCommandSource source, int intId) {
         ServerWorld world = source.getWorld();
-        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderServerGameManager(world);
         Map<Integer, IFlounderGame> map = manager.getGames();
 
         if(map == null || map.isEmpty()) {
@@ -141,7 +141,7 @@ public class FlounderGameCommand {
 
     public static int stopAll(ServerCommandSource source) {
         ServerWorld world = source.getWorld();
-        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderServerGameManager(world);
         Map<Integer, IFlounderGame> games = manager.getGames();
 
         if(games == null || games.isEmpty()) {
@@ -159,7 +159,7 @@ public class FlounderGameCommand {
 
     public static int stopAll(ServerCommandSource source, Identifier id) {
         ServerWorld world = source.getWorld();
-        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderServerGameManager(world);
 
         int gameCount = 0;
         Map<Integer, IFlounderGame> games = manager.getGames();

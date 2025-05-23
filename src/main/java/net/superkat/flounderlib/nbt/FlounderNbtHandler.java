@@ -6,6 +6,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
@@ -27,7 +28,7 @@ public class FlounderNbtHandler {
 
     @SuppressWarnings("unchecked")
     public static void serializeMinigames(Map<Integer, IFlounderGame> games, ServerWorld world, NbtCompound nbt) {
-        FlounderServerGameManager manager = FlounderApi.getFlounderGameManager(world);
+        FlounderServerGameManager manager = FlounderApi.getFlounderServerGameManager(world);
         if(manager == null) {
             FlounderLib.LOGGER.warn("Could not serialize minigames - FlounderGameManager was null!");
             return;
@@ -78,7 +79,7 @@ public class FlounderNbtHandler {
         Optional<NbtList> optionalList = nbt.getList(GAMES_LIST_ID);
         if(optionalList.isEmpty()) return null;
 
-        Map<Identifier, FlounderGameType<?>> registry = FlounderApi.getRegistry();
+        Registry<FlounderGameType<?>> registry = FlounderApi.getRegistry();
         Map<Integer, IFlounderGame> gameMap = Maps.newHashMap();
         NbtList list = optionalList.get();
 
@@ -91,7 +92,7 @@ public class FlounderNbtHandler {
                 if(Objects.equals(key, GAME_INT_ID_ID)) continue;
 
                 Identifier gameId = Identifier.of(key);
-                if(!registry.containsKey(gameId)) {
+                if(!registry.containsId(gameId)) {
                     FlounderLib.LOGGER.warn("Unknown minigame id {} found when deserializing - skipping", key);
                     continue;
                 }

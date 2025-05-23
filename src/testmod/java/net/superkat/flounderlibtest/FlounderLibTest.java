@@ -10,6 +10,7 @@ import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlibtest.games.MoveQuicklyGame;
 import net.superkat.flounderlibtest.testgames.CodecMinigame;
 import net.superkat.flounderlibtest.testgames.TestMinigame;
+import net.superkat.flounderlibtest.testgames.TestRenderedMinigame;
 import net.superkat.flounderlibtest.testgames.TestSyncedMinigame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,9 +35,16 @@ public class FlounderLibTest implements ModInitializer {
             TestSyncedMinigame.PACKET_CODEC
     );
 
-    public static final FlounderGameType<MoveQuicklyGame> MOVE_QUICKLY_GAME = FlounderApi.createPersistent(
+    public static final FlounderGameType<TestRenderedMinigame> TEST_RENDERED_MINIGAME = FlounderApi.createPersistentSynced(
+            TestRenderedMinigame.ID,
+            TestRenderedMinigame.CODEC,
+            TestRenderedMinigame.PACKET_CODEC
+    );
+
+    public static final FlounderGameType<MoveQuicklyGame> MOVE_QUICKLY_GAME = FlounderApi.createPersistentSynced(
             MoveQuicklyGame.ID,
-            MoveQuicklyGame.CODEC
+            MoveQuicklyGame.CODEC,
+            MoveQuicklyGame.PACKET_CODEC
     );
 
     @Override
@@ -44,10 +52,6 @@ public class FlounderLibTest implements ModInitializer {
         ServerTickEvents.END_WORLD_TICK.register(world -> {
             for (ServerPlayerEntity player : world.getPlayers()) {
                 if (player.getItemUseTime() == 20) {
-//                    if(true) {
-//                        return;
-//                    }
-
                     TestMinigame myGame = new TestMinigame(player.getBlockPos());
                     FlounderApi.addGame(world, myGame);
 
@@ -56,6 +60,9 @@ public class FlounderLibTest implements ModInitializer {
 
                     TestSyncedMinigame alsoAlsoMyGame = new TestSyncedMinigame(player);
                     FlounderApi.addGame(world, alsoAlsoMyGame);
+
+                    TestRenderedMinigame testRenderedMinigame = new TestRenderedMinigame(player);
+                    FlounderApi.addGame(world, testRenderedMinigame);
 
                     if(player.isSneaking()) {
                         MoveQuicklyGame moveQuicklyGame = new MoveQuicklyGame(world, player);

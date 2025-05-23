@@ -12,6 +12,7 @@ import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.command.FlounderGameArgumentType;
 import net.superkat.flounderlib.command.FlounderGameCommand;
 import net.superkat.flounderlib.command.fun.RepoTextCommand;
+import net.superkat.flounderlib.minigame.FlounderGameManager;
 import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 import net.superkat.flounderlib.network.FlounderPackets;
 import org.slf4j.Logger;
@@ -37,13 +38,13 @@ public class FlounderLib implements ModInitializer {
 		});
 
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
-			FlounderServerGameManager flounderGameManager = FlounderApi.getFlounderGameManager(world);
+			FlounderGameManager flounderGameManager = FlounderApi.getFlounderGameManager(world);
 			flounderGameManager.tick();
 		});
 
 		ServerLifecycleEvents.BEFORE_SAVE.register((server, flush, force) -> {
 			for (ServerWorld world : server.getWorlds()) {
-				FlounderServerGameManager flounderGameManager = FlounderApi.getFlounderGameManager(world);
+				FlounderServerGameManager flounderGameManager = FlounderApi.getFlounderServerGameManager(world);
 				flounderGameManager.markDirty();
 			}
 		});
