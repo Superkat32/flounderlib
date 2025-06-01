@@ -13,6 +13,7 @@ public class FlounderGameTypeBuilder<T extends IFlounderGame> {
     private Codec<T> persistentCodec = null;
     @Nullable
     private PacketCodec<RegistryByteBuf, T> packetCodec;
+    private int allowedActiveInstances = Integer.MAX_VALUE;
     private int searchDist = 96;
 
     public FlounderGameTypeBuilder(Identifier id) {
@@ -34,8 +35,17 @@ public class FlounderGameTypeBuilder<T extends IFlounderGame> {
         return this;
     }
 
+    public FlounderGameTypeBuilder<T> setAllowedActiveInstances(int allowedActiveInstances) {
+        this.allowedActiveInstances = allowedActiveInstances;
+        return this;
+    }
+
+    public FlounderGameTypeBuilder<T> setToSingleton() {
+        return this.setAllowedActiveInstances(1);
+    }
+
     public FlounderGameType<T> build() {
-        return new FlounderGameType<>(id, persistentCodec, packetCodec, searchDist);
+        return new FlounderGameType<>(id, persistentCodec, packetCodec, allowedActiveInstances, searchDist);
     }
 
 }

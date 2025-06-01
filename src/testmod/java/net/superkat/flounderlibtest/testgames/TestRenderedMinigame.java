@@ -27,6 +27,7 @@ public class TestRenderedMinigame extends FlounderGame implements SyncedFlounder
                     Uuids.CODEC.fieldOf("playerId").forGetter(game -> game.playerUuid)
             ).apply(instance, TestRenderedMinigame::new)
     );
+
     public static final PacketCodec<RegistryByteBuf, TestRenderedMinigame> PACKET_CODEC = PacketCodec.tuple(
             PacketCodecs.INTEGER, game -> game.ticks,
             Uuids.PACKET_CODEC, game -> game.playerUuid,
@@ -65,12 +66,6 @@ public class TestRenderedMinigame extends FlounderGame implements SyncedFlounder
         if(this.ticks >= 300) {
             this.invalidate();
         }
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        this.removeAllListeners();
     }
 
     @Override

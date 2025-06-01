@@ -94,12 +94,6 @@ public class TestSyncedMinigame extends FlounderGame implements SyncedFlounderGa
     }
 
     @Override
-    public void invalidate() {
-        super.invalidate();
-        this.removeAllListeners();
-    }
-
-    @Override
     public FlounderDataTracker getFlounderDataTracker() {
         return this.dataTracker;
     }

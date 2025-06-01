@@ -34,6 +34,11 @@ public interface IFlounderGame {
     void invalidate();
 
     /**
+     * Internal method for specific minigames (e.g. {@link net.superkat.flounderlib.api.minigame.SyncedFlounderGame}) to call required code.
+     */
+    default void onInvalidate() {}
+
+    /**
      * Called every tick to see if this minigame is ready to be removed from the {@link FlounderServerGameManager}.<br>
      * Once removed, your game will stop ticking and will be assumed as finished.<br>
      * Return true if it should be removed, otherwise return false.

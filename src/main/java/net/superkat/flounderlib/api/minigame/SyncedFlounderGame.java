@@ -5,6 +5,7 @@ import net.superkat.flounderlib.api.sync.FlounderDataTracker;
 
 public interface SyncedFlounderGame extends IFlounderGame {
 
+
     void initDataTracker(FlounderDataTracker.Builder builder);
 
     FlounderDataTracker getFlounderDataTracker();
@@ -21,7 +22,11 @@ public interface SyncedFlounderGame extends IFlounderGame {
         dataTracker.tick();
     }
 
-    // TODO - make this happen by default with invalidation because expecting the user to do it themselves is ridiculous
+    @Override
+    default void onInvalidate() {
+        this.removeAllListeners();
+    }
+
     default void removeAllListeners() {
         FlounderDataTracker dataTracker = this.getFlounderDataTracker();
         dataTracker.removeAllListeners();

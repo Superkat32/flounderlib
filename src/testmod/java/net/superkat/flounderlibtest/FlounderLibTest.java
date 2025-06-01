@@ -7,7 +7,6 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.minigame.listener.FlounderGameListener;
 import net.superkat.flounderlibtest.games.MoveQuicklyGame;
 import net.superkat.flounderlibtest.testgames.CodecMinigame;
 import net.superkat.flounderlibtest.testgames.TestMinigame;
@@ -41,7 +40,6 @@ public class FlounderLibTest implements ModInitializer {
             TestRenderedMinigame.CODEC,
             TestRenderedMinigame.PACKET_CODEC
     );
-    public static final FlounderGameListener<TestRenderedMinigame> TEST_RENDERED_MINIGAME_LISTENER = FlounderApi.registerListener(TEST_RENDERED_MINIGAME);
 
     @Override
     public void onInitialize() {

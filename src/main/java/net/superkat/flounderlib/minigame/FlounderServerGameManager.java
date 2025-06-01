@@ -30,7 +30,7 @@ public class FlounderServerGameManager extends PersistentState implements Flound
     public static PersistentStateType<FlounderServerGameManager> getPersistentStateType(ServerWorld world) {
         return new PersistentStateType<>(
                 ID,
-                FlounderServerGameManager::new,
+                () -> new FlounderServerGameManager(world),
                 getCodec(world),
                 null
         );
@@ -53,21 +53,24 @@ public class FlounderServerGameManager extends PersistentState implements Flound
                 Map<Integer, IFlounderGame> gameMap = FlounderNbtHandler.deserializeMinigames(world, nbt);
                 int next_id = nbt.getInt(NEXT_ID_ID, 0);
                 int ticks = nbt.getInt(TICKS_ID, 0);
-                return DataResult.success(Pair.of(new FlounderServerGameManager(gameMap, next_id, ticks), ops.empty()));
+                return DataResult.success(Pair.of(new FlounderServerGameManager(world, gameMap, next_id, ticks), ops.empty()));
             }
         });
     }
 
+    public final ServerWorld world;
     // Active, ticking minigames - only available when minigame(s) are running.
     public final Int2ObjectMap<IFlounderGame> games = new Int2ObjectOpenHashMap<>();
     public int nextId = 0;
     public int ticks = 0;
 
-    public FlounderServerGameManager() {
+    public FlounderServerGameManager(ServerWorld world) {
+        this.world = world;
         this.markDirty();
     }
 
-    public FlounderServerGameManager(Map<Integer, IFlounderGame> games, int nextId, int ticks) {
+    public FlounderServerGameManager(ServerWorld world, Map<Integer, IFlounderGame> games, int nextId, int ticks) {
+        this.world = world;
         if(games != null) {
             for (Map.Entry<Integer, IFlounderGame> entry : games.entrySet()) {
                 int intId = entry.getKey();
@@ -90,6 +93,7 @@ public class FlounderServerGameManager extends PersistentState implements Flound
             if(game.isInvalidated()) {
                 iterator.remove();
                 this.markDirty();
+                this.onMinigameRemove(this.world, game);
             } else {
                 game.tick();
             }
@@ -100,21 +104,14 @@ public class FlounderServerGameManager extends PersistentState implements Flound
         }
     }
 
-    public void addGame(ServerWorld world, IFlounderGame game) {
+    public void addGame(IFlounderGame game) {
         int intId = this.getNextId();
-        game.initialize(world, intId);
+        game.initialize(this.world, intId);
         this.games.put(intId, game);
         this.markDirty();
-    }
 
-//    public int getMinigameIntId(IFlounderGame game) {
-//        for (Int2ObjectMap.Entry<IFlounderGame> entry : this.games.int2ObjectEntrySet()) {
-//            IFlounderGame entryGame = entry.getValue();
-//            if(!entryGame.equals(game)) continue;
-//            return entry.getIntKey();
-//        }
-//        return -1;
-//    }
+        this.onMinigameCreate(this.world, game);
+    }
 
     private int getNextId() {
         return this.nextId++;

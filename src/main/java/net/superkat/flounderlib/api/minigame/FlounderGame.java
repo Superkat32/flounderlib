@@ -23,6 +23,7 @@ public abstract class FlounderGame implements IFlounderGame {
     @Override
     public void invalidate() {
         this.invalidated = true;
+        this.onInvalidate();
     }
 
     @Override
