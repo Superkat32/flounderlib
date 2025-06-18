@@ -8,8 +8,8 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
 import net.minecraft.world.World;
+import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
 import net.superkat.flounderlib.api.sync.FlTrackedData;
 import net.superkat.flounderlib.api.sync.FlTrackedDataHandlers;
 import net.superkat.flounderlib.api.sync.FlounderDataTracker;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class TestSyncedMinigame extends FlounderGame implements SyncedFlounderGame {
+public class TestSyncedMinigame extends FlounderGame implements DataTrackedSyncedFlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_synced_minigame");
 
     public static final Codec<TestSyncedMinigame> CODEC = RecordCodecBuilder.create(

@@ -10,15 +10,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
 import net.minecraft.world.World;
+import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
 import net.superkat.flounderlib.api.sync.FlounderDataTracker;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class TestRenderedMinigame extends FlounderGame implements SyncedFlounderGame {
+public class TestRenderedMinigame extends FlounderGame implements DataTrackedSyncedFlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_rendered_minigame");
 
     public static final Codec<TestRenderedMinigame> CODEC = RecordCodecBuilder.create(

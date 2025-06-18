@@ -19,8 +19,8 @@ import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
+import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
 import net.superkat.flounderlib.api.sync.FlTrackedData;
 import net.superkat.flounderlib.api.sync.FlTrackedDataHandlers;
 import net.superkat.flounderlib.api.sync.FlounderDataTracker;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class MoveQuicklyGame extends FlounderGame implements SyncedFlounderGame {
+public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "move_quickly_game");
 
     public static final Codec<MoveQuicklyGame> CODEC = RecordCodecBuilder.create(

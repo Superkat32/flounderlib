@@ -31,7 +31,7 @@ public class FlTrackedDataHandlers {
     public static final FlTrackedDataHandler<BlockPos> BLOCK_POS = createAndRegister(BlockPos.PACKET_CODEC, "block_pos");
     public static final FlTrackedDataHandler<Vector3f> VECTOR_3f = createAndRegister(PacketCodecs.VECTOR_3F, "vector_3f");
 
-    public static <T> FlTrackedDataHandler<T> createAndRegister(PacketCodec<? super RegistryByteBuf, T> packetCodec, String name) {
+    private static <T> FlTrackedDataHandler<T> createAndRegister(PacketCodec<? super RegistryByteBuf, T> packetCodec, String name) {
         return createAndRegister(packetCodec, Identifier.of(FlounderLib.MOD_ID, name));
     }
 

@@ -15,10 +15,10 @@ public class TestRenderedMinigameHud {
 
     public static void render(DrawContext context, RenderTickCounter counter) {
         int index = 0;
-        for (TestRenderedMinigame game : FlounderLibTest.TEST_RENDERED_MINIGAME.getActiveGames()) {
-            renderGame(game, context, counter, index);
-            index++;
-        }
+//        for (TestRenderedMinigame game : FlounderLibTest.TEST_RENDERED_MINIGAME.getActiveGames()) {
+//            renderGame(game, context, counter, index);
+//            index++;
+//        }
     }
 
     public static void renderGame(TestRenderedMinigame game, DrawContext context, RenderTickCounter counter, int index) {

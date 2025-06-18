@@ -2,6 +2,7 @@ package net.superkat.flounderlib.api;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
+import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
 import net.superkat.flounderlib.minigame.FlounderServerGameManager;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +35,7 @@ public interface IFlounderGame {
     void invalidate();
 
     /**
-     * Internal method for specific minigames (e.g. {@link net.superkat.flounderlib.api.minigame.SyncedFlounderGame}) to call required code.
+     * Internal method for specific minigames (e.g. {@link DataTrackedSyncedFlounderGame}) to call required code.
      */
     default void onInvalidate() {}
 

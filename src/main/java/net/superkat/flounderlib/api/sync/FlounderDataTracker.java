@@ -8,7 +8,7 @@ import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.collection.Class2IntMap;
-import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
+import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.network.sync.FlTrackedDataHandler;
 import net.superkat.flounderlib.network.sync.FlTrackedDataHandlerRegistry;
 import net.superkat.flounderlib.network.sync.packets.FlounderDataTrackerUpdateS2CPacket;
@@ -25,17 +25,17 @@ import java.util.Set;
 public class FlounderDataTracker {
     private static final Class2IntMap CLASS_TO_LAST_ID = new Class2IntMap();
 
-    private final SyncedFlounderGame trackedGame;
+    private final DataTrackedSyncedFlounderGame trackedGame;
     private final FlounderDataTracker.Entry<?>[] entries;
     private final Set<PlayerAssociatedNetworkHandler> listeners = Sets.newIdentityHashSet();
     private boolean dirty = true;
 
-    public FlounderDataTracker(SyncedFlounderGame trackedGame, FlounderDataTracker.Entry<?>[] entries) {
+    public FlounderDataTracker(DataTrackedSyncedFlounderGame trackedGame, FlounderDataTracker.Entry<?>[] entries) {
         this.trackedGame = trackedGame;
         this.entries = entries;
     }
 
-    public static <T>FlTrackedData<T> registerData(Class<? extends SyncedFlounderGame> minigameClass, FlTrackedDataHandler<T> handler) {
+    public static <T>FlTrackedData<T> registerData(Class<? extends DataTrackedSyncedFlounderGame> minigameClass, FlTrackedDataHandler<T> handler) {
         int dataId = CLASS_TO_LAST_ID.put(minigameClass);
         if(dataId > 254) {
             // idk why 254 is max but I'm guessing it's something to do with packet sizes?
@@ -174,10 +174,10 @@ public class FlounderDataTracker {
     }
 
     public static class Builder {
-        private final SyncedFlounderGame trackedGame;
+        private final DataTrackedSyncedFlounderGame trackedGame;
         private final FlounderDataTracker.Entry<?>[] entries;
 
-        public Builder(SyncedFlounderGame trackedGame) {
+        public Builder(DataTrackedSyncedFlounderGame trackedGame) {
             this.trackedGame = trackedGame;
             this.entries = new FlounderDataTracker.Entry[FlounderDataTracker.CLASS_TO_LAST_ID.getNext(trackedGame.getClass())];
         }

@@ -7,11 +7,9 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlibtest.games.MoveQuicklyGame;
 import net.superkat.flounderlibtest.testgames.CodecMinigame;
+import net.superkat.flounderlibtest.testgames.RealTestSyncedMinigame;
 import net.superkat.flounderlibtest.testgames.TestMinigame;
-import net.superkat.flounderlibtest.testgames.TestRenderedMinigame;
-import net.superkat.flounderlibtest.testgames.TestSyncedMinigame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,16 +27,22 @@ public class FlounderLibTest implements ModInitializer {
             CodecMinigame.CODEC
     );
 
-    public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
-            TestSyncedMinigame.ID,
-            TestSyncedMinigame.CODEC,
-            TestSyncedMinigame.PACKET_CODEC
-    );
+//    public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
+//            TestSyncedMinigame.ID,
+//            TestSyncedMinigame.CODEC,
+//            TestSyncedMinigame.PACKET_CODEC
+//    );
+//
+//    public static final FlounderGameType<TestRenderedMinigame> TEST_RENDERED_MINIGAME = FlounderApi.createPersistentSynced(
+//            TestRenderedMinigame.ID,
+//            TestRenderedMinigame.CODEC,
+//            TestRenderedMinigame.PACKET_CODEC
+//    );
 
-    public static final FlounderGameType<TestRenderedMinigame> TEST_RENDERED_MINIGAME = FlounderApi.createPersistentSynced(
-            TestRenderedMinigame.ID,
-            TestRenderedMinigame.CODEC,
-            TestRenderedMinigame.PACKET_CODEC
+    public static final FlounderGameType<RealTestSyncedMinigame> REAL_TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
+            RealTestSyncedMinigame.ID,
+            RealTestSyncedMinigame.CODEC,
+            RealTestSyncedMinigame.PACKET_CODEC
     );
 
     @Override
@@ -54,15 +58,18 @@ public class FlounderLibTest implements ModInitializer {
                     CodecMinigame alsoMyGame = new CodecMinigame(player.getBlockPos());
                     FlounderApi.addGame(world, alsoMyGame);
 
-                    TestSyncedMinigame alsoAlsoMyGame = new TestSyncedMinigame(player);
-                    FlounderApi.addGame(world, alsoAlsoMyGame);
+                    RealTestSyncedMinigame reallyAlsoMyGame = new RealTestSyncedMinigame(player.getUuid());
+                    FlounderApi.addGame(world, reallyAlsoMyGame);
 
-                    TestRenderedMinigame testRenderedMinigame = new TestRenderedMinigame(player);
-                    FlounderApi.addGame(world, testRenderedMinigame);
+//                    TestSyncedMinigame alsoAlsoMyGame = new TestSyncedMinigame(player);
+//                    FlounderApi.addGame(world, alsoAlsoMyGame);
+//
+//                    TestRenderedMinigame testRenderedMinigame = new TestRenderedMinigame(player);
+//                    FlounderApi.addGame(world, testRenderedMinigame);
 
                     if(player.isSneaking()) {
-                        MoveQuicklyGame moveQuicklyGame = new MoveQuicklyGame(world, player);
-                        FlounderApi.addGame(world, moveQuicklyGame);
+//                        MoveQuicklyGame moveQuicklyGame = new MoveQuicklyGame(world, player);
+//                        FlounderApi.addGame(world, moveQuicklyGame);
                     }
 
                     player.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.MASTER, 1f, 1f);
