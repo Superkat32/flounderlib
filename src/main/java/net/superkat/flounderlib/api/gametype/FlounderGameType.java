@@ -1,7 +1,7 @@
 package net.superkat.flounderlib.api.gametype;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.network.RegistryByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.IFlounderGame;
@@ -15,7 +15,7 @@ import java.util.Map;
 public final class FlounderGameType<T extends IFlounderGame> {
     private final Identifier id;
     private final @Nullable Codec<T> codec;
-    private final @Nullable PacketCodec<RegistryByteBuf, T> packetCodec;
+    private final @Nullable PacketCodec<ByteBuf, T> packetCodec;
     private final int allowedActiveInstances;
     private final int searchDistance;
 
@@ -24,7 +24,7 @@ public final class FlounderGameType<T extends IFlounderGame> {
     public FlounderGameType(
             Identifier id,
             @Nullable Codec<T> codec,
-            @Nullable PacketCodec<RegistryByteBuf, T> packetCodec,
+            @Nullable PacketCodec<ByteBuf, T> packetCodec,
             int allowedActiveInstances,
             int searchDistance
     ) {
@@ -73,7 +73,7 @@ public final class FlounderGameType<T extends IFlounderGame> {
         return this.codec;
     }
 
-    public @Nullable PacketCodec<RegistryByteBuf, T> packetCodec() {
+    public @Nullable PacketCodec<ByteBuf, T> packetCodec() {
         return this.packetCodec;
     }
 

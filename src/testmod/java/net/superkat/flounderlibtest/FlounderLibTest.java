@@ -8,8 +8,8 @@ import net.minecraft.sound.SoundEvents;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlibtest.testgames.CodecMinigame;
-import net.superkat.flounderlibtest.testgames.RealTestSyncedMinigame;
 import net.superkat.flounderlibtest.testgames.TestMinigame;
+import net.superkat.flounderlibtest.testgames.TestSyncedMinigame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +39,10 @@ public class FlounderLibTest implements ModInitializer {
 //            TestRenderedMinigame.PACKET_CODEC
 //    );
 
-    public static final FlounderGameType<RealTestSyncedMinigame> REAL_TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
-            RealTestSyncedMinigame.ID,
-            RealTestSyncedMinigame.CODEC,
-            RealTestSyncedMinigame.PACKET_CODEC
+    public static final FlounderGameType<TestSyncedMinigame> REAL_TEST_SYNCED_MINIGAME = FlounderApi.createPersistentSynced(
+            TestSyncedMinigame.ID,
+            TestSyncedMinigame.CODEC,
+            TestSyncedMinigame.PACKET_CODEC
     );
 
     @Override
@@ -58,14 +58,8 @@ public class FlounderLibTest implements ModInitializer {
                     CodecMinigame alsoMyGame = new CodecMinigame(player.getBlockPos());
                     FlounderApi.addGame(world, alsoMyGame);
 
-                    RealTestSyncedMinigame reallyAlsoMyGame = new RealTestSyncedMinigame(player.getUuid());
+                    TestSyncedMinigame reallyAlsoMyGame = new TestSyncedMinigame(player.getUuid(), false, 0, 0);
                     FlounderApi.addGame(world, reallyAlsoMyGame);
-
-//                    TestSyncedMinigame alsoAlsoMyGame = new TestSyncedMinigame(player);
-//                    FlounderApi.addGame(world, alsoAlsoMyGame);
-//
-//                    TestRenderedMinigame testRenderedMinigame = new TestRenderedMinigame(player);
-//                    FlounderApi.addGame(world, testRenderedMinigame);
 
                     if(player.isSneaking()) {
 //                        MoveQuicklyGame moveQuicklyGame = new MoveQuicklyGame(world, player);

@@ -2,105 +2,94 @@ package net.superkat.flounderlibtest.testgames;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryByteBuf;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Uuids;
-import net.minecraft.world.World;
-import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.sync.FlTrackedData;
-import net.superkat.flounderlib.api.sync.FlTrackedDataHandlers;
-import net.superkat.flounderlib.api.sync.FlounderDataTracker;
+import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
+import net.superkat.flounderlib.api.sync.FlDataSyncer;
+import net.superkat.flounderlib.api.sync.FlounderDataSyncer;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class TestSyncedMinigame extends FlounderGame implements DataTrackedSyncedFlounderGame {
+public class TestSyncedMinigame extends FlounderGame implements SyncedFlounderGame<TestSyncedMinigame> {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_synced_minigame");
 
     public static final Codec<TestSyncedMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
-                    Uuids.CODEC.fieldOf("playerUuid").forGetter(game -> game.player)
+                    Uuids.CODEC.fieldOf("playerUuid").forGetter(game -> game.playerUuid),
+                    Codec.BOOL.fieldOf("test_bool").forGetter(game -> game.testBool),
+                    Codec.INT.fieldOf("test_int").forGetter(game -> game.testInt),
+                    Codec.FLOAT.fieldOf("test_float").forGetter(game -> game.testFloat)
             ).apply(instance, TestSyncedMinigame::new)
     );
 
-    public static final PacketCodec<RegistryByteBuf, TestSyncedMinigame> PACKET_CODEC = PacketCodec.tuple(
-            Uuids.PACKET_CODEC, game -> game.player, TestSyncedMinigame::new
+    public static final PacketCodec<ByteBuf, TestSyncedMinigame> PACKET_CODEC = PacketCodecs.unlimitedCodec(CODEC);
+//    public static final PacketCodec<RegistryByteBuf, TestSyncedMinigame> TEST = PacketCodec.tuple(
+//            PacketCodecs.BOOLEAN, game -> game.testBool, TestSyncedMinigame::new
+//    );
+
+    public static final FlounderDataSyncer<TestSyncedMinigame> DATA_SYNCER = new FlounderDataSyncer<>(
+            FlDataSyncer.tuple(Codec.BOOL, TestSyncedMinigame::isTestBool, TestSyncedMinigame::setTestBool),
+            FlDataSyncer.tuple(Codec.INT, TestSyncedMinigame::getTestInt, TestSyncedMinigame::setTestInt),
+            FlDataSyncer.tuple(Codec.FLOAT, TestSyncedMinigame::getTestFloat, TestSyncedMinigame::setTestFloat)
     );
 
-    public static final FlTrackedData<Boolean> MY_BOOLEAN = FlounderDataTracker.registerData(TestSyncedMinigame.class, FlTrackedDataHandlers.BOOLEAN);
-    public static final FlTrackedData<Integer> MY_INT = FlounderDataTracker.registerData(TestSyncedMinigame.class, FlTrackedDataHandlers.INTEGER);
-    public static final FlTrackedData<String> MY_STRING = FlounderDataTracker.registerData(TestSyncedMinigame.class, FlTrackedDataHandlers.STRING);
+    public boolean testBool;
+    public int testInt;
+    public float testFloat;
+    public final UUID playerUuid;
 
-    public final UUID player;
-    public final FlounderDataTracker dataTracker = this.createDataTracker();
-
-    // The main constructor when we want to start this minigame
-    public TestSyncedMinigame(ServerPlayerEntity player) {
-        this.player = player.getUuid();
-    }
-
-    // The persistent constructor when the minigame is reloaded upon world rejoin
-    // This also happens to be the packet constructor because the packet codec uses this constructor
-    public TestSyncedMinigame(UUID player) {
-        this.player = player;
-    }
-
-    // Defining specific data which should be synced between all listening client(s)
-    @Override
-    public void initDataTracker(FlounderDataTracker.Builder builder) {
-        builder.add(MY_BOOLEAN, false);
-        builder.add(MY_INT, 0);
-        builder.add(MY_STRING, "e");
-    }
-
-    @Override
-    public void initialize(World world, int minigameId) {
-        super.initialize(world, minigameId);
-        if(!this.world.isClient) {
-            this.dataTracker.addPlayerListener((ServerPlayerEntity) this.world.getPlayerByUuid(this.player));
-        }
+    public TestSyncedMinigame(UUID playerUuid, boolean testBool, int testInt, float testFloat) {
+        this.playerUuid = playerUuid;
+        this.testBool = testBool;
+        this.testInt = testInt;
+        this.testFloat = testFloat;
     }
 
     @Override
     public void tick() {
         super.tick();
-        this.tickDataTracker(this.world.isClient());
-
-        if(this.ticks % 80 == 0) {
-            boolean myBool = this.dataTracker.get(MY_BOOLEAN);
-            FlounderLibTest.LOGGER.info(String.valueOf(myBool));
-            this.dataTracker.set(MY_BOOLEAN, !myBool);
-
-            myBool = this.dataTracker.get(MY_BOOLEAN);
-            FlounderLibTest.LOGGER.info(String.valueOf(myBool));
-        }
-
-        if(this.ticks == 200) {
-            FlounderLibTest.LOGGER.info("what's up home homie buddy");
-            this.dataTracker.set(MY_INT, 200);
-        }
-
-        if(this.ticks == 290) {
-            this.dataTracker.set(MY_STRING, "What's up homie buddy?");
-        }
-
         if(this.ticks >= 300) {
             this.invalidate();
         }
     }
 
+    public boolean isTestBool() {
+        return testBool;
+    }
+
+    public void setTestBool(boolean testBool) {
+        this.testBool = testBool;
+    }
+
+    public int getTestInt() {
+        return testInt;
+    }
+
+    public void setTestInt(int testInt) {
+        this.testInt = testInt;
+    }
+
+    public float getTestFloat() {
+        return testFloat;
+    }
+
+    public void setTestFloat(float testFloat) {
+        this.testFloat = testFloat;
+    }
+
     @Override
-    public FlounderDataTracker getFlounderDataTracker() {
-        return this.dataTracker;
+    public FlounderDataSyncer<TestSyncedMinigame> getFlounderDataSyncer() {
+        return DATA_SYNCER;
     }
 
     @Override
     public @NotNull Identifier getIdentifier() {
         return ID;
     }
-
 }

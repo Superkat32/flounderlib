@@ -38,7 +38,7 @@ public class FlounderGameCommand {
 //                if(commandContext.getSource() instanceof ServerCommandSource serverCommandSource) {
 //                    ServerWorld world = serverCommandSource.getWorld();
 //                    FlounderGameManager manager = FlounderApi.getFlounderGameManager(world);
-//                    return CommandSource.suggestMatching(manager.getGamesMap().keySet().stream().map(Object::toString), suggestionsBuilder);
+//                    return CommandSource.suggestMatching(manager.getGamesMap().keySet().stream().entries(Object::toString), suggestionsBuilder);
 //                }
 //                return CommandSource.suggestMatching(List.of(), suggestionsBuilder);
 //            }

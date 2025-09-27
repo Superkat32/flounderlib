@@ -11,11 +11,13 @@ public record FlounderGameUpdateS2CPacket(int minigameId, NbtCompound nbt) imple
     public static final Identifier FLOUNDER_GAME_UPDATE_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_game_update");
     public static final CustomPayload.Id<FlounderGameUpdateS2CPacket> ID = new CustomPayload.Id<>(FLOUNDER_GAME_UPDATE_ID);
     public static final PacketCodec<RegistryByteBuf, FlounderGameUpdateS2CPacket> CODEC = PacketCodec.of(
-            FlounderGameUpdateS2CPacket::write, FlounderGameUpdateS2CPacket::new
+            FlounderGameUpdateS2CPacket::write, FlounderGameUpdateS2CPacket::fromBuf
     );
 
-    public FlounderGameUpdateS2CPacket(RegistryByteBuf buf) {
-        this(buf.readVarInt(), buf.readNbt());
+    public static FlounderGameUpdateS2CPacket fromBuf(RegistryByteBuf buf) {
+        int minigameId = buf.readVarInt();
+        NbtCompound nbt = buf.readNbt();
+        return new FlounderGameUpdateS2CPacket(minigameId, nbt);
     }
 
     public void write(RegistryByteBuf buf) {

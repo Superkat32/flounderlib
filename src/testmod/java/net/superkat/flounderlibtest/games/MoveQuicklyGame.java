@@ -19,18 +19,14 @@ import net.minecraft.util.Uuids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.Heightmap;
-import net.superkat.flounderlib.api.minigame.DataTrackedSyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.sync.FlTrackedData;
-import net.superkat.flounderlib.api.sync.FlTrackedDataHandlers;
-import net.superkat.flounderlib.api.sync.FlounderDataTracker;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
-public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFlounderGame {
+public class MoveQuicklyGame extends FlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "move_quickly_game");
 
     public static final Codec<MoveQuicklyGame> CODEC = RecordCodecBuilder.create(
@@ -56,10 +52,6 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
             MoveQuicklyGame::new
     );
 
-    public static final FlTrackedData<BlockPos> TARGET_POS = FlounderDataTracker.registerData(MoveQuicklyGame.class, FlTrackedDataHandlers.BLOCK_POS);
-
-    public FlounderDataTracker dataTracker = this.createDataTracker();
-
     public final UUID playerUuid;
     public BlockPos start;
     public BlockPos end;
@@ -77,7 +69,6 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
         this.playerUuid = player.getUuid();
 
         this.startRound();
-        this.dataTracker = createDataTracker();
     }
 
     public MoveQuicklyGame(UUID playerUuid, BlockPos start, BlockPos end, int ticksRemaining, int completedRounds, boolean ended, int ticksSinceEnd) {
@@ -88,11 +79,6 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
         this.completedRounds = completedRounds;
         this.ended = ended;
         this.ticksSinceEnd = ticksSinceEnd;
-    }
-
-    @Override
-    public void initDataTracker(FlounderDataTracker.Builder builder) {
-        builder.add(TARGET_POS, this.end);
     }
 
     public void startRound() {
@@ -106,7 +92,6 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
         int z = this.start.getZ() + random.nextBetween(-100, 100);
         int y = world.getTopY(Heightmap.Type.WORLD_SURFACE, x, z) + 1;
         this.end = new BlockPos(x, y, z);
-        this.dataTracker.set(TARGET_POS, this.end);
 
         player.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_RESONATE, SoundCategory.PLAYERS, 1f, 1f);
         this.calcDistance();
@@ -135,7 +120,7 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
         }
 
         if(!this.ended && this.ticks % 5 == 0) {
-            BlockPos target = this.dataTracker.get(TARGET_POS);
+            BlockPos target = BlockPos.ORIGIN;
             this.world.addParticleClient(
                     ParticleTypes.TRIAL_SPAWNER_DETECTION,
                     target.getX() + this.world.getRandom().nextGaussian(),
@@ -214,7 +199,7 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
 
     public void calcDistance() {
         PlayerEntity player = this.getPlayer();
-        this.distance = (int) Math.sqrt(player.getBlockPos().getSquaredDistance(this.dataTracker.get(TARGET_POS)));
+        this.distance = (int) Math.sqrt(player.getBlockPos().getSquaredDistance(BlockPos.ORIGIN));
         int secondsLeft = this.ticksRemaining / 20;
 
         boolean withinDistance = withinDistance();
@@ -232,11 +217,6 @@ public class MoveQuicklyGame extends FlounderGame implements DataTrackedSyncedFl
     @Nullable
     public PlayerEntity getPlayer() {
         return this.world.getPlayerByUuid(this.playerUuid);
-    }
-
-    @Override
-    public FlounderDataTracker getFlounderDataTracker() {
-        return this.dataTracker;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package net.superkat.flounderlib.api;
 
 import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
@@ -24,12 +25,13 @@ import net.superkat.flounderlib.minigame.registry.FlounderGameTypeRegistry;
  */
 public class FlounderApi {
     /**
-     * Add a minigame to a world. This will begin ticking the minigame
+     * Add a minigame to the world and start ticking it.<br><br>
      *
-     * @param world The ServerWorld the minigame is in.
+     * This is the entry method to allow FlounderLib to start handling your game, while still allowing your game class to have a custom constructor.
+     *
+     * @param world The ServerWorld the minigame is in
      * @param game The minigame to add
      */
-    // Called to add a minigame, starting it to tick & be managed by FlounderLib
     public static void addGame(ServerWorld world, IFlounderGame game) {
         FlounderServerGameManager manager = getFlounderServerGameManager(world);
 
@@ -37,7 +39,7 @@ public class FlounderApi {
     }
 
     /**
-     * End a minigame. Calls the minigames {@link IFlounderGame#invalidate()} method.
+     * End a minigame by calling its {@link IFlounderGame#invalidate()} method.
      *
      * @param game The minigame to end
      */
@@ -52,6 +54,20 @@ public class FlounderApi {
     public static int bruteForceGetMinigameIntId(ServerWorld world, IFlounderGame game) {
         FlounderGameManager manager = getFlounderGameManager(world);
         return manager.getMinigameIntId(game);
+    }
+
+
+
+    public static FlounderGameManager getFlounderGameManager(World world) {
+        if(world.isClient) {
+            return ((FlounderClientWorld) world).flounderlib$getFlounderClientGameManager();
+        } else {
+            return ((FlounderServerWorld) world).flounderlib$getFlounderGameManager();
+        }
+    }
+
+    public static FlounderServerGameManager getFlounderServerGameManager(ServerWorld serverWorld) {
+        return ((FlounderServerWorld) serverWorld).flounderlib$getFlounderGameManager();
     }
 
 
@@ -73,7 +89,7 @@ public class FlounderApi {
         return registerType(type);
     }
 
-    public static <T extends SyncedFlounderGame> FlounderGameType<T> createSynced(
+    public static <T extends SyncedFlounderGame<?>> FlounderGameType<T> createSynced(
             Identifier id,
             PacketCodec<RegistryByteBuf, T> packetCodec
     ) {
@@ -81,9 +97,9 @@ public class FlounderApi {
         return registerType(type);
     }
 
-    public static <T extends SyncedFlounderGame> FlounderGameType<T> createPersistentSynced(
+    public static <T extends SyncedFlounderGame<?>> FlounderGameType<T> createPersistentSynced(
             Identifier id, Codec<T> persistentCodec,
-            PacketCodec<RegistryByteBuf, T> packetCodec
+            PacketCodec<ByteBuf, T> packetCodec
     ) {
         FlounderGameType<T> type = new FlounderGameTypeBuilder<T>(id)
                 .setPersistentCodec(persistentCodec)
@@ -93,18 +109,6 @@ public class FlounderApi {
 
     public static Registry<FlounderGameType<?>> getRegistry() {
         return FlounderGameTypeRegistry.getRegistry();
-    }
-
-    public static FlounderGameManager getFlounderGameManager(World world) {
-        if(world.isClient) {
-            return ((FlounderClientWorld) world).flounderlib$getFlounderClientGameManager();
-        } else {
-            return ((FlounderServerWorld) world).flounderlib$getFlounderGameManager();
-        }
-    }
-
-    public static FlounderServerGameManager getFlounderServerGameManager(ServerWorld serverWorld) {
-        return ((FlounderServerWorld) serverWorld).flounderlib$getFlounderGameManager();
     }
 
 }
