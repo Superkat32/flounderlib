@@ -19,7 +19,7 @@ public class FlounderLibTest implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static final FlounderGameType<ExampleMinigame> EXAMPLE_MINIGAME_TYPE = FlounderApi.register(
-            FlounderGameTypeBuilder.createSimple(ExampleMinigame.ID)
+            FlounderGameTypeBuilder.createPersistent(ExampleMinigame.ID, ExampleMinigame.CODEC)
     );
 
     public static final FlounderGameType<TestMinigame> TEST_MINIGAME_TYPE = FlounderApi.register(

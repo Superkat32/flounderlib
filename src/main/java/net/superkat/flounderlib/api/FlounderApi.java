@@ -16,7 +16,7 @@ public class FlounderApi {
     // region Minigame Management
 
     public static FlounderGameStartResult startMinigame(ServerWorld world, FlounderableGame game) {
-        if(canStartMinigame(world, game.getGameType(), game.getCenterBlockPos())) {
+        if(canStartMinigame(world, game.getGameType(), game.getCenterPos())) {
             addMinigame(world, game);
             return FlounderGameStartResult.SUCCESS;
         } else {

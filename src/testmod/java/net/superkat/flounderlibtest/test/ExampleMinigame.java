@@ -22,7 +22,7 @@ public class ExampleMinigame extends FlounderGame {
     public static final Codec<ExampleMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("ticks").forGetter(game -> game.ticks),
-                    BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerBlockPos),
+                    BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos),
                     Codec.BOOL.fieldOf("myBoolean").forGetter(game -> game.myBoolean),
                     Codec.INT.fieldOf("myInteger").forGetter(game -> game.myInteger),
                     Codec.STRING.fieldOf("myString").forGetter(game -> game.myString),
@@ -37,12 +37,14 @@ public class ExampleMinigame extends FlounderGame {
     public Vec3d myVec3d = Vec3d.ZERO;
     public Text myText = Text.translatable("item.minecraft.spyglass");
 
-    public ExampleMinigame(BlockPos centerBlockPos) {
-        super(centerBlockPos);
+    // The main constructor for when we want to first start the minigame
+    public ExampleMinigame(BlockPos centerPos) {
+        super(centerPos);
     }
 
-    public ExampleMinigame(int ticks, BlockPos centerBlockPos, Boolean myBoolean, int myInteger, String myString, Vec3d myVec3d, Text myText) {
-        super(ticks, centerBlockPos);
+    // The persistent constructor for when the minigame is reloaded upon world rejoin
+    public ExampleMinigame(int ticks, BlockPos centerPos, Boolean myBoolean, int myInteger, String myString, Vec3d myVec3d, Text myText) {
+        super(ticks, centerPos);
         this.myBoolean = myBoolean;
         this.myInteger = myInteger;
         this.myString = myString;
@@ -54,17 +56,21 @@ public class ExampleMinigame extends FlounderGame {
     public void tick() {
         super.tick();
 
+        // Every second, send the player a randomly generated message
         if(this.ticks % 20 == 0) {
+            // Let the first message be the spyglass item translation, then generate random messages
             if(this.ticks != 20) {
                 this.myText = Text.literal(NameGenerator.name(UUID.randomUUID()));
             }
 
+            // Send all players the message
             for (ServerPlayerEntity player : this.getPlayers()) {
                 player.sendMessage(this.myText);
             }
 
         }
 
+        // After 300 ticks, or 15 seconds, end the minigame by invalidating it
         if (this.ticks >= 300) {
             this.invalidate();
         }
@@ -74,6 +80,7 @@ public class ExampleMinigame extends FlounderGame {
     public void addPlayer(ServerPlayerEntity player) {
         super.addPlayer(player);
 
+        // Send the player a joining message
         player.sendMessage(Text.literal("Joined minigame!").formatted(Formatting.GREEN), true);
     }
 
@@ -81,11 +88,13 @@ public class ExampleMinigame extends FlounderGame {
     public void removePlayer(ServerPlayerEntity player) {
         super.removePlayer(player);
 
+        // Send the player a leaving message
         player.sendMessage(Text.literal("Left minigame!").formatted(Formatting.RED), true);
     }
 
     @Override
     public void invalidate() {
+        // Send all in the minigame players a message that the game has ended
         for (ServerPlayerEntity player : this.getPlayers()) {
             player.sendMessage(Text.literal("Minigame ended!"), true);
         }

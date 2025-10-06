@@ -4,6 +4,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,8 +34,17 @@ public interface FlounderableGame {
      */
     void tick();
 
+    /**
+     * Called when the game should be removed. This can happen forcefully via {@link FlounderApi#endMinigame(FlounderableGame)} & commands, or can happen naturally through your game logic(e.g.{@link FlounderableGame#tick()} method).<br><br>
+     * Think of it as your last chance to clean up after yourself(e.g. remove entities, teleport players, etc.), because after this, the minigame will be removed and will no longer tick.
+     */
     void invalidate();
 
+    /**
+     * Called every tick to see if this minigame is ready to be removed from the {@link net.superkat.flounderlib.minigame.FlounderGameManager}.<br>
+     * Once removed, your game will stop ticking and will be assumed as finished.<br>
+     * @return True if your game is ready to be removed, otherwise return false.
+     */
     boolean isInvalidated();
 
     /**
@@ -47,8 +57,19 @@ public interface FlounderableGame {
      */
     Set<UUID> getPlayerUuids();
 
-    BlockPos getCenterBlockPos();
+    /**
+     * The center BlockPos of this minigame, used for tracking and determining spacing between other minigames wanting to start.<br><br>
+     *
+     * If using {@link FlounderGame}, this, along with {@link FlounderGame#playerSearchDistance()}, will be used to determine when players are considered within bounds.
+     *
+     * @return The center BlockPos of this minigame.
+     */
+    BlockPos getCenterPos();
 
+    /**
+     * @param pos The checked BlockPos.
+     * @return True if this minigame's bounds contains the BlockPos.
+     */
     boolean containsBlockPos(BlockPos pos);
 
     /**
@@ -58,6 +79,11 @@ public interface FlounderableGame {
      */
     int getMinigameId();
 
+    /**
+     * The minigame's unique {@link FlounderGameType}. This is used for various default data, and tracking & saving the minigame(if it should be saved).
+     *
+     * @return The minigame's unique FlounderGameType
+     */
     @NotNull
     FlounderGameType<?> getGameType();
 

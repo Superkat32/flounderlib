@@ -21,7 +21,7 @@ public class TestMinigame extends FlounderGame {
     public static final Codec<TestMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("ticks").forGetter(game -> game.ticks),
-                    BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerBlockPos),
+                    BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos),
                     Codec.BOOL.fieldOf("test").forGetter(game -> game.test)
             ).apply(instance, TestMinigame::new)
     );
@@ -56,7 +56,7 @@ public class TestMinigame extends FlounderGame {
             for (ServerPlayerEntity player : this.getPlayers()) {
                 player.sendMessage(Text.literal("In minigame " + this.getMinigameId()), true);
             }
-            this.world.spawnParticles(ParticleTypes.END_ROD, this.centerBlockPos.getX(), this.centerBlockPos.getY() + 1, this.centerBlockPos.getZ(), 1, 0, 0, 0, 0);
+            this.world.spawnParticles(ParticleTypes.END_ROD, this.centerPos.getX(), this.centerPos.getY() + 1, this.centerPos.getZ(), 1, 0, 0, 0, 0);
             this.spawnBorderParticles();
         }
     }
@@ -67,9 +67,9 @@ public class TestMinigame extends FlounderGame {
         for (int i = 0; i < rangeTimesALotOfDigits; i++) {
             float h = this.world.getRandom().nextFloat() * (float) (Math.PI * 2);
             float k = MathHelper.sqrt(this.world.getRandom().nextFloat()) * range;
-            double x = this.centerBlockPos.getX() + (double)(MathHelper.cos(h) * range);
-            double y = this.centerBlockPos.getY();
-            double z = this.centerBlockPos.getZ() + (double)(MathHelper.sin(h) * range);
+            double x = this.centerPos.getX() + (double)(MathHelper.cos(h) * range);
+            double y = this.centerPos.getY();
+            double z = this.centerPos.getZ() + (double)(MathHelper.sin(h) * range);
             this.world.spawnParticles(this.getBorderParticle(), x, y + 1, z, 1, 0, 0, 0, 0);
         }
     }

@@ -12,20 +12,32 @@ import java.util.UUID;
 
 public abstract class FlounderGame implements FlounderableGame {
     public ServerWorld world;
-    public BlockPos centerBlockPos;
+    public BlockPos centerPos;
     private int minigameId;
 
     public int ticks = 0;
     public boolean invalidated = false;
     public Set<UUID> playerUuids = new HashSet<>();
 
-    public FlounderGame(BlockPos centerBlockPos) {
-        this.centerBlockPos = centerBlockPos;
+    /**
+     * Main constructor for minigames - intended for use when initially creating a minigame.
+     *
+     * @param centerPos This minigame's center BlockPos
+     */
+    public FlounderGame(BlockPos centerPos) {
+        this.centerPos = centerPos;
     }
 
-    public FlounderGame(int ticks, BlockPos centerBlockPos) {
+    /**
+     * Main constructor for minigames from their codecs - intended for use for a minigame's creation from their codec. <br><br>
+     * Nothing else special happens besides giving a simple way of setting the current tick count.
+     *
+     * @param ticks This minigame's current tick count (intended to be deserialized via your game's codec)
+     * @param centerPos This minigame's center BlocKPos (intended to be deserialized via your game's codec)
+     */
+    public FlounderGame(int ticks, BlockPos centerPos) {
         this.ticks = ticks;
-        this.centerBlockPos = centerBlockPos;
+        this.centerPos = centerPos;
     }
 
     @Override
@@ -55,26 +67,26 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public void addPlayer(ServerPlayerEntity player) {
-        this.addPlayer(player.getUuid());
+        this.addPlayerUuid(player.getUuid());
     }
 
-    public void addPlayer(UUID playerUuid) {
+    public void addPlayerUuid(UUID playerUuid) {
         this.playerUuids.add(playerUuid);
     }
 
     public void removePlayer(ServerPlayerEntity player) {
-        this.removePlayer(player.getUuid());
+        this.removePlayerUuid(player.getUuid());
     }
 
-    public void removePlayer(UUID playerUuid) {
+    public void removePlayerUuid(UUID playerUuid) {
         this.playerUuids.remove(playerUuid);
     }
 
     public boolean containsPlayer(ServerPlayerEntity player) {
-        return this.containsPlayer(player.getUuid());
+        return this.containsPlayerUuid(player.getUuid());
     }
 
-    public boolean containsPlayer(UUID playerUuid) {
+    public boolean containsPlayerUuid(UUID playerUuid) {
         return this.playerUuids.contains(playerUuid);
     }
 
@@ -98,13 +110,13 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     @Override
-    public BlockPos getCenterBlockPos() {
-        return this.centerBlockPos;
+    public BlockPos getCenterPos() {
+        return this.centerPos;
     }
 
     @Override
     public boolean containsBlockPos(BlockPos pos) {
-        return pos.isWithinDistance(this.getCenterBlockPos(), this.getGameType().distance());
+        return pos.isWithinDistance(this.getCenterPos(), this.getGameType().distance());
     }
 
     public boolean playerWithinBounds(ServerPlayerEntity player) {
