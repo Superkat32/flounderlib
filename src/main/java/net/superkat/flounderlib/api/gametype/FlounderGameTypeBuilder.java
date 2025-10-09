@@ -28,7 +28,7 @@ public class FlounderGameTypeBuilder<T extends FlounderableGame> {
     private Codec<T> codec = null;
     private int distance = 96;
     private int paddingDistance = 96;
-    private boolean overlap = false;
+    private boolean overlap = true;
     private boolean singleton = false;
 
     private FlounderGameTypeBuilder(Identifier id) {

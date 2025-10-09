@@ -10,6 +10,7 @@ import net.superkat.flounderlib.api.action.FlounderGameStartResult;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
+import net.superkat.flounderlibtest.test.MonkeyMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,8 @@ import org.slf4j.LoggerFactory;
 public class FlounderLibTest implements ModInitializer {
     public static final String MOD_ID = "flounderlibtest";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    
+    // TODO - Swift Seek (Sprint?) example (move quickly game)
 
     public static final FlounderGameType<ExampleMinigame> EXAMPLE_MINIGAME_TYPE = FlounderApi.register(
             FlounderGameTypeBuilder.createPersistent(ExampleMinigame.ID, ExampleMinigame.CODEC)
@@ -26,8 +29,14 @@ public class FlounderLibTest implements ModInitializer {
             FlounderGameTypeBuilder.createPersistent(TestMinigame.ID, TestMinigame.CODEC)
     );
 
+    public static final FlounderGameType<MonkeyMinigame> MONKEY_MINIGAME_TYPE = FlounderApi.register(
+            FlounderGameTypeBuilder.createSimple(MonkeyMinigame.ID)
+    );
+
     @Override
     public void onInitialize() {
+        MinigameAutofills.init();
+
         ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
             for (ServerPlayerEntity player : serverWorld.getPlayers()) {
 

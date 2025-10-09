@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TestMinigame extends FlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_minigame");
+
     public static final Codec<TestMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("ticks").forGetter(game -> game.ticks),
@@ -41,7 +42,7 @@ public class TestMinigame extends FlounderGame {
     @Override
     public void init(ServerWorld world, int minigameId) {
         super.init(world, minigameId);
-        this.test = this.world.getRandom().nextBoolean();
+//        this.test = this.world.getRandom().nextBoolean();
     }
 
     @Override
