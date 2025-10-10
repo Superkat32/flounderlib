@@ -46,23 +46,29 @@ public class FlounderGameCommand {
     );
 
 //    public static final FlounderCommand FLOUNDER_COMMAND = FlounderCommand.create(
-//            instance -> instance.literal("flounderlib").literal("minigames"),
-//            instance.literal("list").executes(this::executeList),
-//            instance.literal("locate")
-//                    .executes(this::executeLocate, context.getSource.getPosition)
-//                    .argument(FlCommandArg.ofBlockPos("position"))
-//                    .executes(this::executeLocate),
-//            instance.literal("highlight")
-//                    .executes(this::executeHighlight, -1)
-//                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
-//                    .executes(this::executeLocate),
-//            instance.literal("start")
-//                    .addArguments(this.getAutofillList()),
-//            instance.literal("stop")
-//                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
-//                    .executes(this::executeStop),
-//            instance.literal("stopAll")
-//                    .executes(this::executeStopAll)
+//            instance -> instance.literal("flounderlib")
+//                    .requiresPermission(4)
+//                    .literal("minigames")
+//                    .group(instance.literal("list").executes(this::executeList))
+//                    .group(
+//                            instance.literal("locate")
+//                                    .executes(this::executeLocate, context.getSource.getPosition)
+//                                    .argument(FlCommandArg.ofBlockPos("position"))
+//                                    .executes(this::executeLocate)
+//                    )
+//                    .group(
+//                            instance.literal("highlight")
+//                                    .executes(this.executeHighlight, -1)
+//                                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
+//                                    .executes(this::executeLocate)
+//                    )
+//                    .group(instance.literal("start").addArguments(this.getAutofillList))
+//                    .group(
+//                            instance.literal("stop")
+//                                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
+//                                    .executes(this::executeStop)
+//                    )
+//                    .group(instance.literal("stopAll").executes(this::executeStoppAll))
 //    );
 
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
@@ -123,10 +129,10 @@ public class FlounderGameCommand {
         LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal(name);
 
         for (Identifier minigameId : FlounderRegistry.getRegistry().getIds()) {
-            if(AUTOFILL_TEST.containsKey(minigameId)) {
+//            if(AUTOFILL_TEST.containsKey(minigameId)) {
 
-                FlounderAutofill<?> autofill = AUTOFILL_TEST.get(minigameId);
-                command.then(CommandManager.literal(minigameId.toString()).then(autofill.createArguments()));
+//                FlounderAutofill<?> autofill = AUTOFILL_TEST.get(minigameId);
+//                command.then(CommandManager.literal(minigameId.toString()).then(autofill.createArguments()));
 
 //                FlounderGameAutofill autofill = MINIGAMES_ARGUMENT_BUILDERS.get(minigameId);
 //                command.then(CommandManager.literal(minigameId.toString()).then(autofill.argumentBuilder(registryAccess)));
@@ -140,9 +146,9 @@ public class FlounderGameCommand {
 //                                        .executes(context -> executeStart(context.getSource(), autofillFunction.argumentFunction().apply(context)))
 //                        )
 //                );
-            } else {
+//            } else {
                 command.then(CommandManager.literal(minigameId.toString()));
-            }
+//            }
         }
 
         return command;

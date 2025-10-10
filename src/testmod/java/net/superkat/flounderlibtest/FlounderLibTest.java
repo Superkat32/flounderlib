@@ -1,6 +1,7 @@
 package net.superkat.flounderlibtest;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -9,6 +10,7 @@ import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.action.FlounderGameStartResult;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
+import net.superkat.flounderlibtest.command.TestCommand;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.MonkeyMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
@@ -36,6 +38,10 @@ public class FlounderLibTest implements ModInitializer {
     @Override
     public void onInitialize() {
         MinigameAutofills.init();
+
+        CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
+            TestCommand.register(commandDispatcher, commandRegistryAccess);
+        });
 
         ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
             for (ServerPlayerEntity player : serverWorld.getPlayers()) {

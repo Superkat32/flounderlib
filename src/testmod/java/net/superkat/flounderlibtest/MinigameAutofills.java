@@ -13,9 +13,7 @@ import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.superkat.flounderlib.api.command.FlounderCommandApi;
 import net.superkat.flounderlib.api.command.FlounderGameAutofill;
-import net.superkat.flounderlib.command.minigame.FlounderGameCommand;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
-import net.superkat.flounderlibtest.test.MonkeyMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
 
 public class MinigameAutofills {
@@ -80,7 +78,7 @@ public class MinigameAutofills {
         FlounderCommandApi.registerAutofill(ExampleMinigame.ID, EXAMPLE_AUTOFILL);
         FlounderCommandApi.registerAutofill(TestMinigame.ID, TEST_AUTOFILL);
 
-        FlounderGameCommand.AUTOFILL_TEST.put(MonkeyMinigame.ID, MonkeyMinigame.AUTOFILL);
+//        FlounderGameCommand.AUTOFILL_TEST.put(MonkeyMinigame.ID, MonkeyMinigame.AUTOFILL);
     }
 
 }

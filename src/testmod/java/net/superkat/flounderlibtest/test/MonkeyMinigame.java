@@ -7,10 +7,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.api.command.FlounderAutofill;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.command.argument.FlCommandArg;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,13 +19,14 @@ public class MonkeyMinigame extends FlounderGame {
                     BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos)
             ).apply(instance, MonkeyMinigame::new)
     );
-    public static final FlounderAutofill<MonkeyMinigame> AUTOFILL = FlounderAutofill.create(
-            instance -> instance.group(
-//                    FlCommandArg.of("test", BoolArgumentType::bool, BoolArgumentType::getBool)
-                    FlCommandArg.ofBoolean("test")
-//                    FlCommandArg.ofBlockPos("center")
-            ).apply(MonkeyMinigame::new)
-    );
+
+//    public static final FlounderAutofill<MonkeyMinigame> AUTOFILL = FlounderAutofill.create(
+//            instance -> instance.group(
+////                    FlCommandArg.of("test", BoolArgumentType::bool, BoolArgumentType::getBool)
+//                    FlCommandArg.ofBoolean("test")
+////                    FlCommandArg.ofBlockPos("center")
+//            ).apply(MonkeyMinigame::new)
+//    );
 
     public MonkeyMinigame(BlockPos centerPos) {
         super(centerPos);
