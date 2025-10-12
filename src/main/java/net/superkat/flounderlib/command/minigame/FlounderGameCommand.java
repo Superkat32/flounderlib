@@ -44,32 +44,6 @@ public class FlounderGameCommand {
             }
     );
 
-//    public static final FlounderCommand FLOUNDER_COMMAND = FlounderCommand.create(
-//            instance -> instance.literal("flounderlib")
-//                    .requiresPermission(4)
-//                    .literal("minigames")
-//                    .group(instance.literal("list").executes(this::executeList))
-//                    .group(
-//                            instance.literal("locate")
-//                                    .executes(this::executeLocate, context.getSource.getPosition)
-//                                    .argument(FlCommandArg.ofBlockPos("position"))
-//                                    .executes(this::executeLocate)
-//                    )
-//                    .group(
-//                            instance.literal("highlight")
-//                                    .executes(this.executeHighlight, -1)
-//                                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
-//                                    .executes(this::executeLocate)
-//                    )
-//                    .group(instance.literal("start").addArguments(this.getAutofillList))
-//                    .group(
-//                            instance.literal("stop")
-//                                    .argument(FlCommandArg.ofInteger("minigameIntId", 0, this.ACTIVE_MINIGAMES_SUGGESTER))
-//                                    .executes(this::executeStop)
-//                    )
-//                    .group(instance.literal("stopAll").executes(this::executeStoppAll))
-//    );
-
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
         dispatcher.register(
                 CommandManager.literal("flounderlib")

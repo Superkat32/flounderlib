@@ -12,20 +12,16 @@ import net.superkat.flounderlib.api.minigame.FlounderGame;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
-public class MonkeyMinigame extends FlounderGame {
-    public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "monkey");
-    public static final Codec<MonkeyMinigame> CODEC = RecordCodecBuilder.create(
+public class SimpleTestMinigame extends FlounderGame {
+    public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "simple_test");
+    public static final Codec<SimpleTestMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos)
-            ).apply(instance, MonkeyMinigame::new)
+            ).apply(instance, SimpleTestMinigame::new)
     );
 
-    public MonkeyMinigame(BlockPos centerPos) {
+    public SimpleTestMinigame(BlockPos centerPos) {
         super(centerPos);
-    }
-
-    public MonkeyMinigame(boolean test) {
-        super(BlockPos.ORIGIN);
     }
 
     @Override
@@ -65,6 +61,6 @@ public class MonkeyMinigame extends FlounderGame {
 
     @Override
     public @NotNull FlounderGameType<?> getGameType() {
-        return FlounderLibTest.MONKEY_MINIGAME_TYPE;
+        return FlounderLibTest.SIMPLE_TEST_TYPE;
     }
 }
