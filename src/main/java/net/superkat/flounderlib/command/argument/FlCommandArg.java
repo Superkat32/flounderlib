@@ -2,27 +2,19 @@ package net.superkat.flounderlib.command.argument;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FlCommandArg<T> {
-
-    public static FlCommandArg<Boolean> ofBoolean(String name) {
-        return of(name, BoolArgumentType::bool, BoolArgumentType::getBool);
-    }
-
-    public static FlCommandArg<BlockPos> ofBlockPos(String name) {
-        return of(name, BlockPosArgumentType::new, BlockPosArgumentType::getBlockPos);
-    }
 
     public static <T> FlCommandArg<T> of(
             String name,
@@ -36,8 +28,9 @@ public class FlCommandArg<T> {
     private final Supplier<? extends ArgumentType<?>> argTypeSupplier;
     private final BiFunction<CommandContext<ServerCommandSource>, String, T> argGetter;
 
+    private final List<Command<ServerCommandSource>> commands = new ArrayList<>();
     private SuggestionProvider<ServerCommandSource> suggests = null;
-    private Command<ServerCommandSource> command = null;
+    private Function<CommandContext<ServerCommandSource>, T> defaultValueGetter;
 
     private FlCommandArg(
             String name,
@@ -49,13 +42,29 @@ public class FlCommandArg<T> {
         this.argGetter = argGetter;
     }
 
+    public FlCommandArg<T> optional(T defaultValue) {
+        return optional(context -> defaultValue);
+    }
+
+    public FlCommandArg<T> optional(Function<CommandContext<ServerCommandSource>, T> defaultValueGetter) {
+        this.defaultValueGetter = defaultValueGetter;
+        return this;
+    }
+
     public FlCommandArg<T> suggests(SuggestionProvider<ServerCommandSource> suggestionProvider) {
         this.suggests = suggestionProvider;
         return this;
     }
 
     public FlCommandArg<T> executes(Command<ServerCommandSource> command) {
-        this.command = command;
+        this.commands.add(command);
+        return this;
+    }
+
+    public FlCommandArg<T> executesIfOptional(Command<ServerCommandSource> command) {
+        if(this.isOptional()) {
+            this.commands.add(command);
+        }
         return this;
     }
 
@@ -64,13 +73,26 @@ public class FlCommandArg<T> {
         if(this.suggests != null) {
             argument = argument.suggests(this.suggests);
         }
-        if(this.command != null) {
-            argument = argument.executes(this.command);
+        if(!this.commands.isEmpty()) {
+            for (Command<ServerCommandSource> command : commands) {
+                argument = argument.executes(command);
+            }
         }
         return argument;
     }
 
     public T getArgument(CommandContext<ServerCommandSource> context) {
+        if(this.isOptional()) {
+            try {
+                return argGetter.apply(context, this.name);
+            } catch (Exception e) {
+                return this.defaultValueGetter.apply(context);
+            }
+        }
         return argGetter.apply(context, this.name);
+    }
+
+    public boolean isOptional() {
+        return this.defaultValueGetter != null;
     }
 }

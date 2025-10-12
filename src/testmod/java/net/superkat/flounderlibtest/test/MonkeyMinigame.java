@@ -20,14 +20,6 @@ public class MonkeyMinigame extends FlounderGame {
             ).apply(instance, MonkeyMinigame::new)
     );
 
-//    public static final FlounderAutofill<MonkeyMinigame> AUTOFILL = FlounderAutofill.create(
-//            instance -> instance.group(
-////                    FlCommandArg.of("test", BoolArgumentType::bool, BoolArgumentType::getBool)
-//                    FlCommandArg.ofBoolean("test")
-////                    FlCommandArg.ofBlockPos("center")
-//            ).apply(MonkeyMinigame::new)
-//    );
-
     public MonkeyMinigame(BlockPos centerPos) {
         super(centerPos);
     }

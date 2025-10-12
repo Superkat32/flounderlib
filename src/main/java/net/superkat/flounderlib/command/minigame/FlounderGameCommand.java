@@ -2,6 +2,7 @@ package net.superkat.flounderlib.command.minigame;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
@@ -20,9 +21,8 @@ import net.minecraft.util.math.BlockPos;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.action.FlounderGameStartResult;
-import net.superkat.flounderlib.api.command.FlounderAutofill;
-import net.superkat.flounderlib.api.command.FlounderGameAutofill;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.command.minigame.argument.FlounderMinigameArgumentType;
 import net.superkat.flounderlib.minigame.FlounderGameManager;
 import net.superkat.flounderlib.minigame.FlounderRegistry;
 
@@ -34,8 +34,7 @@ import java.util.Set;
 
 public class FlounderGameCommand {
 
-    public static final Map<Identifier, FlounderGameAutofill> MINIGAMES_ARGUMENT_BUILDERS = new HashMap<>();
-    public static final Map<Identifier, FlounderAutofill<?>> AUTOFILL_TEST = new HashMap<>();
+    public static final Map<Identifier, ArgumentBuilder<ServerCommandSource, ?>> MINIGAME_AUTOFILLS = new HashMap<>();
 
     public static final SuggestionProvider<ServerCommandSource> AVAILABLE_MINIGAME_IDS = SuggestionProviders.register(
             Identifier.of(FlounderLib.MOD_ID, "available_minigame_ids"),
@@ -109,46 +108,25 @@ public class FlounderGameCommand {
 
     private static LiteralArgumentBuilder<ServerCommandSource> startCommand(CommandRegistryAccess registryAccess) {
         return forAllMinigames(registryAccess, "start");
-        //                        CommandManager.literal("flounderlibtest:test_minigame").then(
-//                                CommandManager.argument("ticks", IntegerArgumentType.integer())
-//                                        .then(CommandManager.argument("pos", BlockPosArgumentType.blockPos())
-//                                                .then(CommandManager.argument("test", BoolArgumentType.bool())
-//                                                        .executes(context -> {
-//                                                            executeStart(context.getSource(), new TestMinigame(IntegerArgumentType.getInteger(context, "ticks")))
-//                                                        })))
-//                        )
-//        return CommandManager.literal("start")
-//                .then(
-//                        CommandManager.argument("minigameId", FlounderMinigameArgumentType.flounderGame(registryAccess))
-//                                .suggests(AVAILABLE_MINIGAME_IDS)
-//                                .executes(context -> executeStart(context.getSource(), FlounderMinigameArgumentType.getFlounderGame(context, "minigameId")))
-//                );
     }
 
     private static LiteralArgumentBuilder<ServerCommandSource> forAllMinigames(CommandRegistryAccess registryAccess, String name) {
         LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal(name);
 
         for (Identifier minigameId : FlounderRegistry.getRegistry().getIds()) {
-//            if(AUTOFILL_TEST.containsKey(minigameId)) {
-
-//                FlounderAutofill<?> autofill = AUTOFILL_TEST.get(minigameId);
-//                command.then(CommandManager.literal(minigameId.toString()).then(autofill.createArguments()));
-
-//                FlounderGameAutofill autofill = MINIGAMES_ARGUMENT_BUILDERS.get(minigameId);
-//                command.then(CommandManager.literal(minigameId.toString()).then(autofill.argumentBuilder(registryAccess)));
-
-//                command.then(autofill.argumentBuilder());
-
-//                FlounderGameAutofillFunction<? extends FlounderableGame> autofillFunction = MINIGAMES_ARGUMENT_BUILDERS.get(minigameId);
-//                command.then(CommandManager.literal(minigameId.toString())
-//                        .then(
-//                                autofillFunction.argumentBuilder()
-//                                        .executes(context -> executeStart(context.getSource(), autofillFunction.argumentFunction().apply(context)))
-//                        )
-//                );
-//            } else {
-                command.then(CommandManager.literal(minigameId.toString()));
-//            }
+            if(MINIGAME_AUTOFILLS.containsKey(minigameId)) {
+                command.then(
+                        CommandManager.literal(minigameId.toString())
+                                .then(MINIGAME_AUTOFILLS.get(minigameId))
+                );
+            } else {
+                command.then(
+                        CommandManager.argument("minigame", FlounderMinigameArgumentType.flounderGame(registryAccess))
+                                .suggests(AVAILABLE_MINIGAME_IDS)
+                                .executes(context -> executeStart(context.getSource(), FlounderMinigameArgumentType.getFlounderGame(context, "minigame")))
+                );
+            }
+            command.then(CommandManager.literal(minigameId.toString()));
         }
 
         return command;
