@@ -1,0 +1,21 @@
+{
+  "command.flounderlib.found": "Found %s minigames",
+  "command.flounderlib.found_suffix": "!",
+  "command.flounderlib.found_location": "at %s",
+  "command.flounderlib.found_fail": "No minigames found at %s!",
+  "command.flounderlib.highlight": "Highlighted %s!",
+  "command.flounderlib.start_success": "Started minigame %s!",
+  "command.flounderlib.could_not_start": "Couldn't start minigame %s - %s %s",
+  "command.flounderlib.start_fail_singleton": "GameType is singleton!",
+  "command.flounderlib.start_fail_singleton_tooltip": "(another one of its GameType is already active)",
+  "command.flounderlib.start_fail_overlap": "GameType shouldn't overlap!",
+  "command.flounderlib.start_fail_overlap_tooltip": "(another one of its GameType is too close)",
+  "command.flounderlib.start_fail": "Reason unknown",
+  "command.flounderlib.start_fail_tooltip": "",
+  "command.flounderlib.stop_all": "Ending %s minigames!",
+  "command.flounderlib.stop": "Ended %s!",
+
+  "command.flounderlib.none_active": "No minigames are active!",
+  "command.flounderlib.id_not_active": "No active minigame with Int ID: %s",
+  "command.flounderlib.player_location": "your location"
+}

@@ -13,15 +13,12 @@ import java.util.List;
 
 public class FlounderApi {
 
-    // region Minigame Management
-
     public static FlounderGameStartResult startMinigame(ServerWorld world, FlounderableGame game) {
-        if(canStartMinigame(world, game.getGameType(), game.getCenterPos())) {
+        FlounderGameStartResult result = canMinigameStart(world, game.getGameType(), game.getCenterPos());
+        if(result.isSuccessful()) {
             addMinigame(world, game);
-            return FlounderGameStartResult.SUCCESS;
-        } else {
-            return FlounderGameStartResult.FAILED;
         }
+        return result;
     }
 
     public static void addMinigame(ServerWorld world, FlounderableGame game) {
@@ -32,11 +29,10 @@ public class FlounderApi {
         game.invalidate();
     }
 
-    public static <T extends FlounderableGame> boolean canStartMinigame(ServerWorld world, FlounderGameType<T> gameType, BlockPos centerPos) {
-        if(gameType.singleton() && isMinigameAlreadyRunning(world, gameType)) return false;
-
-        if(gameType.overlap()) return true;
-        return !minigameContainsPos(world, centerPos);
+    public static <T extends FlounderableGame> FlounderGameStartResult canMinigameStart(ServerWorld world, FlounderGameType<T> gameType, BlockPos centerPos) {
+        if(gameType.singleton() && isMinigameAlreadyRunning(world, gameType)) return FlounderGameStartResult.FAILED_SINGLETON;
+        if(!gameType.overlap() && gameTypeContainsPos(world, gameType, centerPos)) return FlounderGameStartResult.FAILED_OVERLAP;
+        return FlounderGameStartResult.SUCCESS;
     }
 
     public static boolean minigameContainsPos(ServerWorld world, BlockPos centerPos) {
@@ -47,27 +43,29 @@ public class FlounderApi {
         return getGameManager(world).findGamesAt(pos);
     }
 
+    public static <T extends FlounderableGame> boolean gameTypeContainsPos(ServerWorld world, FlounderGameType<T> gameType, BlockPos centerPos) {
+        return !findGameTypeAt(world, gameType, centerPos).isEmpty();
+    }
+
+    public static <T extends FlounderableGame> List<FlounderableGame> findGameTypeAt(ServerWorld world, FlounderGameType<T> gameType, BlockPos pos) {
+        return getGameManager(world).findGameTypeAt(gameType, pos);
+    }
+
     public static <T extends FlounderableGame> boolean isMinigameAlreadyRunning(ServerWorld world, FlounderGameType<T> gameType) {
         return getGameManager(world).doesGameExist(gameType);
     }
-
-    // endregion
-
-    // region Minigame Registration
 
     public static <T extends FlounderableGame> FlounderGameType<T> register(FlounderGameType<T> type) {
         return FlounderRegistry.register(type);
     }
 
-    // endregion
-
-    // region Minigame Handling
+    public static <T extends FlounderableGame> FlounderGameType<T> register(FlounderGameType.Builder<T> builder) {
+        return register(builder.build());
+    }
 
     public static FlounderGameManager getGameManager(ServerWorld world) {
         return ((FlounderWorld) world).flounderlib$getFlounderGameManager();
     }
-
-    // endregion
 
 
 

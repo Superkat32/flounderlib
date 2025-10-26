@@ -8,7 +8,6 @@ import net.minecraft.util.Formatting;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.action.FlounderGameStartResult;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.gametype.FlounderGameTypeBuilder;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
@@ -22,15 +21,19 @@ public class FlounderLibTest implements ModInitializer {
     // TODO - Swift Seek (Sprint?) example (move quickly game)
 
     public static final FlounderGameType<ExampleMinigame> EXAMPLE_MINIGAME_TYPE = FlounderApi.register(
-            FlounderGameTypeBuilder.createPersistent(ExampleMinigame.ID, ExampleMinigame.CODEC)
+            FlounderGameType.create(ExampleMinigame.ID, ExampleMinigame.CODEC)
+                    .singleton(true)
     );
 
     public static final FlounderGameType<TestMinigame> TEST_MINIGAME_TYPE = FlounderApi.register(
-            FlounderGameTypeBuilder.createPersistent(TestMinigame.ID, TestMinigame.CODEC)
+            FlounderGameType.create(TestMinigame.ID, TestMinigame.CODEC)
     );
 
     public static final FlounderGameType<SimpleTestMinigame> SIMPLE_TEST_TYPE = FlounderApi.register(
-            FlounderGameTypeBuilder.createSimple(SimpleTestMinigame.ID)
+            FlounderGameType.<SimpleTestMinigame>create(SimpleTestMinigame.ID)
+                    .overlap(false)
+                    .distance(16)
+                    .padding(8)
     );
 
     @Override

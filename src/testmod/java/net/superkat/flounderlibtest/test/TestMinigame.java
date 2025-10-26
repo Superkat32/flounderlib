@@ -42,7 +42,6 @@ public class TestMinigame extends FlounderGame {
     @Override
     public void init(ServerWorld world, int minigameId) {
         super.init(world, minigameId);
-//        this.test = this.world.getRandom().nextBoolean();
     }
 
     @Override

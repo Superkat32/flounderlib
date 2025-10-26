@@ -9,7 +9,7 @@ import net.superkat.flounderlib.command.minigame.FlounderGameCommand;
 
 public class FlounderGameCommandApi {
 
-    public static <T extends FlounderableGame> void registerGameAutofill(Identifier minigameId, RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder) {
+    public static void registerGameAutofill(Identifier minigameId, RequiredArgumentBuilder<ServerCommandSource, ?> argumentBuilder) {
         FlounderGameCommand.MINIGAME_AUTOFILLS.put(minigameId, argumentBuilder);
     }
 

@@ -112,6 +112,13 @@ public class FlounderGameManager extends PersistentState {
                 .toList();
     }
 
+    public <T extends FlounderableGame> List<FlounderableGame> findGameTypeAt(FlounderGameType<T> gameType, BlockPos pos) {
+        return this.getGames().values().stream()
+                .filter(game -> game.getGameType() == gameType)
+                .filter(game -> game.containsBlockPos(pos))
+                .toList();
+    }
+
     public <T extends FlounderableGame> boolean doesGameExist(FlounderGameType<T> gameType) {
         return this.games.values().stream().anyMatch(game -> game.getGameType() == gameType);
     }
