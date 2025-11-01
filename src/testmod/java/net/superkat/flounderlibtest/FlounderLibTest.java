@@ -11,6 +11,7 @@ import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
+import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,12 @@ public class FlounderLibTest implements ModInitializer {
                     .overlap(false)
                     .distance(16)
                     .padding(8)
+    );
+
+    public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.register(
+            FlounderGameType.create(TestSyncedMinigame.ID, TestSyncedMinigame.CODEC)
+                    .sync(TestSyncedMinigame.Data.DATA_PACKET_CODEC)
+                    .singleton(true)
     );
 
     @Override

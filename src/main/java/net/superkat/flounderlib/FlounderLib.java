@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.world.ServerWorld;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.command.FlounderLibCommands;
+import net.superkat.flounderlib.network.FlounderPackets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,6 +16,7 @@ public class FlounderLib implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		FlounderPackets.init();
 		FlounderLibCommands.init();
 
 		ServerTickEvents.END_WORLD_TICK.register(world -> {

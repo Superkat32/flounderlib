@@ -1,8 +1,11 @@
 package net.superkat.flounderlib.api.gametype;
 
 import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.api.sync.FlounderSyncData;
 
 // goals:
 // - singleton by default
@@ -17,7 +20,8 @@ public record FlounderGameType<T extends FlounderableGame>(
         int distance,
         int padding,
         boolean overlap,
-        boolean singleton
+        boolean singleton,
+        PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec
 ) {
 
     public static <T extends FlounderableGame> Builder<T> create(Identifier id) {
@@ -39,6 +43,8 @@ public record FlounderGameType<T extends FlounderableGame>(
         private int padding = 0;
         private boolean overlap = true;
         private boolean singleton = false;
+
+        private PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec = null;
 
         protected Builder(Identifier id) {
             this.id = id;
@@ -69,11 +75,17 @@ public record FlounderGameType<T extends FlounderableGame>(
             return this;
         }
 
+        public Builder<T> sync(PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec) {
+            this.dataPacketCodec = dataPacketCodec;
+            return this;
+        }
+
         public FlounderGameType<T> build() {
             return new FlounderGameType<>(
                     this.id, this.codec,
                     this.distance, this.padding, this.overlap,
-                    this.singleton
+                    this.singleton,
+                    this.dataPacketCodec
             );
         }
     }
