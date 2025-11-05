@@ -21,9 +21,8 @@ public class TestSyncedMinigameRenderer {
         String text = data.title();
         int ticks = data.ticks();
 
-        context.drawText(MinecraftClient.getInstance().textRenderer, text, 0, 0, Colors.WHITE, true);
-        context.drawText(MinecraftClient.getInstance().textRenderer, String.valueOf(ticks), 0, 16, Colors.WHITE, true);
-//        context.drawText(MinecraftClient.getInstance().textRenderer, "what's up homie buddy", 0, 12, Colors.WHITE, true);
+        context.drawText(textRenderer, text, 0, 0, Colors.WHITE, true);
+        context.drawText(textRenderer, String.valueOf(ticks), 0, 16, Colors.WHITE, true);
     }
 
 }

@@ -9,13 +9,15 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
 import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
-import net.superkat.flounderlib.api.sync.FlounderDataSyncer;
 import net.superkat.flounderlib.api.sync.FlounderSyncData;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class TestSyncedMinigame extends SyncedFlounderGame<TestSyncedMinigame.Data> {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_synced_minigame");
@@ -25,10 +27,6 @@ public class TestSyncedMinigame extends SyncedFlounderGame<TestSyncedMinigame.Da
                     BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos),
                     Codec.STRING.fieldOf("title").forGetter(game -> game.title)
             ).apply(instance, TestSyncedMinigame::new)
-    );
-
-    public static final FlounderDataSyncer<TestSyncedMinigame> DATA_SYNCER = new FlounderDataSyncer<>(
-            game -> game.title, (game, title) -> game.title = title
     );
 
     public String title;
@@ -47,9 +45,18 @@ public class TestSyncedMinigame extends SyncedFlounderGame<TestSyncedMinigame.Da
     public void tick() {
         super.tick();
 
-//        if(this.ticks % 20 == 0) {
-        this.markDirty();
-//        }
+        if(this.ticks % 20 == 0) {
+            if(this.ticks != 20) {
+                this.title = Text.literal(NameGenerator.name(UUID.randomUUID())).toString();
+            }
+
+            // Send all players the message
+            for (ServerPlayerEntity player : this.getPlayers()) {
+                player.sendMessage(Text.of(this.title));
+            }
+
+            this.markDirty();
+        }
 
         if(this.ticks >= 500) {
             this.invalidate();
