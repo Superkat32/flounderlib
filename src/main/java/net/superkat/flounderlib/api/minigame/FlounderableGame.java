@@ -5,7 +5,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.superkat.flounderlib.api.FlounderApi;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

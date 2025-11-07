@@ -1,11 +1,11 @@
-package net.superkat.flounderlib.api.gametype;
+package net.superkat.flounderlib.api.minigame.gametype;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 
 // goals:
 // - singleton by default

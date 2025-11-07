@@ -1,7 +1,7 @@
 package net.superkat.flounderlib.api.minigame;
 
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 
 import java.util.UUID;
 

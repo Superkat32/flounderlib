@@ -4,7 +4,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameDataUpdateS2CPacket;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameRemoveS2CPacket;
 

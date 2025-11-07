@@ -6,8 +6,8 @@ import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 
 public class FlounderRegistry {
     public static final Identifier FLOUNDER_GAME_TYPE_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_game_type");

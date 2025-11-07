@@ -2,9 +2,9 @@ package net.superkat.flounderlib.api;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.world.ClientWorld;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.SyncableFlounderableGame;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 import net.superkat.flounderlib.duck.FlounderClientWorld;
 import net.superkat.flounderlib.minigame.sync.FlounderClientGameManager;
 

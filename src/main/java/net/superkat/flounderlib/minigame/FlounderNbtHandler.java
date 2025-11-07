@@ -12,8 +12,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.FlounderApi;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;

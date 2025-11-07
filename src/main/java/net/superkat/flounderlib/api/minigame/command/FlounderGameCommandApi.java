@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.api.command;
+package net.superkat.flounderlib.api.minigame.command;
 
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;

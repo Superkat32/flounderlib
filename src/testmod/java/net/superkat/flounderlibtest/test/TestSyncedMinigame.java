@@ -11,9 +11,9 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.SyncedFlounderGame;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 

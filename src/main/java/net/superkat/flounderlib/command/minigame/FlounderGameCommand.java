@@ -25,7 +25,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.FlounderApi;
-import net.superkat.flounderlib.api.action.FlounderGameStartResult;
+import net.superkat.flounderlib.api.FlounderGameStartResult;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
 import net.superkat.flounderlib.command.minigame.argument.FlounderMinigameArgumentType;
 import net.superkat.flounderlib.minigame.FlounderGameManager;

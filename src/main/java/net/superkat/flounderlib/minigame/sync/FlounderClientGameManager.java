@@ -3,8 +3,8 @@ package net.superkat.flounderlib.minigame.sync;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.world.ClientWorld;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 
 import java.util.ArrayList;
 import java.util.List;

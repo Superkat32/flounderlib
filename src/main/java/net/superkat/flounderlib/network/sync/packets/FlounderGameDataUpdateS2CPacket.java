@@ -5,8 +5,8 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.sync.FlounderSyncData;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
 import net.superkat.flounderlib.minigame.FlounderRegistry;
 
 public record FlounderGameDataUpdateS2CPacket<D extends FlounderSyncData>(Identifier gameTypeId, int minigameId, D data) implements CustomPayload {

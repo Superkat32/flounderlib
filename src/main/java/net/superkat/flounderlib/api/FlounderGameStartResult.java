@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.api.action;
+package net.superkat.flounderlib.api;
 
 public enum FlounderGameStartResult {
     SUCCESS(),

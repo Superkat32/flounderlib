@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.mixin;
+package net.superkat.flounderlib.mixin.client;
 
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.render.WorldRenderer;

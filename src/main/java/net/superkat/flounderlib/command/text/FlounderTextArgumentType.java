@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.command.minigame.argument;
+package net.superkat.flounderlib.command.text;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -14,11 +14,11 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.superkat.flounderlib.api.minigame.FlounderableGame;
-import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
-import net.superkat.flounderlib.minigame.FlounderRegistry;
+import net.superkat.flounderlib.api.text.FlounderText;
+import net.superkat.flounderlib.text.FlounderTextType;
+import net.superkat.flounderlib.text.client.FlounderClientTextManager;
 
-public class FlounderMinigameArgumentType implements ArgumentType<FlounderableGame> {
+public class FlounderTextArgumentType implements ArgumentType<FlounderText> {
 
     public static final DynamicCommandExceptionType INVALID_OPTIONS_EXCEPTION = new DynamicCommandExceptionType(
             error -> Text.stringifiedTranslatable("particle.invalidOptions", error)
@@ -27,22 +27,22 @@ public class FlounderMinigameArgumentType implements ArgumentType<FlounderableGa
     private static final StringNbtReader<?> SNBT_READER = StringNbtReader.fromOps(NbtOps.INSTANCE);
     private final RegistryWrapper.WrapperLookup registries;
 
-    public static FlounderMinigameArgumentType flounderGame(CommandRegistryAccess registryAccess) {
-        return new FlounderMinigameArgumentType(registryAccess);
+    public static FlounderTextArgumentType flounderText(CommandRegistryAccess registryAccess) {
+        return new FlounderTextArgumentType(registryAccess);
     }
 
-    public static FlounderableGame getFlounderGame(CommandContext<ServerCommandSource> context, String name) {
-        return context.getArgument(name, FlounderableGame.class);
+    public static FlounderText getFlounderText(CommandContext<ServerCommandSource> context, String name) {
+        return context.getArgument(name, FlounderText.class);
     }
 
-    public FlounderMinigameArgumentType(CommandRegistryAccess registryAccess) {
+    public FlounderTextArgumentType(CommandRegistryAccess registryAccess) {
         this.registries = registryAccess;
     }
 
     @Override
-    public FlounderableGame parse(StringReader reader) throws CommandSyntaxException {
+    public FlounderText parse(StringReader reader) throws CommandSyntaxException {
         Identifier id = Identifier.fromCommandInput(reader);
-        FlounderGameType<?> type = FlounderRegistry.getRegistry().get(id);
+        FlounderTextType<?> type = FlounderClientTextManager.getRegistry().get(id);
 
         RegistryOps<NbtElement> registryOps = registries.getOps(NbtOps.INSTANCE);
         NbtElement game;

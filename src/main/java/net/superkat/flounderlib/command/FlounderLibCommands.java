@@ -7,6 +7,8 @@ import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.command.minigame.FlounderGameCommand;
 import net.superkat.flounderlib.command.minigame.argument.FlounderMinigameArgumentType;
+import net.superkat.flounderlib.command.text.FlounderTextArgumentType;
+import net.superkat.flounderlib.command.text.FlounderTextCommand;
 
 public class FlounderLibCommands {
 
@@ -17,8 +19,15 @@ public class FlounderLibCommands {
                 ConstantArgumentSerializer.of(FlounderMinigameArgumentType::new)
         );
 
+        ArgumentTypeRegistry.registerArgumentType(
+                Identifier.of(FlounderLib.MOD_ID, "flounder_text_argument"),
+                FlounderTextArgumentType.class,
+                ConstantArgumentSerializer.of(FlounderTextArgumentType::new)
+        );
+
         CommandRegistrationCallback.EVENT.register((commandDispatcher, commandRegistryAccess, registrationEnvironment) -> {
             FlounderGameCommand.register(commandDispatcher, commandRegistryAccess);
+            FlounderTextCommand.register(commandDispatcher, commandRegistryAccess);
         });
     }
 

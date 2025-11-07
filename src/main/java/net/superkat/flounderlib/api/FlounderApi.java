@@ -2,9 +2,8 @@ package net.superkat.flounderlib.api;
 
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.superkat.flounderlib.api.action.FlounderGameStartResult;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import net.superkat.flounderlib.duck.FlounderWorld;
 import net.superkat.flounderlib.minigame.FlounderGameManager;
 import net.superkat.flounderlib.minigame.FlounderRegistry;

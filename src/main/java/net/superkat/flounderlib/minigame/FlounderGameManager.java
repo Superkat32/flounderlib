@@ -13,8 +13,8 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.PersistentStateType;
-import net.superkat.flounderlib.api.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.FlounderableGame;
+import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 
 import java.util.Iterator;
 import java.util.List;
