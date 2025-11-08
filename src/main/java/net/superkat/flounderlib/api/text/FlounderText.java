@@ -1,16 +1,11 @@
 package net.superkat.flounderlib.api.text;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Function;
+import net.superkat.flounderlib.api.text.type.FlounderTextParams;
 
 public abstract class FlounderText {
     public final MinecraftClient client;
@@ -23,6 +18,10 @@ public abstract class FlounderText {
         this.client = MinecraftClient.getInstance();
         this.textRenderer = client.textRenderer;
         this.text = text;
+    }
+
+    public FlounderText(FlounderTextParams.Default params) {
+        this(params.getText());
     }
 
     public abstract void render(DrawContext context, RenderTickCounter tickCounter);
@@ -41,15 +40,8 @@ public abstract class FlounderText {
         return this.text;
     }
 
-    public static <T extends FlounderText> Codec<T> createDefaultCodec(Function<Text, T> applyFunction) {
-        return RecordCodecBuilder.create(instance ->
-            instance.group(
-                    getDefaultTextCodec()
-            ).apply(instance, applyFunction)
-        );
+    public boolean textBlank() {
+        return this.text == null || this.text.getLiteralString() == null || this.text.getLiteralString().isBlank();
     }
 
-    public static <T extends FlounderText> @NotNull RecordCodecBuilder<T, Text> getDefaultTextCodec() {
-        return TextCodecs.CODEC.fieldOf("text").forGetter(FlounderText::getText);
-    }
 }

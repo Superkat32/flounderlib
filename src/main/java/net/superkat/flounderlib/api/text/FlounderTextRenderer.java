@@ -5,21 +5,21 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
-public class FlounderTextRenderer<T extends FlounderText> implements HudElement {
+public class FlounderTextRenderer implements HudElement {
+    public static final FlounderTextRenderer DEFAULT_INSTANCE = new FlounderTextRenderer();
+    public final List<FlounderText> texts = new ObjectArrayList<>();
 
-    public final Collection<T> texts = this.createCollection();
-
-    public void addText(T flounderText) {
-        if(flounderText.getText().getLiteralString().isBlank()) return;
-        texts.add(flounderText);
+    public void addText(FlounderText flounderText) {
+        if(flounderText.textBlank()) return;
+        this.texts.add(flounderText);
     }
 
     public void tick(boolean paused) {
-        for (Iterator<T> iterator = this.texts.iterator(); iterator.hasNext(); ) {
-            T text = iterator.next();
+        for (Iterator<FlounderText> iterator = this.texts.iterator(); iterator.hasNext(); ) {
+            FlounderText text = iterator.next();
             text.tick(paused);
 
             if(text.shouldRemove()) {
@@ -33,8 +33,7 @@ public class FlounderTextRenderer<T extends FlounderText> implements HudElement 
         this.texts.forEach(text -> text.render(context, tickCounter));
     }
 
-    public Collection<T> createCollection() {
-        return new ObjectArrayList<>();
+    public void clear() {
+        this.texts.clear();
     }
-
 }

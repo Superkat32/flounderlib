@@ -7,10 +7,10 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
-import net.superkat.flounderlib.api.text.FlounderText;
+import net.superkat.flounderlib.api.text.type.FlounderTextParams;
 import net.superkat.flounderlib.text.client.FlounderClientTextManager;
 
-public record FlounderTextS2CPacket<T extends FlounderText>(Identifier textId, T text) implements CustomPayload {
+public record FlounderTextS2CPacket<T extends FlounderTextParams>(Identifier textId, T text) implements CustomPayload {
     public static final String TEXT_NBT_ID = "text_nbt";
     public static final Identifier FLOUNDER_TEXT_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_text_packet");
     public static final CustomPayload.Id<FlounderTextS2CPacket<?>> ID = new CustomPayload.Id<>(FLOUNDER_TEXT_ID);
@@ -19,7 +19,7 @@ public record FlounderTextS2CPacket<T extends FlounderText>(Identifier textId, T
     );
 
     @SuppressWarnings("unchecked")
-    public static <T extends FlounderText> FlounderTextS2CPacket<T> fromBuf(RegistryByteBuf buf) {
+    public static <T extends FlounderTextParams> FlounderTextS2CPacket<T> fromBuf(RegistryByteBuf buf) {
         Identifier textId = buf.readIdentifier();
         NbtCompound nbt = buf.readNbt();
 

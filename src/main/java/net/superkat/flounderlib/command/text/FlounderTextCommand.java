@@ -15,7 +15,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
-import net.superkat.flounderlib.api.text.FlounderText;
+import net.superkat.flounderlib.api.text.type.FlounderTextParams;
 import net.superkat.flounderlib.network.text.FlounderTextS2CPacket;
 import net.superkat.flounderlib.text.client.FlounderClientTextManager;
 
@@ -49,28 +49,30 @@ public class FlounderTextCommand {
                                                                 )
                                                         )
                                         )
-//                        ).then(
-//                            CommandManager.argument("type", FlounderTextArgumentType.flounderText(registryAccess))
-//                                    .executes(context ->
-//                                            executeText(
-//                                                    context.getSource(),
-//                                                    FlounderTextArgumentType.getFlounderText(context, "type")
-//                                            )
-//                                    )
+                                        .then(
+                                                CommandManager.argument("type", FlounderTextParamsArgument.flounderTextParams(registryAccess))
+                                                        .executes(context ->
+                                                                executeText(
+                                                                        context.getSource(),
+                                                                        IdentifierArgumentType.getIdentifier(context, "type"),
+                                                                        FlounderTextParamsArgument.getFlounderTextParams(context, "type")
+                                                                )
+                                                        )
+                                        )
                         )
         );
     }
 
 
     public static int executeText(ServerCommandSource source, Identifier identifier, Text text) {
-        FlounderText flounderText = FlounderClientTextManager.getRegistry().get(identifier).create(text);
-        return executeText(source, identifier, flounderText);
+        FlounderTextParams params = new FlounderTextParams.Default(text);
+        return executeText(source, identifier, params);
     }
 
-    public static int executeText(ServerCommandSource source, Identifier identifier, FlounderText text) {
+    public static int executeText(ServerCommandSource source, Identifier identifier, FlounderTextParams params) {
         ServerPlayerEntity player = source.getPlayer();
 
-        ServerPlayNetworking.send(player, new FlounderTextS2CPacket<>(identifier, text));
+        ServerPlayNetworking.send(player, new FlounderTextS2CPacket<>(identifier, params));
         Text id = Text.literal(identifier.toString()).formatted(Formatting.AQUA);
         Text feedback = Text.literal("Displaying Text: ").append(id).append("!");
         source.sendFeedback(() -> feedback, false);

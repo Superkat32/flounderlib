@@ -5,8 +5,8 @@ import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.FlounderClientApi;
 import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
-import net.superkat.flounderlib.api.text.FlounderText;
 import net.superkat.flounderlib.api.text.FlounderTextApi;
+import net.superkat.flounderlib.api.text.type.FlounderTextParams;
 import net.superkat.flounderlib.minigame.FlounderRegistry;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameDataUpdateS2CPacket;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameRemoveS2CPacket;
@@ -36,7 +36,7 @@ public class FlounderClientNetworkHandler {
         FlounderClientApi.getClientGameManager().removeMinigameData(gameType, minigameId);
     }
 
-    public static <T extends FlounderText> void onTextReceive(FlounderTextS2CPacket<T> packet, ClientPlayNetworking.Context context) {
+    public static <T extends FlounderTextParams> void onTextReceive(FlounderTextS2CPacket<T> packet, ClientPlayNetworking.Context context) {
         Identifier id = packet.textId();
         T text = packet.text();
         FlounderTextApi.getTextManager().add(id, text);
