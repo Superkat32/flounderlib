@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.api;
+package net.superkat.flounderlib.api.minigame.util;
 
 public enum FlounderGameStartResult {
     SUCCESS(),

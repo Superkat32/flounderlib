@@ -5,12 +5,9 @@ import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.FlounderClientApi;
 import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.sync.FlounderSyncData;
-import net.superkat.flounderlib.api.text.FlounderTextApi;
-import net.superkat.flounderlib.api.text.type.FlounderTextParams;
 import net.superkat.flounderlib.minigame.FlounderRegistry;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameDataUpdateS2CPacket;
 import net.superkat.flounderlib.network.sync.packets.FlounderGameRemoveS2CPacket;
-import net.superkat.flounderlib.network.text.FlounderTextS2CPacket;
 
 public class FlounderClientNetworkHandler {
 
@@ -19,7 +16,6 @@ public class FlounderClientNetworkHandler {
         ClientPlayNetworking.registerGlobalReceiver(FlounderGameDataUpdateS2CPacket.ID, FlounderClientNetworkHandler::onMinigameDataUpdate);
         ClientPlayNetworking.registerGlobalReceiver(FlounderGameRemoveS2CPacket.ID, FlounderClientNetworkHandler::onMinigameRemove);
 
-        ClientPlayNetworking.registerGlobalReceiver(FlounderTextS2CPacket.ID, FlounderClientNetworkHandler::onTextReceive);
     }
 
     public static <D extends FlounderSyncData> void onMinigameDataUpdate(FlounderGameDataUpdateS2CPacket<D> packet, ClientPlayNetworking.Context context) {
@@ -34,12 +30,6 @@ public class FlounderClientNetworkHandler {
         int minigameId = packet.minigameId();
         FlounderGameType<?> gameType = FlounderRegistry.getRegistry().get(gameTypeId);
         FlounderClientApi.getClientGameManager().removeMinigameData(gameType, minigameId);
-    }
-
-    public static <T extends FlounderTextParams> void onTextReceive(FlounderTextS2CPacket<T> packet, ClientPlayNetworking.Context context) {
-        Identifier id = packet.textId();
-        T text = packet.text();
-        FlounderTextApi.getTextManager().add(id, text);
     }
 
 }
