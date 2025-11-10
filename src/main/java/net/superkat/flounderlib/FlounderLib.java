@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.world.ServerWorld;
 import net.superkat.flounderlib.api.FlounderApi;
+import net.superkat.flounderlib.api.text.builtin.BuiltinFlounderTextRenderers;
 import net.superkat.flounderlib.command.FlounderLibCommands;
 import net.superkat.flounderlib.network.FlounderPackets;
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ public class FlounderLib implements ModInitializer {
 	public void onInitialize() {
 		FlounderPackets.init();
 		FlounderLibCommands.init();
+		BuiltinFlounderTextRenderers.init();
 
 		ServerTickEvents.END_WORLD_TICK.register(world -> {
 			FlounderApi.getGameManager(world).tick();
