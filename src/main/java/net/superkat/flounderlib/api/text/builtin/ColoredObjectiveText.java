@@ -35,6 +35,7 @@ public class ColoredObjectiveText extends FlounderText {
 
     @Override
     public void draw(DrawContext context, RenderTickCounter tickCounter) {
+        // Stretch in/out and fade in/out the text
         float endTime = this.maxTime - 100;
         if(this.time <= 100) {
             float timeDelta = this.time / 100f;
@@ -56,21 +57,24 @@ public class ColoredObjectiveText extends FlounderText {
         int x = -width / 2;
         int y = centerY / -3;
         int color = ColorHelper.withAlpha(this.alpha, Colors.WHITE);
-        int shadowColor = ColorHelper.scaleRgb(ColorHelper.withAlpha(this.alpha, this.color), 0.85f);
-//        int shadowColor = ColorHelper.withAlpha(this.alpha, this.color);
+
+        // Make shadow color slightly darker to be more readable in brighter environments (e.g. day time)
+        int shadowColor = ColorHelper.scaleRgb(ColorHelper.withAlpha(this.alpha, this.color), 0.75f);
 
         // Translate to center of screen, then scale up, then render
         context.getMatrices().pushMatrix();
         context.getMatrices().translate(centerX, centerY);
         context.getMatrices().scale(2f * stretch, 2f);
 
-        float offsetX = 1.25f;
-        float offsetY = 1.25f;
+        // Draw the colored shadow text slightly offset
+        float offsetX = 0.5f;
+        float offsetY = 0.5f;
         context.getMatrices().translate(offsetX, offsetY);
         context.drawText(this.textRenderer, this.text, x, y, shadowColor, false);
         context.getMatrices().translate(-offsetX, -offsetY);
 
-        context.drawText(this.textRenderer, this.text, x, y, color, true);
+        // Draw the normal text
+        context.drawText(this.textRenderer, this.text, x, y, color, false);
 
         context.getMatrices().popMatrix();
     }

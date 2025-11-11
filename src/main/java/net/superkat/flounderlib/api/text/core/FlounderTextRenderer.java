@@ -32,6 +32,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
     default void add(T text) {
         if(text.isTextBlank()) return;
         this.getTexts().add(text);
+        text.onAdd();
     }
 
     @Override
@@ -41,6 +42,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
             renderText(text, context, tickCounter);
             if (text.isFinishedRendering()) {
                 iterator.remove();
+                text.onRemove();
             }
         }
     }
@@ -70,6 +72,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         public void add(T text) {
             this.clear();
             this.texts.add(text);
+            text.onAdd();
         }
     }
 
@@ -111,6 +114,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
             for (String word : words) {
                 T wordText = this.wordSplitter.createTextFromWord(text, word);
                 this.texts.add(wordText);
+                text.onAdd();
             }
         }
     }

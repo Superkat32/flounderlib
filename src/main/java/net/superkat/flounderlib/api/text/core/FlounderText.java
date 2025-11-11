@@ -12,6 +12,7 @@ import net.minecraft.util.Util;
 
 import java.util.function.Function;
 
+// TODO - better animation handling to account for paused game (ask Echo)
 public abstract class FlounderText {
     public final MinecraftClient client;
     public final TextRenderer textRenderer;
@@ -28,6 +29,8 @@ public abstract class FlounderText {
         this.client = MinecraftClient.getInstance();
         this.textRenderer = client.textRenderer;
     }
+
+    public void onAdd() {}
 
     public abstract void draw(DrawContext context, RenderTickCounter tickCounter);
 
@@ -55,6 +58,8 @@ public abstract class FlounderText {
     public void setFinishedRendering(boolean finishedRendering) {
         this.finishedRendering = finishedRendering;
     }
+
+    public void onRemove() {}
 
     public Text getText() {
         return text;
