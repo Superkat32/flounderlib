@@ -11,6 +11,7 @@ import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.core.FlounderText;
 import net.superkat.flounderlib.api.text.core.FlounderTextRenderer;
 import net.superkat.flounderlib.api.text.core.FlounderTextType;
+import net.superkat.flounderlib.event.hud.HudEvents;
 import org.jetbrains.annotations.Nullable;
 
 public class FlounderTextRegistry {
@@ -22,6 +23,16 @@ public class FlounderTextRegistry {
 
     public static <T extends FlounderText> FlounderTextType<T> register(FlounderTextType<T> flounderTextType) {
         return Registry.register(TEXT_TYPE_REGISTRY, flounderTextType.id(), flounderTextType);
+    }
+
+    public static void init() {
+        HudEvents.END_TICK.register((client, hud, paused) -> {
+            TEXT_TYPE_REGISTRY.stream().forEach(flounderTextType -> flounderTextType.renderer().tick(paused));
+        });
+
+        HudEvents.HUD_CLEAR.register((client, hud) -> {
+            TEXT_TYPE_REGISTRY.stream().forEach(flounderTextType -> flounderTextType.renderer().clear());
+        });
     }
 
     @SuppressWarnings("unchecked")

@@ -37,9 +37,13 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
 
     @Override
     default void render(DrawContext context, RenderTickCounter tickCounter) {
+        int entry = 0;
         for (Iterator<T> iterator = this.getTexts().iterator(); iterator.hasNext(); ) {
             T text = iterator.next();
-            renderText(text, context, tickCounter);
+
+            renderText(text, context, tickCounter, entry);
+            entry++;
+
             if (text.isFinishedRendering()) {
                 iterator.remove();
                 text.onRemove();
@@ -47,9 +51,12 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         }
     }
 
-    default void renderText(T text, DrawContext context, RenderTickCounter tickCounter) {
-        text.draw(context, tickCounter);
-        text.update();
+    default void renderText(T text, DrawContext context, RenderTickCounter tickCounter, int entry) {
+        text.draw(context, tickCounter, entry, this.getTexts().size());
+    }
+
+    default void tick(boolean paused) {
+        this.getTexts().forEach(text -> text.tick(paused));
     }
 
     default void clear() {
@@ -83,7 +90,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         @Override
         public void render(DrawContext context, RenderTickCounter tickCounter) {
             if(this.currentText != null) {
-                this.renderText(this.currentText, context, tickCounter);
+                this.renderText(this.currentText, context, tickCounter, 0);
                 if(this.currentText.isFinishedRendering()) {
                     this.currentText = null;
                 }
@@ -91,6 +98,12 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
                 if(this.texts.isEmpty()) return;
                 this.currentText = this.texts.poll();
             }
+        }
+
+        @Override
+        public void tick(boolean paused) {
+            if(this.currentText == null) return;
+            this.currentText.tick(paused);
         }
 
         @Override

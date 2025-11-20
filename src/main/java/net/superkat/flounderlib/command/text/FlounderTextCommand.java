@@ -35,7 +35,7 @@ public class FlounderTextCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
         dispatcher.register(
                 CommandManager.literal("floundertext")
-                        .requires(source -> source.hasPermissionLevel(3))
+                        .requires(source -> source.hasPermissionLevel(2))
                         .then(
                                 CommandManager.argument("type", IdentifierArgumentType.identifier())
                                         .suggests(AVAILABLE_TEXT_IDS)
@@ -50,7 +50,8 @@ public class FlounderTextCommand {
                                                                         .executes(context -> executeText(
                                                                                 context.getSource(),
                                                                                 IdentifierArgumentType.getIdentifier(context, "type"),
-                                                                                FlounderTextArgument.getFlounderText(context, "text"))
+                                                                                FlounderTextArgument.getFlounderText(context, "text"),
+                                                                                EntityArgumentType.getPlayers(context, "viewers"))
                                                                         )
                                                         )
                                         )

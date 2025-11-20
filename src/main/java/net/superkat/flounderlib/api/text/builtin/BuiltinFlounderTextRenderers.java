@@ -20,9 +20,16 @@ public class BuiltinFlounderTextRenderers {
             FlounderTextRenderer.createSingleton()
     );
 
+    public static final FlounderTextType<SplatText> SPLAT_TEXT_TYPE = FlounderTextApi.register(
+            SplatText.ID,
+            SplatText.CODEC,
+            FlounderTextRenderer.createSimple()
+    );
+
     public static void init() {
         HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, RepoText.ID, FlounderTextApi.getRendererFromId(RepoText.ID));
         HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, ColoredObjectiveText.ID, FlounderTextApi.getRendererFromId(ColoredObjectiveText.ID));
+        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, SplatText.ID, FlounderTextApi.getRendererFromId(SplatText.ID));
     }
 
 }

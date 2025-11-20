@@ -8,11 +8,9 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Util;
 
 import java.util.function.Function;
 
-// TODO - better animation handling to account for paused game (ask Echo)
 public abstract class FlounderText {
     public final MinecraftClient client;
     public final TextRenderer textRenderer;
@@ -20,9 +18,8 @@ public abstract class FlounderText {
     public Text text;
     protected boolean finishedRendering = false;
 
-    public long time = 0;
-    public long startTime = -1;
-    public long maxTime = 5000;
+    public int ticks = 0;
+    public int maxTicks = 100;
 
     public FlounderText(Text text) {
         this.text = text;
@@ -32,16 +29,13 @@ public abstract class FlounderText {
 
     public void onAdd() {}
 
-    public abstract void draw(DrawContext context, RenderTickCounter tickCounter);
+    public abstract void draw(DrawContext context, RenderTickCounter tickCounter, int entry, int totalEntries);
 
-    public void update() {
-        long ms = Util.getMeasuringTimeMs();
-        if(this.startTime == -1) {
-            this.startTime = ms;
-        }
+    public void tick(boolean paused) {
+        if(paused) return;
 
-        this.time = ms - this.startTime;
-        if(this.time >= maxTime) {
+        this.ticks++;
+        if(this.ticks >= this.maxTicks) {
             this.setFinishedRendering(true);
         }
     }

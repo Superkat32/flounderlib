@@ -6,7 +6,6 @@ import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.core.FlounderText;
 import net.superkat.flounderlib.api.text.core.FlounderTextType;
@@ -18,27 +17,31 @@ public class RepoText extends FlounderText {
     public int bounceY = 0;
     public boolean yellow = true;
 
+    public int bounceInTicks;
+
     public RepoText(Text text) {
         super(text);
         int textLength = text.getLiteralString().length();
-        this.maxTime = (long) (1050 + (textLength + (textLength * 0.75f)));
+        this.maxTicks = (int) (21 + (textLength + (textLength * 0.75f)));
+
+        this.bounceInTicks = 2;
     }
 
     @Override
-    public void draw(DrawContext context, RenderTickCounter tickCounter) {
-        // Bounce up & down
-        if(this.time <= 50) {
-            this.bounceY = MathHelper.lerp( this.time / 50f, 0, 3);
-        } else if(this.time <= 100f) {
-            this.bounceY = MathHelper.lerp((this.time - 50f) / 50f, 2, -5);
-        } else if(this.bounceY != 0) {
-            this.bounceY = MathHelper.lerp(0.5f * tickCounter.getDynamicDeltaTicks(), this.bounceY, 0);
-        }
-
-        // Change color to yellow during the beginning
-        if(this.time >= 250) {
-            this.yellow = false;
-        }
+    public void draw(DrawContext context, RenderTickCounter tickCounter, int entry, int totalEntries) {
+//        // Bounce up & down
+//        if(this.ticks <= 2) {
+//            this.bounceY = MathHelper.lerp( this.time / 50f, 0, 3);
+//        } else if(this.time <= 100f) {
+//            this.bounceY = MathHelper.lerp((this.time - 50f) / 50f, 2, -5);
+//        } else if(this.bounceY != 0) {
+//            this.bounceY = MathHelper.lerp(0.5f * tickCounter.getDynamicDeltaTicks(), this.bounceY, 0);
+//        }
+//
+//        // Change color to yellow during the beginning
+//        if(this.time >= 250) {
+//            this.yellow = false;
+//        }
 
         // Determine positions and color
         int centerX = context.getScaledWindowWidth() / 2;

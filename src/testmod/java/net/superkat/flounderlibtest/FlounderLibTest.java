@@ -1,15 +1,18 @@
 package net.superkat.flounderlibtest;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.util.FlounderGameStartResult;
 import net.superkat.flounderlib.api.text.builtin.BuiltinFlounderTextRenderers;
 import net.superkat.flounderlib.api.text.builtin.RepoText;
+import net.superkat.flounderlib.api.text.builtin.SplatText;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
@@ -66,6 +69,14 @@ public class FlounderLibTest implements ModInitializer {
                         player.sendMessage(Text.literal("Minigame couldn't start!").formatted(Formatting.RED));
                     }
                 }
+            }
+        });
+
+        ServerLivingEntityEvents.AFTER_DEATH.register((livingEntity, damageSource) -> {
+            if (damageSource.getAttacker() instanceof ServerPlayerEntity player) {
+                String name = livingEntity.getName().getString();
+                Text text = Text.of("\uD83D\uDDE1Splatted " + name);
+                BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, new SplatText(text, Colors.WHITE));
             }
         });
     }

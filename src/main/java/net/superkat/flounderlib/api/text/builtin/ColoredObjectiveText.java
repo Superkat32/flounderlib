@@ -9,7 +9,6 @@ import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.core.FlounderText;
 import net.superkat.flounderlib.api.text.core.FlounderTextType;
@@ -30,25 +29,25 @@ public class ColoredObjectiveText extends FlounderText {
     public ColoredObjectiveText(Text text, int color) {
         super(text);
         this.color = color;
-        this.maxTime = 3000;
+        this.ticks = 60;
     }
 
     @Override
-    public void draw(DrawContext context, RenderTickCounter tickCounter) {
+    public void draw(DrawContext context, RenderTickCounter tickCounter, int entry, int totalEntries) {
         // Stretch in/out and fade in/out the text
-        float endTime = this.maxTime - 100;
-        if(this.time <= 100) {
-            float timeDelta = this.time / 100f;
-            this.stretch = MathHelper.lerp(timeDelta, 3f, 1f);
-            this.alpha = MathHelper.lerp(timeDelta, 0f, 1f);
-        } else if(this.time >= endTime) {
-            float timeDelta = (this.time - endTime) / 100f;
-            this.stretch = MathHelper.lerp(timeDelta, 1f, 3f);
-            this.alpha = MathHelper.lerp(timeDelta, 1f, 0f);
-        } else {
-            this.stretch = MathHelper.lerp(tickCounter.getDynamicDeltaTicks(), this.stretch, 1f);
-            this.alpha = MathHelper.lerp(tickCounter.getDynamicDeltaTicks(), this.alpha, 1f);
-        }
+//        float endTime = this.maxTime - 100;
+//        if(this.time <= 100) {
+//            float timeDelta = this.time / 100f;
+//            this.stretch = MathHelper.lerp(timeDelta, 3f, 1f);
+//            this.alpha = MathHelper.lerp(timeDelta, 0f, 1f);
+//        } else if(this.time >= endTime) {
+//            float timeDelta = (this.time - endTime) / 100f;
+//            this.stretch = MathHelper.lerp(timeDelta, 1f, 3f);
+//            this.alpha = MathHelper.lerp(timeDelta, 1f, 0f);
+//        } else {
+//            this.stretch = MathHelper.lerp(tickCounter.getDynamicDeltaTicks(), this.stretch, 1f);
+//            this.alpha = MathHelper.lerp(tickCounter.getDynamicDeltaTicks(), this.alpha, 1f);
+//        }
 
         // Determine positions and color
         int centerX = context.getScaledWindowWidth() / 2;
