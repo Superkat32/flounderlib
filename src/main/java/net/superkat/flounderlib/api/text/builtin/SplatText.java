@@ -73,7 +73,7 @@ public class SplatText extends FlounderText {
         // Slide in
         int xOffset = 0;
         if(this.ticks < this.slideInTicks) {
-            xOffset = MathHelper.lerp((this.ticks + tickCounter.getTickProgress(false)) / this.slideInTicks, this.startXOffset, 0);
+            xOffset = MathHelper.lerp(this.getTickDelta(tickCounter) / this.slideInTicks, this.startXOffset, 0);
         }
 
         // Fading

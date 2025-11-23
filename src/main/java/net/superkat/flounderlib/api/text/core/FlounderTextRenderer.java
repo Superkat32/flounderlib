@@ -127,7 +127,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
             for (String word : words) {
                 T wordText = this.wordSplitter.createTextFromWord(text, word);
                 this.texts.add(wordText);
-                text.onAdd();
+                wordText.onAdd();
             }
         }
     }

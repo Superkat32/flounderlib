@@ -11,6 +11,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
 import java.util.function.Function;
@@ -61,10 +62,6 @@ public abstract class FlounderText {
         player.playSoundToPlayer(sound, category, volume, pitch);
     }
 
-    public SoundCategory getSoundCategory() {
-        return SoundCategory.PLAYERS;
-    }
-
     public boolean isTextBlank() {
         String literalString = this.text.getLiteralString();
         return literalString == null || literalString.isBlank();
@@ -82,6 +79,18 @@ public abstract class FlounderText {
 
     public Text getText() {
         return text;
+    }
+
+    public float getTickDelta(RenderTickCounter tickCounter) {
+        return this.ticks + tickCounter.getTickProgress(false);
+    }
+
+    public SoundCategory getSoundCategory() {
+        return SoundCategory.PLAYERS;
+    }
+
+    public Identifier getId() {
+        return this.getType().id();
     }
 
     public abstract FlounderTextType<?> getType();

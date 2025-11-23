@@ -5,7 +5,6 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
@@ -37,38 +36,40 @@ public class FlounderTextCommand {
                 CommandManager.literal("floundertext")
                         .requires(source -> source.hasPermissionLevel(2))
                         .then(
-                                CommandManager.argument("type", IdentifierArgumentType.identifier())
-                                        .suggests(AVAILABLE_TEXT_IDS)
-                                        .then(
-                                                CommandManager.argument("text", FlounderTextArgument.flounderText(registryAccess))
-                                                        .suggests(AVAILABLE_TEXT_IDS)
-                                                        .executes(context -> executeText(
-                                                                context.getSource(),
-                                                                IdentifierArgumentType.getIdentifier(context, "type"),
-                                                                FlounderTextArgument.getFlounderText(context, "text"))
-                                                        ).then(CommandManager.argument("viewers", EntityArgumentType.players())
-                                                                        .executes(context -> executeText(
-                                                                                context.getSource(),
-                                                                                IdentifierArgumentType.getIdentifier(context, "type"),
-                                                                                FlounderTextArgument.getFlounderText(context, "text"),
-                                                                                EntityArgumentType.getPlayers(context, "viewers"))
-                                                                        )
-                                                        )
-                                        )
+//                                CommandManager.argument("type", IdentifierArgumentType.identifier())
+//                                        .suggests(AVAILABLE_TEXT_IDS)
+//                                        .then(
+                                            CommandManager.argument("text", FlounderTextArgument.flounderText(registryAccess))
+                                                    .suggests(AVAILABLE_TEXT_IDS)
+                                                    .executes(context -> executeText(
+                                                            context.getSource(),
+//                                                            IdentifierArgumentType.getIdentifier(context, "type"),
+                                                            FlounderTextArgument.getFlounderText(context, "text"))
+                                                    ).then(CommandManager.argument("viewers", EntityArgumentType.players())
+                                                                    .executes(context -> executeText(
+                                                                            context.getSource(),
+//                                                                            IdentifierArgumentType.getIdentifier(context, "type"),
+                                                                            FlounderTextArgument.getFlounderText(context, "text"),
+                                                                            EntityArgumentType.getPlayers(context, "viewers"))
+                                                                    )
+                                                    )
+//                                        )
                         )
         );
     }
 
-    public static int executeText(ServerCommandSource source, Identifier id, FlounderText text) {
+    public static int executeText(ServerCommandSource source, FlounderText text) {
         List<ServerPlayerEntity> players = source.getPlayer() == null ? List.of() : List.of(source.getPlayer());
-        return executeText(source, id, text, players);
+        return executeText(source, text, players);
     }
 
-    public static int executeText(ServerCommandSource source, Identifier id, FlounderText text, Collection<ServerPlayerEntity> viewers) {
+    public static int executeText(ServerCommandSource source, FlounderText text, Collection<ServerPlayerEntity> viewers) {
         if(viewers.isEmpty()) {
             source.sendFeedback(() -> Text.literal("Did not send any text - there were no viewers to view it!").formatted(Formatting.RED), false);
             return 0;
         }
+
+        Identifier id = text.getId();
 
         FlounderTextApi.sendText(viewers, id, text);
         Text idText = Text.literal(id.toString()).formatted(Formatting.AQUA);
