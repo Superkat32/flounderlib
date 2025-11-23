@@ -23,21 +23,9 @@ public class SplatText extends FlounderText {
                     Codecs.ARGB.optionalFieldOf("color", Colors.PURPLE).forGetter(text -> text.color)
             ).apply(instance, SplatText::new)
     );
-
-    private static final int BACKGROUND_TEXTURE_COUNT = 7;
     public static final Identifier[] BACKGROUND_TEXTURES = getBackgroundTextures();
 
-    private static Identifier[] getBackgroundTextures() {
-        Identifier[] textures = new Identifier[BACKGROUND_TEXTURE_COUNT];
-        for (int i = 0; i < BACKGROUND_TEXTURE_COUNT; i++) {
-            textures[i] = bg(i + 1);
-        }
-        return textures;
-    }
-
-    private static Identifier bg(int id) {
-        return Identifier.of(FlounderLib.MOD_ID, "text/splat/splatted" + id);
-    }
+    private static final int BACKGROUND_TEXTURE_COUNT = 7;
 
     public int color;
     public int textY;
@@ -66,7 +54,14 @@ public class SplatText extends FlounderText {
         this.fadeInTicks = 3;
         this.fadeOutTicks = 5;
 
-        this.backgroundId = this.client.world.getRandom().nextInt(BACKGROUND_TEXTURE_COUNT);
+        this.backgroundId = this.random.nextInt(BACKGROUND_TEXTURE_COUNT);
+    }
+
+    @Override
+    public void onAdd() {
+        // Play a simple, quiet sound when displayed on the client
+//        float pitch = 1.5f + this.random.nextFloat() / 8f;
+//        this.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 0.25f, pitch);
     }
 
     @Override
@@ -74,35 +69,41 @@ public class SplatText extends FlounderText {
         int windowWidth = context.getScaledWindowWidth();
         int windowHeight = context.getScaledWindowHeight();
         int centerX = windowWidth / 2;
-        int centerY = windowHeight / 2;
 
+        // Slide in
         int xOffset = 0;
         if(this.ticks < this.slideInTicks) {
             xOffset = MathHelper.lerp((this.ticks + tickCounter.getTickProgress(false)) / this.slideInTicks, this.startXOffset, 0);
         }
 
+        // Fading
         float alpha = 1f;
-        if(this.ticks <= this.fadeInTicks) {
+        if(this.ticks <= this.fadeInTicks) { // Fade in
             alpha = MathHelper.lerp((float) this.ticks / this.fadeInTicks, 0f, 1f);
-        } else if (this.ticks >= this.maxTicks - this.fadeOutTicks) {
+        } else if (this.ticks >= this.maxTicks - this.fadeOutTicks) { // Fade out
             alpha = MathHelper.lerp((float) (this.ticks - (this.maxTicks - this.fadeOutTicks)) / this.fadeOutTicks, 1f, 0f);
         }
 
+        // Center the text background
         int backgroundWidth = (int) (windowWidth / 3.5);
         int backgroundHeight = 16;
         int backgroundX = centerX - (backgroundWidth / 2) + xOffset;
+        // Slide up the text background
         this.backgroundY = this.getBackgroundY(windowHeight, entry);
         this.prevBackgroundY = MathHelper.lerp(tickCounter.getTickProgress(false) / 2f, this.prevBackgroundY, this.backgroundY);;
 
+        // Center the text
         int textWidth = this.textRenderer.getWidth(this.getText());
-//        int textHeight = this.textRenderer.getWrappedLinesHeight(this.text, backgroundWidth);
         int textHeight = 9;
         int textX = centerX - (textWidth / 2) + xOffset;
-
-        int textColor = ColorHelper.withAlpha(alpha, Colors.WHITE);
+        // Slide the text up
         this.textY = this.backgroundY + (textHeight / 2);
         this.prevTextY = MathHelper.lerp(tickCounter.getTickProgress(false) / 2f, this.prevTextY, this.textY);;
 
+        // Apply fading effects (if any)
+        int textColor = ColorHelper.withAlpha(alpha, Colors.WHITE);
+
+        // Draw the background and text
         context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURES[this.backgroundId], backgroundX, this.prevBackgroundY, backgroundWidth, backgroundHeight, alpha);
         context.drawTextWithShadow(this.textRenderer, this.getText(), textX, this.prevTextY, textColor);
     }
@@ -115,5 +116,17 @@ public class SplatText extends FlounderText {
     @Override
     public FlounderTextType<?> getType() {
         return BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE;
+    }
+
+    private static Identifier[] getBackgroundTextures() {
+        Identifier[] textures = new Identifier[BACKGROUND_TEXTURE_COUNT];
+        for (int i = 0; i < BACKGROUND_TEXTURE_COUNT; i++) {
+            textures[i] = bg(i + 1);
+        }
+        return textures;
+    }
+
+    private static Identifier bg(int id) {
+        return Identifier.of(FlounderLib.MOD_ID, "text/splat/splatted" + id);
     }
 }

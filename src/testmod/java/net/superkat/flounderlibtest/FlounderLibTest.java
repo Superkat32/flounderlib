@@ -6,12 +6,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
 import net.superkat.flounderlib.api.FlounderApi;
 import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.minigame.util.FlounderGameStartResult;
 import net.superkat.flounderlib.api.text.builtin.BuiltinFlounderTextRenderers;
-import net.superkat.flounderlib.api.text.builtin.RepoText;
 import net.superkat.flounderlib.api.text.builtin.SplatText;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
@@ -55,27 +52,27 @@ public class FlounderLibTest implements ModInitializer {
         ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
             for (ServerPlayerEntity player : serverWorld.getPlayers()) {
 
-                if(player.getItemUseTime() == 5) {
-                    BuiltinFlounderTextRenderers.REPO_TEXT_TYPE.send(player, new RepoText(Text.of("What's up homie buddy")));
-                }
+//                if(player.getItemUseTime() == 5) {
+//                    BuiltinFlounderTextRenderers.REPO_TEXT_TYPE.send(player, new RepoText(Text.of("What's up homie buddy")));
+//                }
 
-                if(player.getItemUseTime() == 20) {
-                    ExampleMinigame exampleMinigame = new ExampleMinigame(player.getBlockPos());
-
-                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, exampleMinigame);
-                    if(startResult.isSuccessful()) {
-                        player.sendMessage(Text.literal("Minigame started!").formatted(Formatting.GREEN));
-                    } else {
-                        player.sendMessage(Text.literal("Minigame couldn't start!").formatted(Formatting.RED));
-                    }
-                }
+//                if(player.getItemUseTime() == 20) {
+//                    ExampleMinigame exampleMinigame = new ExampleMinigame(player.getBlockPos());
+//
+//                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, exampleMinigame);
+//                    if(startResult.isSuccessful()) {
+//                        player.sendMessage(Text.literal("Minigame started!").formatted(Formatting.GREEN));
+//                    } else {
+//                        player.sendMessage(Text.literal("Minigame couldn't start!").formatted(Formatting.RED));
+//                    }
+//                }
             }
         });
 
         ServerLivingEntityEvents.AFTER_DEATH.register((livingEntity, damageSource) -> {
             if (damageSource.getAttacker() instanceof ServerPlayerEntity player) {
                 String name = livingEntity.getName().getString();
-                Text text = Text.of("\uD83D\uDDE1Splatted " + name);
+                Text text = Text.of("\uD83D\uDDE1 Splatted " + name);
                 BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, new SplatText(text, Colors.WHITE));
             }
         });
