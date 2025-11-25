@@ -26,10 +26,17 @@ public class BuiltinFlounderTextRenderers {
             FlounderTextRenderer.createSimple()
     );
 
+    public static final FlounderTextType<WipeoutText> WIPEOUT_TEXT_TYPE = FlounderTextApi.register(
+            WipeoutText.ID,
+            WipeoutText.CODEC,
+            FlounderTextRenderer.createSingleton()
+    );
+
     public static void init() {
         HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, RepoText.ID, FlounderTextApi.getRendererFromId(RepoText.ID));
         HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, ColoredObjectiveText.ID, FlounderTextApi.getRendererFromId(ColoredObjectiveText.ID));
         HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, SplatText.ID, FlounderTextApi.getRendererFromId(SplatText.ID));
+        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, WipeoutText.ID, FlounderTextApi.getRendererFromId(WipeoutText.ID));
     }
 
 }
