@@ -1,7 +1,5 @@
 package net.superkat.flounderlib.api.text.builtin;
 
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.text.Text;
 import net.superkat.flounderlib.api.text.FlounderTextApi;
 import net.superkat.flounderlib.api.text.core.FlounderTextRenderer;
@@ -39,11 +37,11 @@ public class BuiltinFlounderTextRenderers {
     );
 
     public static void init() {
-        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, RepoText.ID, FlounderTextApi.getRendererFromId(RepoText.ID));
-        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, ColoredObjectiveText.ID, FlounderTextApi.getRendererFromId(ColoredObjectiveText.ID));
-        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, SplatText.ID, FlounderTextApi.getRendererFromId(SplatText.ID));
-        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, WipeoutText.ID, FlounderTextApi.getRendererFromId(WipeoutText.ID));
-        HudElementRegistry.attachElementAfter(VanillaHudElements.SCOREBOARD, ShakeyActionText.ID, FlounderTextApi.getRendererFromId(ShakeyActionText.ID));
+        FlounderTextApi.registerDefaultRenderer(RepoText.ID);
+        FlounderTextApi.registerDefaultRenderer(ColoredObjectiveText.ID);
+        FlounderTextApi.registerDefaultRenderer(SplatText.ID);
+        FlounderTextApi.registerDefaultRenderer(WipeoutText.ID);
+        FlounderTextApi.registerDefaultRenderer(ShakeyActionText.ID);
     }
 
 }
