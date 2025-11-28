@@ -52,7 +52,7 @@ public class WipeoutText extends FlounderText {
 
         this.maxTicks = 60;
 
-        this.textIntroTicks = 10;
+        this.textIntroTicks = 8;
         this.letterBounceY = 2f;
 
         this.maxBackgroundAlpha = 0.5f;
