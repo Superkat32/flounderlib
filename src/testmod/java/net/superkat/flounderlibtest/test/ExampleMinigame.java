@@ -11,10 +11,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.superkat.flounderlib.api.minigame.FlounderGame;
-import net.superkat.flounderlib.api.minigame.gametype.FlounderGameType;
-import net.superkat.flounderlib.api.text.builtin.BuiltinFlounderTextRenderers;
-import net.superkat.flounderlib.api.text.builtin.ColoredObjectiveText;
+import net.superkat.flounderlib.api.minigame.v1.game.FlounderGame;
+import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
+import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
+import net.superkat.flounderlib.api.text.v1.builtin.ColoredObjectiveText;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 

@@ -5,7 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Colors;
-import net.superkat.flounderlib.api.FlounderClientApi;
+import net.superkat.flounderlib.api.minigame.v1.FlounderClientApi;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 

@@ -3,13 +3,13 @@
   "package": "net.superkat.flounderlib.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "ServerWorldMixin",
-    "client.InGameHudMixin"
+    "hud.client.InGameHudMixin",
+    "minigame.ServerWorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-    "client.ClientWorldMixin"
+    "minigame.client.ClientWorldMixin"
   ]
 }
