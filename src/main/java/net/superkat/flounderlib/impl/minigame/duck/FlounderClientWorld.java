@@ -1,6 +1,6 @@
 package net.superkat.flounderlib.impl.minigame.duck;
 
-import net.superkat.flounderlib.impl.minigame.sync.FlounderClientGameManager;
+import net.superkat.flounderlib.impl.minigame.client.FlounderClientGameManager;
 
 public interface FlounderClientWorld {
 

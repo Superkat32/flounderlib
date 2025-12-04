@@ -11,7 +11,6 @@ import net.superkat.flounderlib.api.minigame.v1.FlounderApi;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.util.FlounderGameStartResult;
 import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
-import net.superkat.flounderlib.api.text.v1.builtin.RepoText;
 import net.superkat.flounderlib.api.text.v1.builtin.SplatText;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
@@ -44,7 +43,7 @@ public class FlounderLibTest implements ModInitializer {
 
     public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.register(
             FlounderGameType.create(TestSyncedMinigame.ID, TestSyncedMinigame.CODEC)
-                    .sync(TestSyncedMinigame.Data.DATA_PACKET_CODEC)
+                    .synced(true)
                     .singleton(true)
     );
 
@@ -55,20 +54,30 @@ public class FlounderLibTest implements ModInitializer {
         ServerTickEvents.END_WORLD_TICK.register(serverWorld -> {
             for (ServerPlayerEntity player : serverWorld.getPlayers()) {
 
-                if(player.getItemUseTime() == 5) {
-                    BuiltinFlounderTextRenderers.REPO_TEXT_TYPE.send(player, new RepoText(Text.of("What's up homie buddy")));
-                }
-
                 if(player.getItemUseTime() == 20) {
-                    ExampleMinigame exampleMinigame = new ExampleMinigame(player.getBlockPos());
+                    TestSyncedMinigame testSyncedMinigame = new TestSyncedMinigame(player.getBlockPos());
 
-                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, exampleMinigame);
+                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, testSyncedMinigame);
                     if(startResult.isSuccessful()) {
                         player.sendMessage(Text.literal("Minigame started!").formatted(Formatting.GREEN));
                     } else {
                         player.sendMessage(Text.literal("Minigame couldn't start!").formatted(Formatting.RED));
                     }
                 }
+//                if(player.getItemUseTime() == 5) {
+//                    BuiltinFlounderTextRenderers.REPO_TEXT_TYPE.send(player, new RepoText(Text.of("What's up homie buddy")));
+//                }
+//
+//                if(player.getItemUseTime() == 20) {
+//                    ExampleMinigame exampleMinigame = new ExampleMinigame(player.getBlockPos());
+//
+//                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, exampleMinigame);
+//                    if(startResult.isSuccessful()) {
+//                        player.sendMessage(Text.literal("Minigame started!").formatted(Formatting.GREEN));
+//                    } else {
+//                        player.sendMessage(Text.literal("Minigame couldn't start!").formatted(Formatting.RED));
+//                    }
+//                }
             }
         });
 

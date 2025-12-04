@@ -4,16 +4,10 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.PlayerAssociatedNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncData;
-import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameDataUpdateS2CPacket;
-import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameRemoveS2CPacket;
 
 import java.util.List;
 
-// TODO - Tracked syncable minigame which syncs each individual value only when updated, instead of each value at once
-public interface SyncableFlounderableGame<T extends FlounderSyncData> extends FlounderableGame {
-
-    T createData();
+public interface SyncableFlounderableGame extends FlounderableGame {
 
     boolean isDirty();
 
@@ -28,7 +22,8 @@ public interface SyncableFlounderableGame<T extends FlounderSyncData> extends Fl
     }
 
     default void syncAdd(List<ServerPlayerEntity> players) {
-        // NO-OP for now
+        CustomPayload packet = this.createAddPacket();
+        this.sendPacketToPlayers(players, packet);
     }
 
     default void syncUpdate(ServerPlayerEntity player) {
@@ -50,6 +45,10 @@ public interface SyncableFlounderableGame<T extends FlounderSyncData> extends Fl
         this.sendPacketToPlayers(players, packet);
     }
 
+    default void sendPacketToPlayer(ServerPlayerEntity player, CustomPayload packet) {
+        this.sendPacketToPlayers(List.of(player), packet);
+    }
+
     default void sendPacketToPlayers(List<ServerPlayerEntity> players, CustomPayload packet) {
         for (ServerPlayerEntity player : players) {
             if(player == null || player.networkHandler == null) continue;
@@ -62,15 +61,9 @@ public interface SyncableFlounderableGame<T extends FlounderSyncData> extends Fl
         ServerPlayNetworking.send(player, packet);
     }
 
-    default CustomPayload createAddPacket() {
-        return null;
-    }
+    CustomPayload createAddPacket();
 
-    default CustomPayload createUpdatePacket() {
-        return new FlounderGameDataUpdateS2CPacket<>(this.getIdentifier(), this.getMinigameId(), this.createData());
-    }
+    CustomPayload createUpdatePacket();
 
-    default CustomPayload createRemovePacket() {
-        return new FlounderGameRemoveS2CPacket(this.getIdentifier(), this.getMinigameId());
-    }
+    CustomPayload createRemovePacket();
 }

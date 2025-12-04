@@ -5,7 +5,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
-import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncData;
+import net.superkat.flounderlib.impl.minigame.game.FlounderRegistry;
 
 // goals:
 // - singleton by default
@@ -21,8 +21,13 @@ public record FlounderGameType<T extends FlounderableGame>(
         int padding,
         boolean overlap,
         boolean singleton,
-        PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec
+        boolean synced
 ) {
+
+    public static final PacketCodec<RegistryByteBuf, FlounderGameType<?>> PACKET_CODEC = PacketCodec.of(
+            (value, buf) -> buf.writeIdentifier(value.id),
+            buf -> FlounderRegistry.getRegistry().get(buf.readIdentifier())
+    );
 
     public static <T extends FlounderableGame> Builder<T> create(Identifier id) {
         return new Builder<T>(id);
@@ -44,7 +49,8 @@ public record FlounderGameType<T extends FlounderableGame>(
         private boolean overlap = true;
         private boolean singleton = false;
 
-        private PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec = null;
+        private boolean synced = false;
+//        private PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec = null;
 
         protected Builder(Identifier id) {
             this.id = id;
@@ -75,8 +81,8 @@ public record FlounderGameType<T extends FlounderableGame>(
             return this;
         }
 
-        public Builder<T> sync(PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec) {
-            this.dataPacketCodec = dataPacketCodec;
+        public Builder<T> synced(boolean synced) {
+            this.synced = synced;
             return this;
         }
 
@@ -85,7 +91,7 @@ public record FlounderGameType<T extends FlounderableGame>(
                     this.id, this.codec,
                     this.distance, this.padding, this.overlap,
                     this.singleton,
-                    this.dataPacketCodec
+                    this.synced
             );
         }
     }
