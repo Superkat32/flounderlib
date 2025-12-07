@@ -8,7 +8,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.flounderlib.api.minigame.v1.FlounderClientApi;
-import net.superkat.flounderlib.impl.minigame.sync.FlounderSyncState;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 
@@ -20,7 +19,7 @@ public class TestSyncedMinigameRenderer {
         TextRenderer textRenderer = client.textRenderer;
 
         TestRenderState renderState = TestRenderState.fromSyncState(
-                FlounderClientApi.getFirstSyncState(FlounderLibTest.TEST_SYNCED_MINIGAME)
+                FlounderClientApi.getFirstSyncState(TestSyncedMinigame.STATE_SYNCER)
         );
 
         int ticks = renderState.ticks();
@@ -46,16 +45,15 @@ public class TestSyncedMinigameRenderer {
     }
 
     public record TestRenderState(int ticks, boolean myBoolean, int myInteger, String myString, Vec3d myVec3d, Text myText) {
-        public static TestRenderState fromSyncState(FlounderSyncState syncState) {
-            if(syncState.values.size() < 2) return new TestRenderState(-1, false, 0, "", Vec3d.ZERO, Text.of(""));
-
-            int ticks = syncState.getValue(TestSyncedMinigame.TICKS_KEY);
-            boolean myBoolean = syncState.getValue(TestSyncedMinigame.MY_BOOLEAN_KEY);
-            int myInteger = syncState.getValue(TestSyncedMinigame.MY_INTEGER_KEY);
-            String myString = syncState.getValue(TestSyncedMinigame.MY_STRING_KEY);
-            Vec3d myVec3d = syncState.getValue(TestSyncedMinigame.MY_VEC_3D_KEY);
-            Text myText = syncState.getValue(TestSyncedMinigame.MY_TEXT_KEY);
-            return new TestRenderState(ticks, myBoolean, myInteger, myString, myVec3d, myText);
+        public static TestRenderState fromSyncState(TestSyncedMinigame.SyncState syncState) {
+            return new TestRenderState(
+                    syncState.ticks,
+                    syncState.myBoolean,
+                    syncState.myInteger,
+                    syncState.myString,
+                    syncState.myVec3d,
+                    syncState.myText
+            );
         }
     }
 

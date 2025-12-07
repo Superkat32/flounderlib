@@ -7,7 +7,7 @@ import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameAddS2C
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameRemoveS2CPacket;
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameUpdateS2CPacket;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
-import net.superkat.flounderlib.impl.minigame.sync.FlDataValue;
+import net.superkat.flounderlib.impl.minigame.sync.FlSyncValue;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public class FlounderMinigameClientNetworkHandler {
 
     public static void onMinigameUpdate(FlounderGameUpdateS2CPacket packet, ClientPlayNetworking.Context context) {
         PackedFlGameInfo gameInfo = packet.gameInfo();
-        List<FlDataValue.Packed<?>> values = packet.values();
+        List<FlSyncValue.Packed<?>> values = packet.values();
         FlounderClientApi.getClientGameManager().updateMinigame(gameInfo, values);
 
         // Debug

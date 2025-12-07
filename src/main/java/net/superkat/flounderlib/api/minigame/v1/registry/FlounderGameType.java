@@ -5,6 +5,7 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
+import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.impl.minigame.game.FlounderRegistry;
 
 // goals:
@@ -21,7 +22,9 @@ public record FlounderGameType<T extends FlounderableGame>(
         int padding,
         boolean overlap,
         boolean singleton,
-        boolean synced
+
+        boolean synced,
+        FlounderStateSyncer<T, ?> stateSyncer
 ) {
 
     public static final PacketCodec<RegistryByteBuf, FlounderGameType<?>> PACKET_CODEC = PacketCodec.of(
@@ -41,6 +44,12 @@ public record FlounderGameType<T extends FlounderableGame>(
         return this.codec != null;
     }
 
+    public void onInit() {
+        if(this.synced) {
+            this.stateSyncer.setFlounderGameType(this);
+        }
+    }
+
     public static class Builder<T extends FlounderableGame> {
         private final Identifier id;
         private Codec<T> codec = null;
@@ -50,6 +59,7 @@ public record FlounderGameType<T extends FlounderableGame>(
         private boolean singleton = false;
 
         private boolean synced = false;
+        private FlounderStateSyncer<T, ?> stateSyncer = null;
 //        private PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec = null;
 
         protected Builder(Identifier id) {
@@ -86,13 +96,24 @@ public record FlounderGameType<T extends FlounderableGame>(
             return this;
         }
 
+        public Builder<T> synced(FlounderStateSyncer<T, ?> stateSyncer) {
+            this.synced = true;
+            this.stateSyncer = stateSyncer;
+            return this;
+        }
+
         public FlounderGameType<T> build() {
-            return new FlounderGameType<>(
+            FlounderGameType<T> gameType = new FlounderGameType<>(
                     this.id, this.codec,
                     this.distance, this.padding, this.overlap,
                     this.singleton,
-                    this.synced
+
+                    this.synced,
+                    this.stateSyncer
             );
+
+            gameType.onInit();
+            return gameType;
         }
     }
 }

@@ -109,6 +109,10 @@ public abstract class FlounderGame implements FlounderableGame {
         }
     }
 
+    public int getTicks() {
+        return this.ticks;
+    }
+
     @Override
     public BlockPos getCenterPos() {
         return this.centerPos;

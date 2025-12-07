@@ -24,6 +24,12 @@ public interface SyncableFlounderableGame extends FlounderableGame {
     default void syncAdd(List<ServerPlayerEntity> players) {
         CustomPayload packet = this.createAddPacket();
         this.sendPacketToPlayers(players, packet);
+
+        // TODO - custom bundle packet
+        List<CustomPayload> extraPackets = this.createExtraAddPackets();
+        for (CustomPayload extraPacket : extraPackets) {
+            this.sendPacketToPlayers(players, extraPacket);
+        }
     }
 
     default void syncUpdate(ServerPlayerEntity player) {
@@ -33,6 +39,13 @@ public interface SyncableFlounderableGame extends FlounderableGame {
     default void syncUpdate(List<ServerPlayerEntity> players) {
         CustomPayload packet = this.createUpdatePacket();
         this.sendPacketToPlayers(players, packet);
+
+        // TODO - custom bundle packet
+        List<CustomPayload> extraPackets = this.createExtraUpdatePackets();
+        for (CustomPayload extraPacket : extraPackets) {
+            this.sendPacketToPlayers(players, extraPacket);
+        }
+
         this.setDirty(false);
     }
 
@@ -43,6 +56,12 @@ public interface SyncableFlounderableGame extends FlounderableGame {
     default void syncRemove(List<ServerPlayerEntity> players) {
         CustomPayload packet = this.createRemovePacket();
         this.sendPacketToPlayers(players, packet);
+
+        // TODO - custom bundle packet
+        List<CustomPayload> extraPackets = this.createExtraRemovePackets();
+        for (CustomPayload extraPacket : extraPackets) {
+            this.sendPacketToPlayers(players, extraPacket);
+        }
     }
 
     default void sendPacketToPlayer(ServerPlayerEntity player, CustomPayload packet) {
@@ -66,4 +85,16 @@ public interface SyncableFlounderableGame extends FlounderableGame {
     CustomPayload createUpdatePacket();
 
     CustomPayload createRemovePacket();
+
+    default List<CustomPayload> createExtraAddPackets() {
+        return List.of();
+    }
+
+    default List<CustomPayload> createExtraUpdatePackets() {
+        return List.of();
+    }
+
+    default List<CustomPayload> createExtraRemovePackets() {
+        return List.of();
+    }
 }

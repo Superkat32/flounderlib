@@ -12,8 +12,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.flounderlib.api.minigame.v1.game.SyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
-import net.superkat.flounderlib.api.minigame.v1.sync.FlDataKey;
-import net.superkat.flounderlib.impl.minigame.sync.FlounderSyncState;
+import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
+import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,6 +21,7 @@ import java.util.UUID;
 
 public class TestSyncedMinigame extends SyncedFlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_synced_minigame");
+
     public static final Codec<TestSyncedMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("ticks").forGetter(game -> game.ticks),
@@ -33,12 +34,13 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
             ).apply(instance, TestSyncedMinigame::new)
     );
 
-    public static final FlDataKey<Integer> TICKS_KEY = FlDataKey.ofInt();
-    public static final FlDataKey<Boolean> MY_BOOLEAN_KEY = FlDataKey.ofBoolean();
-    public static final FlDataKey<Integer> MY_INTEGER_KEY = FlDataKey.ofInt();
-    public static final FlDataKey<String> MY_STRING_KEY = FlDataKey.ofString();
-    public static final FlDataKey<Vec3d> MY_VEC_3D_KEY = FlDataKey.ofVec3d();
-    public static final FlDataKey<Text> MY_TEXT_KEY = FlDataKey.ofText();
+    public static final FlounderStateSyncer<TestSyncedMinigame, SyncState> STATE_SYNCER = FlounderStateSyncer.create(TestSyncedMinigame.class, SyncState::new)
+            .addInteger(TestSyncedMinigame::getTicks, SyncState::setTicks)
+            .addBoolean(game -> game.myBoolean, (syncState, value) -> syncState.myBoolean = value)
+            .addInteger(game -> game.myInteger, (syncState, value) -> syncState.myInteger = value)
+            .addString(game -> game.myString, (syncState, value) -> syncState.myString = value)
+            .addVec3d(game -> game.myVec3d, (syncState, value) -> syncState.myVec3d = value)
+            .addText(game -> game.myText, (syncState, value) -> syncState.myText = value);
 
     public boolean myBoolean = true;
     public int myInteger = 0;
@@ -57,16 +59,6 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
         this.myString = myString;
         this.myVec3d = myVec3d;
         this.myText = myText;
-    }
-
-    @Override
-    public void addDataValues(FlounderSyncState.Builder builder) {
-        builder.addKey(TICKS_KEY, () -> this.ticks);
-        builder.addKey(MY_BOOLEAN_KEY, () -> this.myBoolean);
-        builder.addKey(MY_INTEGER_KEY, () -> this.myInteger);
-        builder.addKey(MY_STRING_KEY, () -> this.myString);
-        builder.addKey(MY_VEC_3D_KEY, () -> this.myVec3d);
-        builder.addKey(MY_TEXT_KEY, () -> this.myText);
     }
 
     @Override
@@ -130,5 +122,18 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
     @Override
     public @NotNull FlounderGameType<?> getGameType() {
         return FlounderLibTest.TEST_SYNCED_MINIGAME;
+    }
+
+    public static class SyncState implements FlounderSyncState {
+        public int ticks = 0;
+        public boolean myBoolean = true;
+        public int myInteger = 0;
+        public String myString = "Aha!";
+        public Vec3d myVec3d = Vec3d.ZERO;
+        public Text myText = Text.translatable("item.minecraft.spyglass");
+
+        public void setTicks(int ticks) {
+            this.ticks = ticks;
+        }
     }
 }

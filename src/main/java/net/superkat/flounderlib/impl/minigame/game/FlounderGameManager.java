@@ -80,6 +80,7 @@ public class FlounderGameManager extends PersistentState {
     }
 
     public void tick() {
+        if(!this.world.getTickManager().shouldTick()) return;
         this.ticks++;
 
         Iterator<FlounderableGame> iterator = this.games.values().iterator();

@@ -3,9 +3,9 @@ package net.superkat.flounderlib.impl.minigame.client;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.client.world.ClientWorld;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
+import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
-import net.superkat.flounderlib.impl.minigame.sync.FlDataValue;
-import net.superkat.flounderlib.impl.minigame.sync.FlounderSyncState;
+import net.superkat.flounderlib.impl.minigame.sync.FlSyncValue;
 
 import java.util.List;
 import java.util.Map;
@@ -22,13 +22,14 @@ public class FlounderClientGameManager {
     public void addMinigame(PackedFlGameInfo gameInfo) {
         FlounderGameType<?> gameType = gameInfo.gameType();
         int gameId = gameInfo.gameId();
-        FlounderSyncState syncState = new FlounderSyncState.Builder().build();
+
+        FlounderSyncState syncState = gameType.stateSyncer().createSyncStateForClient();
 
         this.games.computeIfAbsent(gameType, (gameType1) -> new FlClientGameList());
         this.games.get(gameType).addSyncState(gameId, syncState);
     }
 
-    public void updateMinigame(PackedFlGameInfo gameInfo, List<FlDataValue.Packed<?>> values) {
+    public void updateMinigame(PackedFlGameInfo gameInfo, List<FlSyncValue.Packed<?>> values) {
         FlounderGameType<?> gameType = gameInfo.gameType();
         int gameId = gameInfo.gameId();
 

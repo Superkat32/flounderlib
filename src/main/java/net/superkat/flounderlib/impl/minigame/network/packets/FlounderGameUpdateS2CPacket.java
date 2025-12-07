@@ -5,13 +5,15 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.util.Identifier;
 import net.superkat.flounderlib.FlounderLib;
+import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
-import net.superkat.flounderlib.impl.minigame.sync.FlDataValue;
+import net.superkat.flounderlib.impl.minigame.sync.FlSyncValue;
+import net.superkat.flounderlib.impl.minigame.sync.FlounderStateSyncerImpl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, List<FlDataValue.Packed<?>> values) implements CustomPayload {
+public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, FlounderStateSyncer<?, ?> syncer, List<FlSyncValue.Packed<?>> values) implements CustomPayload {
     public static final Identifier GAME_ADD_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_game_update");
     public static final CustomPayload.Id<FlounderGameUpdateS2CPacket> ID = new CustomPayload.Id<>(GAME_ADD_ID);
     public static final PacketCodec<RegistryByteBuf, FlounderGameUpdateS2CPacket> CODEC = PacketCodec.of(
@@ -21,19 +23,23 @@ public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, List<FlData
     public static FlounderGameUpdateS2CPacket fromBuf(RegistryByteBuf buf) {
         PackedFlGameInfo gameInfo = PackedFlGameInfo.PACKET_CODEC.decode(buf);
 
-        List<FlDataValue.Packed<?>> list = new ArrayList<>();
+        int syncerId = buf.readByte();
+        FlounderStateSyncer<?, ?> syncer = FlounderStateSyncerImpl.getSyncer(syncerId);
+
+        List<FlSyncValue.Packed<?>> list = new ArrayList<>();
         int i;
         while ((i = buf.readUnsignedByte()) != 0) {
-            list.add(FlDataValue.Packed.fromBuf(buf, i));
+            list.add(FlSyncValue.Packed.fromBuf(buf, syncer, i));
         }
 
-        return new FlounderGameUpdateS2CPacket(gameInfo, list);
+        return new FlounderGameUpdateS2CPacket(gameInfo, syncer, list);
     }
 
     public void write(RegistryByteBuf buf) {
         PackedFlGameInfo.PACKET_CODEC.encode(buf, this.gameInfo);
 
-        for (FlDataValue.Packed<?> value : values) {
+        buf.writeByte(this.gameInfo.gameType().stateSyncer().getId());
+        for (FlSyncValue.Packed<?> value : values) {
             value.write(buf);
         }
 

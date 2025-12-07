@@ -13,6 +13,7 @@ import net.superkat.flounderlib.api.minigame.v1.util.FlounderGameStartResult;
 import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
 import net.superkat.flounderlib.api.text.v1.builtin.SplatText;
 import net.superkat.flounderlibtest.test.ExampleMinigame;
+import net.superkat.flounderlibtest.test.SimpleSyncedMinigame;
 import net.superkat.flounderlibtest.test.SimpleTestMinigame;
 import net.superkat.flounderlibtest.test.TestMinigame;
 import net.superkat.flounderlibtest.test.TestSyncedMinigame;
@@ -41,11 +42,17 @@ public class FlounderLibTest implements ModInitializer {
                     .padding(8)
     );
 
+    public static final FlounderGameType<SimpleSyncedMinigame> SIMPLE_SYNCED_MINIGAME = FlounderApi.register(
+            FlounderGameType.create(SimpleSyncedMinigame.ID, SimpleSyncedMinigame.CODEC)
+                    .synced(SimpleSyncedMinigame.STATE_SYNCER)
+    );
+
     public static final FlounderGameType<TestSyncedMinigame> TEST_SYNCED_MINIGAME = FlounderApi.register(
             FlounderGameType.create(TestSyncedMinigame.ID, TestSyncedMinigame.CODEC)
-                    .synced(true)
+                    .synced(TestSyncedMinigame.STATE_SYNCER)
                     .singleton(true)
     );
+
 
     @Override
     public void onInitialize() {
@@ -55,9 +62,10 @@ public class FlounderLibTest implements ModInitializer {
             for (ServerPlayerEntity player : serverWorld.getPlayers()) {
 
                 if(player.getItemUseTime() == 20) {
-                    TestSyncedMinigame testSyncedMinigame = new TestSyncedMinigame(player.getBlockPos());
+//                    TestSyncedMinigame testSyncedMinigame = new TestSyncedMinigame(player.getBlockPos());
+                    SimpleSyncedMinigame simpleSyncedMinigame = new SimpleSyncedMinigame(player.getBlockPos());
 
-                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, testSyncedMinigame);
+                    FlounderGameStartResult startResult = FlounderApi.startMinigame(serverWorld, simpleSyncedMinigame);
                     if(startResult.isSuccessful()) {
                         player.sendMessage(Text.literal("Minigame started!").formatted(Formatting.GREEN));
                     } else {
