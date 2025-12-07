@@ -1,14 +1,12 @@
 package net.superkat.flounderlib.api.text.v1.builtin;
 
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 import net.superkat.flounderlib.FlounderLib;
@@ -17,17 +15,11 @@ import net.superkat.flounderlib.api.text.v1.text.FlounderTextType;
 
 public class SplatText extends FlounderText {
     public static final Identifier ID = Identifier.of(FlounderLib.MOD_ID, "splat_text");
-    public static final MapCodec<SplatText> CODEC = RecordCodecBuilder.mapCodec(
-            instance -> instance.group(
-                    createTextCodec(),
-                    Codecs.ARGB.optionalFieldOf("color", Colors.PURPLE).forGetter(text -> text.color)
-            ).apply(instance, SplatText::new)
-    );
+    public static final MapCodec<SplatText> CODEC = createDefaultCodec(SplatText::new);
     public static final Identifier[] BACKGROUND_TEXTURES = getBackgroundTextures();
 
     private static final int BACKGROUND_TEXTURE_COUNT = 7;
 
-    public int color;
     public int textY;
     public int prevTextY;
     public int backgroundY;
@@ -40,9 +32,8 @@ public class SplatText extends FlounderText {
 
     public int backgroundId;
 
-    public SplatText(Text text, int color) {
+    public SplatText(Text text) {
         super(text);
-        this.color = color;
 
         this.backgroundY = this.getBackgroundY(this.client.getWindow().getScaledHeight(), 0);
         this.prevBackgroundY = backgroundY;
@@ -110,7 +101,7 @@ public class SplatText extends FlounderText {
 
     public int getBackgroundY(int windowHeight, int entry) {
         int backgroundHeight = 16;
-        return windowHeight - 22 - ((backgroundHeight + 2) * (entry + 1));
+        return windowHeight - 38 - ((backgroundHeight + 1) * (entry + 1));
     }
 
     @Override

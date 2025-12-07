@@ -3,28 +3,28 @@ package net.superkat.flounderlibtest;
 import net.minecraft.command.argument.BlockPosArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.superkat.flounderlib.api.minigame.v1.registry.command.FlounderGameCommandApi;
-import net.superkat.flounderlibtest.test.ExampleMinigame;
-import net.superkat.flounderlibtest.test.SimpleTestMinigame;
+import net.superkat.flounderlibtest.test.TestMinigame;
+import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 
 public class MinigameAutofills {
 
     public static void init() {
         FlounderGameCommandApi.registerGameAutofill(
-                ExampleMinigame.ID,
+                TestMinigame.ID,
                 CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                         .executes(
                                 context -> FlounderGameCommandApi.executeMinigameStart(
-                                        context, new ExampleMinigame(BlockPosArgumentType.getBlockPos(context, "pos"))
+                                        context, new TestMinigame(BlockPosArgumentType.getBlockPos(context, "pos"))
                                 )
                         )
         );
 
         FlounderGameCommandApi.registerGameAutofill(
-                SimpleTestMinigame.ID,
+                TestSyncedMinigame.ID,
                 CommandManager.argument("pos", BlockPosArgumentType.blockPos())
                         .executes(
                                 context -> FlounderGameCommandApi.executeMinigameStart(
-                                        context, new SimpleTestMinigame(BlockPosArgumentType.getBlockPos(context, "pos"))
+                                        context, new TestSyncedMinigame(BlockPosArgumentType.getBlockPos(context, "pos"))
                                 )
                         )
         );

@@ -14,6 +14,8 @@ import net.superkat.flounderlib.api.minigame.v1.game.SyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
+import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
+import net.superkat.flounderlib.api.text.v1.builtin.SplatText;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
@@ -99,6 +101,8 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
 
         // Send the player a joining message
         player.sendMessage(Text.literal("Joined minigame! - " + this.getCenterPos().toShortString()).formatted(Formatting.GREEN), true);
+        SplatText splatText = new SplatText(Text.of("Joined minigame!"));
+        BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
     }
 
     @Override
@@ -106,14 +110,16 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
         super.removePlayer(player);
 
         // Send the player a leaving message
-        player.sendMessage(Text.literal("Left minigame!").formatted(Formatting.RED), true);
+        SplatText splatText = new SplatText(Text.of("Left minigame!"));
+        BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
     }
 
     @Override
     public void invalidate() {
+        SplatText splatText = new SplatText(Text.of("Minigame ended!"));
         // Send all in the minigame players a message that the game has ended
         for (ServerPlayerEntity player : this.getPlayers()) {
-            player.sendMessage(Text.literal("Minigame ended!"), true);
+            BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
         }
 
         super.invalidate();
@@ -121,7 +127,7 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
 
     @Override
     public @NotNull FlounderGameType<?> getGameType() {
-        return FlounderLibTest.TEST_SYNCED_MINIGAME;
+        return FlounderLibTest.TEST_SYNCED_MINIGAME_TYPE;
     }
 
     public static class SyncState implements FlounderSyncState {

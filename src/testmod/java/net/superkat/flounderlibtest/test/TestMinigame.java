@@ -2,80 +2,110 @@ package net.superkat.flounderlibtest.test;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
+import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
+import net.superkat.flounderlib.api.text.v1.builtin.ColoredObjectiveText;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public class TestMinigame extends FlounderGame {
     public static final Identifier ID = Identifier.of(FlounderLibTest.MOD_ID, "test_minigame");
-
     public static final Codec<TestMinigame> CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("ticks").forGetter(game -> game.ticks),
                     BlockPos.CODEC.fieldOf("pos").forGetter(game -> game.centerPos),
-                    Codec.BOOL.fieldOf("test").forGetter(game -> game.test)
+                    Codec.BOOL.fieldOf("myBoolean").forGetter(game -> game.myBoolean),
+                    Codec.INT.fieldOf("myInteger").forGetter(game -> game.myInteger),
+                    Codec.STRING.fieldOf("myString").forGetter(game -> game.myString),
+                    Vec3d.CODEC.fieldOf("myVec3d").forGetter(game -> game.myVec3d),
+                    TextCodecs.CODEC.fieldOf("myText").forGetter(game -> game.myText)
             ).apply(instance, TestMinigame::new)
     );
 
-    public boolean test;
+    public boolean myBoolean = true;
+    public int myInteger = 0;
+    public String myString = "Aha!";
+    public Vec3d myVec3d = Vec3d.ZERO;
+    public Text myText = Text.translatable("item.minecraft.spyglass");
 
-    public TestMinigame(BlockPos pos) {
-        super(pos);
+    // The main constructor for when we want to first start the minigame
+    public TestMinigame(BlockPos centerPos) {
+        super(centerPos);
     }
 
-    public TestMinigame(int ticks, BlockPos pos, boolean test) {
-        super(pos);
-        this.ticks = ticks;
-        this.test = test;
-    }
-
-    @Override
-    public void init(ServerWorld world, int minigameId) {
-        super.init(world, minigameId);
+    // The persistent constructor for when the minigame is reloaded upon world rejoin
+    public TestMinigame(int ticks, BlockPos centerPos, Boolean myBoolean, int myInteger, String myString, Vec3d myVec3d, Text myText) {
+        super(ticks, centerPos);
+        this.myBoolean = myBoolean;
+        this.myInteger = myInteger;
+        this.myString = myString;
+        this.myVec3d = myVec3d;
+        this.myText = myText;
     }
 
     @Override
     public void tick() {
         super.tick();
-        if(this.ticks >= 500) {
-            for (ServerPlayerEntity player : this.getPlayers()) {
-                player.sendMessage(Text.literal("Minigame ended!").formatted(Formatting.ITALIC));
+
+        // Every second, send the player a randomly generated message
+        if(this.ticks % 20 == 0) {
+            // Let the first message be the spyglass item translation, then generate random messages
+            if(this.ticks != 20) {
+                this.myText = Text.literal(NameGenerator.name(UUID.randomUUID()));
             }
+
+            // Send all players the message
+            for (ServerPlayerEntity player : this.getPlayers()) {
+                player.sendMessage(this.myText);
+            }
+
+        }
+
+        // After 300 ticks, or 15 seconds, end the minigame by invalidating it
+        if (this.ticks >= 300) {
             this.invalidate();
-        } else if(this.ticks % 10 == 0) {
-            for (ServerPlayerEntity player : this.getPlayers()) {
-                player.sendMessage(Text.literal("In minigame " + this.getMinigameId()), true);
-            }
-            this.world.spawnParticles(ParticleTypes.END_ROD, this.centerPos.getX(), this.centerPos.getY() + 1, this.centerPos.getZ(), 1, 0, 0, 0, 0);
-            this.spawnBorderParticles();
         }
     }
 
-    public void spawnBorderParticles() {
-        float range = this.playerSearchDistance();
-        float rangeTimesALotOfDigits = MathHelper.ceil((float) Math.PI * range * range) / 50f;
-        for (int i = 0; i < rangeTimesALotOfDigits; i++) {
-            float h = this.world.getRandom().nextFloat() * (float) (Math.PI * 2);
-            float k = MathHelper.sqrt(this.world.getRandom().nextFloat()) * range;
-            double x = this.centerPos.getX() + (double)(MathHelper.cos(h) * range);
-            double y = this.centerPos.getY();
-            double z = this.centerPos.getZ() + (double)(MathHelper.sin(h) * range);
-            this.world.spawnParticles(this.getBorderParticle(), x, y + 1, z, 1, 0, 0, 0, 0);
-        }
+    @Override
+    public void addPlayer(ServerPlayerEntity player) {
+        super.addPlayer(player);
+
+        // Send the player a joining message
+        player.sendMessage(Text.literal("Joined minigame!").formatted(Formatting.GREEN), true);
+        BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Joined minigame!"), Colors.LIGHT_YELLOW));
     }
 
-    public ParticleEffect getBorderParticle() {
-        return ParticleTypes.SNOWFLAKE;
+    @Override
+    public void removePlayer(ServerPlayerEntity player) {
+        super.removePlayer(player);
+
+        // Send the player a leaving message
+        player.sendMessage(Text.literal("Left minigame!").formatted(Formatting.RED), true);
+        BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Left minigame!"), Colors.PURPLE));
+    }
+
+    @Override
+    public void invalidate() {
+        // Send all in the minigame players a message that the game has ended
+        for (ServerPlayerEntity player : this.getPlayers()) {
+            player.sendMessage(Text.literal("Minigame ended!"), true);
+            BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Minigame ended!"), Colors.CYAN));
+        }
+
+        super.invalidate();
     }
 
     @Override

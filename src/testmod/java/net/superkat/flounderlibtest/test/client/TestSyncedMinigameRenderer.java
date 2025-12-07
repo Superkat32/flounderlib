@@ -14,7 +14,7 @@ import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 public class TestSyncedMinigameRenderer {
 
     public static void renderSyncedMinigameHud(DrawContext context, RenderTickCounter tickCounter) {
-        if(!FlounderClientApi.anyMinigames(FlounderLibTest.TEST_SYNCED_MINIGAME)) return;
+        if(!FlounderClientApi.anyMinigames(FlounderLibTest.TEST_SYNCED_MINIGAME_TYPE)) return;
         MinecraftClient client = MinecraftClient.getInstance();
         TextRenderer textRenderer = client.textRenderer;
 
