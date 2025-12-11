@@ -5,7 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Formatting;
+import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.NameGenerator;
 import net.minecraft.util.math.BlockPos;
@@ -14,8 +14,8 @@ import net.superkat.flounderlib.api.minigame.v1.game.SyncedFlounderGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
-import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
-import net.superkat.flounderlib.api.text.v1.builtin.SplatText;
+import net.superkat.flounderlib.api.text.v1.FlounderTextApi;
+import net.superkat.flounderlib.api.text.v1.builtin.ColoredObjectiveText;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
 
@@ -100,28 +100,22 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
         super.addPlayer(player);
 
         // Send the player a joining message
-        player.sendMessage(Text.literal("Joined minigame! - " + this.getCenterPos().toShortString()).formatted(Formatting.GREEN), true);
-        SplatText splatText = new SplatText(Text.of("Joined minigame!"));
-        BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
+        FlounderTextApi.send(new ColoredObjectiveText(Text.of("Joined minigame!"), Colors.LIGHT_YELLOW), player);
     }
 
     @Override
     public void removePlayer(ServerPlayerEntity player) {
         super.removePlayer(player);
-
-        // Send the player a leaving message
-        SplatText splatText = new SplatText(Text.of("Left minigame!"));
-        BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
+        FlounderTextApi.send(new ColoredObjectiveText(Text.of("Left minigame!"), Colors.PURPLE), player);
     }
 
     @Override
     public void invalidate() {
-        SplatText splatText = new SplatText(Text.of("Minigame ended!"));
         // Send all in the minigame players a message that the game has ended
         for (ServerPlayerEntity player : this.getPlayers()) {
-            BuiltinFlounderTextRenderers.SPLAT_TEXT_TYPE.send(player, splatText);
+            player.sendMessage(Text.literal("Minigame ended!"), true);
+            FlounderTextApi.send(new ColoredObjectiveText(Text.of("Minigame ended!"), Colors.CYAN), player);
         }
-
         super.invalidate();
     }
 

@@ -36,24 +36,18 @@ public class FlounderTextCommand {
                 CommandManager.literal("floundertext")
                         .requires(source -> source.hasPermissionLevel(2))
                         .then(
-//                                CommandManager.argument("type", IdentifierArgumentType.identifier())
-//                                        .suggests(AVAILABLE_TEXT_IDS)
-//                                        .then(
-                                            CommandManager.argument("text", FlounderTextArgument.flounderText(registryAccess))
-                                                    .suggests(AVAILABLE_TEXT_IDS)
-                                                    .executes(context -> executeText(
-                                                            context.getSource(),
-//                                                            IdentifierArgumentType.getIdentifier(context, "type"),
-                                                            FlounderTextArgument.getFlounderText(context, "text"))
-                                                    ).then(CommandManager.argument("viewers", EntityArgumentType.players())
-                                                                    .executes(context -> executeText(
-                                                                            context.getSource(),
-//                                                                            IdentifierArgumentType.getIdentifier(context, "type"),
-                                                                            FlounderTextArgument.getFlounderText(context, "text"),
-                                                                            EntityArgumentType.getPlayers(context, "viewers"))
-                                                                    )
-                                                    )
-//                                        )
+                                CommandManager.argument("text", FlounderTextArgument.flounderText(registryAccess))
+                                        .suggests(AVAILABLE_TEXT_IDS)
+                                        .executes(context -> executeText(
+                                                context.getSource(),
+                                                FlounderTextArgument.getFlounderText(context, "text"))
+                                        ).then(CommandManager.argument("viewers", EntityArgumentType.players())
+                                                        .executes(context -> executeText(
+                                                                context.getSource(),
+                                                                FlounderTextArgument.getFlounderText(context, "text"),
+                                                                EntityArgumentType.getPlayers(context, "viewers"))
+                                                        )
+                                        )
                         )
         );
     }
@@ -69,9 +63,9 @@ public class FlounderTextCommand {
             return 0;
         }
 
-        Identifier id = text.getId();
+        Identifier id = text.getFlounderTextType().id();
 
-        FlounderTextApi.sendText(viewers, id, text);
+        FlounderTextApi.send(text, viewers);
         Text idText = Text.literal(id.toString()).formatted(Formatting.AQUA);
         String players = viewers.size() > 1 ? "players" : "player";
         Text playerCount = Text.literal(viewers.size() + " " + players).formatted(Formatting.DARK_AQUA);

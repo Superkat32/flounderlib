@@ -11,7 +11,7 @@ import net.superkat.flounderlib.impl.text.registry.FlounderTextRegistry;
 
 // FIXME - FlounderText can't be on server because it's loading client classes
 //  i can't believe i didn't catch this earlier :(
-public record FlounderTextS2CPacket(Identifier id, FlounderText text) implements CustomPayload {
+public record FlounderTextS2CPacket(Identifier textTypeId, FlounderText text) implements CustomPayload {
     public static final Identifier FLOUNDER_TEXT_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_text_create_packet");
     public static final CustomPayload.Id<FlounderTextS2CPacket> ID = new CustomPayload.Id<>(FLOUNDER_TEXT_ID);
     public static final PacketCodec<RegistryByteBuf, FlounderTextS2CPacket> CODEC = PacketCodec.of(
@@ -27,7 +27,7 @@ public record FlounderTextS2CPacket(Identifier id, FlounderText text) implements
     }
 
     public void write(RegistryByteBuf buf) {
-        buf.writeIdentifier(this.id);
+        buf.writeIdentifier(this.textTypeId);
 
         NbtCompound nbt = new NbtCompound();
         nbt.put("text", FlounderTextRegistry.FLOUNDER_TEXT_CODEC, this.text);

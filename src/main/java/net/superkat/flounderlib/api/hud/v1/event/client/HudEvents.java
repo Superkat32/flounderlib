@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.api.hud.v1.event;
+package net.superkat.flounderlib.api.hud.v1.event.client;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

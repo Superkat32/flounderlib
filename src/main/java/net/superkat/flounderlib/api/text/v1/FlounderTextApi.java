@@ -1,51 +1,36 @@
 package net.superkat.flounderlib.api.text.v1;
 
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
+import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
-import net.superkat.flounderlib.api.text.v1.text.FlounderTextType;
-import net.superkat.flounderlib.api.text.v1.text.client.FlounderTextRenderer;
 import net.superkat.flounderlib.impl.text.network.packets.FlounderTextS2CPacket;
 import net.superkat.flounderlib.impl.text.registry.FlounderTextRegistry;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
 
 public class FlounderTextApi {
 
-    public static void sendText(ServerPlayerEntity player, Identifier id, FlounderText text) {
-        sendText(List.of(player), id, text);
+    public static <T extends FlounderText> FlounderTextType<T> register(Identifier textTypeId, MapCodec<T> textCodec) {
+        return FlounderTextRegistry.register(new FlounderTextType<>(textTypeId, textCodec));
     }
 
-    public static void sendText(Collection<ServerPlayerEntity> players, Identifier id, FlounderText text) {
-        FlounderTextS2CPacket packet = new FlounderTextS2CPacket(id, text);
+    public static <T extends FlounderText> void send(T text, ServerPlayerEntity player) {
+        CustomPayload payload = createSendPacket(text.getFlounderTextType().id(), text);
+        ServerPlayNetworking.send(player, payload);
+    }
+
+    public static <T extends FlounderText> void send(T text, Collection<ServerPlayerEntity> players) {
         for (ServerPlayerEntity player : players) {
-            ServerPlayNetworking.send(player, packet);
+            send(text, player);
         }
     }
 
-    public static <T extends FlounderText> FlounderTextType<T> register(Identifier id, MapCodec<T> codec, FlounderTextRenderer<T> renderer) {
-        return FlounderTextRegistry.register(new FlounderTextType<>(id, codec, renderer));
-    }
-
-
-    public static <T extends FlounderText> void registerRenderer(Identifier id, BiConsumer<Identifier, FlounderTextRenderer<T>> idAndRendererConsumer) {
-        idAndRendererConsumer.accept(id, getRendererFromId(id));
-    }
-
-    public static void registerDefaultRenderer(Identifier id) {
-        registerRenderer(id, (identifier, flounderTextRenderer) ->
-                HudElementRegistry.attachElementAfter(VanillaHudElements.BOSS_BAR, identifier, flounderTextRenderer)
-        );
-    }
-
-    public static <T extends FlounderText> FlounderTextRenderer<T> getRendererFromId(Identifier id) {
-        return FlounderTextRegistry.getRenderer(id);
+    private static CustomPayload createSendPacket(Identifier textTypeId, FlounderText text) {
+        return new FlounderTextS2CPacket(textTypeId, text);
     }
 
 }

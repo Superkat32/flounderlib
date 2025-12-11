@@ -14,8 +14,8 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
-import net.superkat.flounderlib.api.text.v1.text.FlounderTextType;
 import net.superkat.flounderlib.impl.text.registry.FlounderTextRegistry;
 
 public class FlounderTextArgument implements ArgumentType<FlounderText> {

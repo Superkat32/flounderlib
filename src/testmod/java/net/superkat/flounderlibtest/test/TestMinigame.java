@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
-import net.superkat.flounderlib.api.text.v1.builtin.BuiltinFlounderTextRenderers;
+import net.superkat.flounderlib.api.text.v1.FlounderTextApi;
 import net.superkat.flounderlib.api.text.v1.builtin.ColoredObjectiveText;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import org.jetbrains.annotations.NotNull;
@@ -85,7 +85,7 @@ public class TestMinigame extends FlounderGame {
 
         // Send the player a joining message
         player.sendMessage(Text.literal("Joined minigame!").formatted(Formatting.GREEN), true);
-        BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Joined minigame!"), Colors.LIGHT_YELLOW));
+        FlounderTextApi.send(new ColoredObjectiveText(Text.of("Joined minigame!"), Colors.LIGHT_YELLOW), player);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class TestMinigame extends FlounderGame {
 
         // Send the player a leaving message
         player.sendMessage(Text.literal("Left minigame!").formatted(Formatting.RED), true);
-        BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Left minigame!"), Colors.PURPLE));
+        FlounderTextApi.send(new ColoredObjectiveText(Text.of("Left minigame!"), Colors.PURPLE), player);
     }
 
     @Override
@@ -102,9 +102,8 @@ public class TestMinigame extends FlounderGame {
         // Send all in the minigame players a message that the game has ended
         for (ServerPlayerEntity player : this.getPlayers()) {
             player.sendMessage(Text.literal("Minigame ended!"), true);
-            BuiltinFlounderTextRenderers.COLORED_OBJECTIVE_TEXT_TYPE.send(player, new ColoredObjectiveText(Text.of("Minigame ended!"), Colors.CYAN));
+            FlounderTextApi.send(new ColoredObjectiveText(Text.of("Minigame ended!"), Colors.CYAN), player);
         }
-
         super.invalidate();
     }
 

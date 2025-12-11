@@ -1,13 +1,15 @@
 package net.superkat.flounderlib.impl.text;
 
+import net.superkat.flounderlib.impl.text.client.FlounderTextRendererHandler;
+import net.superkat.flounderlib.impl.text.client.builtin.BuiltinFlounderTextRenderers;
 import net.superkat.flounderlib.impl.text.network.client.FlounderTextClientNetworkHandler;
-import net.superkat.flounderlib.impl.text.registry.FlounderTextRegistry;
 
 public class FlounderTextClientInit {
 
     public static void init() {
+        FlounderTextRendererHandler.init();
         FlounderTextClientNetworkHandler.init();
-        FlounderTextRegistry.init();
+        BuiltinFlounderTextRenderers.init();
     }
 
 }
