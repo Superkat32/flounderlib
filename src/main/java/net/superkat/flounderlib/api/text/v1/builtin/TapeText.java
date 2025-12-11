@@ -1,5 +1,6 @@
 package net.superkat.flounderlib.api.text.v1.builtin;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.text.Text;
@@ -19,17 +20,23 @@ public class TapeText extends FlounderText {
     public static final MapCodec<TapeText> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     createTextCodec(),
-                    Codecs.RGB.optionalFieldOf("color", Colors.CYAN).forGetter(text -> text.color)
+                    Codecs.RGB.optionalFieldOf("color", Colors.CYAN).forGetter(text -> text.color),
+                    Codecs.RGB.optionalFieldOf("text_color", Colors.DARK_GRAY).forGetter(text -> text.textColor),
+                    Codec.BOOL.optionalFieldOf("text_shadow", true).forGetter(text -> text.textShadow)
             ).apply(instance, TapeText::new)
     );
 
     public final int color;
+    public final int textColor;
+    public final boolean textShadow;
     public final List<TapeLine> lines = new ArrayList<>();
 
-    public TapeText(Text text, int color) {
+    public TapeText(Text text, int color, int textColor, boolean textShadow) {
         super(text);
 
         this.color = color;
+        this.textColor = textColor;
+        this.textShadow = textShadow;
     }
 
     public void addTapeLine(TapeLine line) {
@@ -53,20 +60,22 @@ public class TapeText extends FlounderText {
         public float targetY;
         public boolean bounce;
 
-        public int width;
-        public int height;
+        public float width;
+        public float height;
 
         public float rotation; // IN RADIANS!!!
 
         public int moveTicks;
         public int fadeInTicks;
+        public int fadeOutTicks;
 
         public TapeLine(
                 float startX, float targetX,
                 float startY, float targetY,
-                int width, int height,
+                float width, float height,
                 float rotation, boolean bounce,
-                int moveTicks, int fadeInTicks
+                int moveTicks,
+                int fadeInTicks, int fadeOutTicks
         ) {
             this.startX = startX;
             this.startY = startY;
@@ -78,6 +87,7 @@ public class TapeText extends FlounderText {
             this.bounce = bounce;
             this.moveTicks = moveTicks;
             this.fadeInTicks = fadeInTicks;
+            this.fadeOutTicks = fadeOutTicks;
         }
     }
 }

@@ -26,6 +26,7 @@ public abstract class FlounderText {
         this.random = Random.create();
     }
 
+    // TODO - give paused and frozen (from hud event probably)
     public void tick(boolean paused) {
         if(paused) return;
 
