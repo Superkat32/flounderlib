@@ -2,9 +2,9 @@ package net.superkat.flounderlib.api.text.v1.text;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.util.RandomSource;
 import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 
 import java.util.function.Function;
@@ -13,17 +13,17 @@ import java.util.function.Function;
  * Common-sided component which contains the parameters of a FlounderText.
  */
 public abstract class FlounderText {
-    public final Random random;
+    public final RandomSource random;
 
-    public Text text;
+    public Component text;
     public int ticks = 0;
     public int maxTicks = 100;
 
     public boolean finishedRendering = false;
 
-    public FlounderText(Text text) {
+    public FlounderText(Component text) {
         this.text = text;
-        this.random = Random.create();
+        this.random = RandomSource.create();
     }
 
     // TODO - give paused and frozen (from hud event probably)
@@ -53,13 +53,13 @@ public abstract class FlounderText {
         return ticks;
     }
 
-    public Text getText() {
+    public Component getText() {
         return text;
     }
 
     public abstract FlounderTextType<?> getFlounderTextType();
 
-    public static <T extends FlounderText> MapCodec<T> createDefaultCodec(Function<Text, T> applyFunc) {
+    public static <T extends FlounderText> MapCodec<T> createDefaultCodec(Function<Component, T> applyFunc) {
         return RecordCodecBuilder.mapCodec(
                 instance ->  instance.group(
                         createTextCodec()
@@ -67,7 +67,7 @@ public abstract class FlounderText {
         );
     }
 
-    public static <T extends FlounderText> RecordCodecBuilder<T, Text> createTextCodec() {
-        return TextCodecs.CODEC.fieldOf("text").forGetter(FlounderText::getText);
+    public static <T extends FlounderText> RecordCodecBuilder<T, Component> createTextCodec() {
+        return ComponentSerialization.CODEC.fieldOf("text").forGetter(FlounderText::getText);
     }
 }

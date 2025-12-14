@@ -1,14 +1,14 @@
 package net.superkat.flounderlib.api.minigame.v1.sync;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.phys.Vec3;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.game.SyncableFlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
@@ -18,8 +18,8 @@ import net.superkat.flounderlib.impl.minigame.sync.FlSyncKey;
 import net.superkat.flounderlib.impl.minigame.sync.FlSyncValue;
 import net.superkat.flounderlib.impl.minigame.sync.FlounderStateSyncerImpl;
 import org.jetbrains.annotations.ApiStatus;
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,66 +36,66 @@ public interface FlounderStateSyncer<G extends FlounderableGame, S extends Floun
     }
 
     default FlounderStateSyncer<G, S> addByte(SyncedDataGetter<G, Byte> getter, SyncedDataSetter<S, Byte> setter) {
-        return add(PacketCodecs.BYTE, getter, setter);
+        return add(ByteBufCodecs.BYTE, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addBoolean(SyncedDataGetter<G, Boolean> getter, SyncedDataSetter<S, Boolean> setter) {
-        return add(PacketCodecs.BOOLEAN, getter, setter);
+        return add(ByteBufCodecs.BOOL, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addShort(SyncedDataGetter<G, Short> getter, SyncedDataSetter<S, Short> setter) {
-        return add(PacketCodecs.SHORT, getter, setter);
+        return add(ByteBufCodecs.SHORT, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addInteger(SyncedDataGetter<G, Integer> getter, SyncedDataSetter<S, Integer> setter) {
-        return add(PacketCodecs.INTEGER, getter, setter);
+        return add(ByteBufCodecs.INT, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addLong(SyncedDataGetter<G, Long> getter, SyncedDataSetter<S, Long> setter) {
-        return add(PacketCodecs.LONG, getter, setter);
+        return add(ByteBufCodecs.LONG, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addFloat(SyncedDataGetter<G, Float> getter, SyncedDataSetter<S, Float> setter) {
-        return add(PacketCodecs.FLOAT, getter, setter);
+        return add(ByteBufCodecs.FLOAT, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addDouble(SyncedDataGetter<G, Double> getter, SyncedDataSetter<S, Double> setter) {
-        return add(PacketCodecs.DOUBLE, getter, setter);
+        return add(ByteBufCodecs.DOUBLE, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addString(SyncedDataGetter<G, String> getter, SyncedDataSetter<S, String> setter) {
-        return add(PacketCodecs.STRING, getter, setter);
+        return add(ByteBufCodecs.STRING_UTF8, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addNbtElement(SyncedDataGetter<G, NbtElement> getter, SyncedDataSetter<S, NbtElement> setter) {
-        return add(PacketCodecs.NBT_ELEMENT, getter, setter);
+    default FlounderStateSyncer<G, S> addNbtElement(SyncedDataGetter<G, Tag> getter, SyncedDataSetter<S, Tag> setter) {
+        return add(ByteBufCodecs.TAG, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addNbtCompound(SyncedDataGetter<G, NbtCompound> getter, SyncedDataSetter<S, NbtCompound> setter) {
-        return add(PacketCodecs.NBT_COMPOUND, getter, setter);
+    default FlounderStateSyncer<G, S> addNbtCompound(SyncedDataGetter<G, CompoundTag> getter, SyncedDataSetter<S, CompoundTag> setter) {
+        return add(ByteBufCodecs.COMPOUND_TAG, getter, setter);
     }
 
     default FlounderStateSyncer<G, S> addBlockPos(SyncedDataGetter<G, BlockPos> getter, SyncedDataSetter<S, BlockPos> setter) {
-        return add(BlockPos.PACKET_CODEC, getter, setter);
+        return add(BlockPos.STREAM_CODEC, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addVector3f(SyncedDataGetter<G, Vector3f> getter, SyncedDataSetter<S, Vector3f> setter) {
-        return add(PacketCodecs.VECTOR_3F, getter, setter);
+    default FlounderStateSyncer<G, S> addVector3f(SyncedDataGetter<G, Vector3fc> getter, SyncedDataSetter<S, Vector3fc> setter) {
+        return add(ByteBufCodecs.VECTOR3F, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addVec3d(SyncedDataGetter<G, Vec3d> getter, SyncedDataSetter<S, Vec3d> setter) {
-        return add(Vec3d.PACKET_CODEC, getter, setter);
+    default FlounderStateSyncer<G, S> addVec3d(SyncedDataGetter<G, Vec3> getter, SyncedDataSetter<S, Vec3> setter) {
+        return add(Vec3.STREAM_CODEC, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addQuaternionf(SyncedDataGetter<G, Quaternionf> getter, SyncedDataSetter<S, Quaternionf> setter) {
-        return add(PacketCodecs.QUATERNION_F, getter, setter);
+    default FlounderStateSyncer<G, S> addQuaternionf(SyncedDataGetter<G, Quaternionfc> getter, SyncedDataSetter<S, Quaternionfc> setter) {
+        return add(ByteBufCodecs.QUATERNIONF, getter, setter);
     }
 
-    default FlounderStateSyncer<G, S> addText(SyncedDataGetter<G, Text> getter, SyncedDataSetter<S, Text> setter) {
-        return add(TextCodecs.PACKET_CODEC, getter, setter);
+    default FlounderStateSyncer<G, S> addText(SyncedDataGetter<G, Component> getter, SyncedDataSetter<S, Component> setter) {
+        return add(ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC, getter, setter);
     }
 
-    <V> FlounderStateSyncer<G, S> add(PacketCodec<ByteBuf, V> packetCodec, SyncedDataGetter<G, V> getter, SyncedDataSetter<S, V> setter);
+    <V> FlounderStateSyncer<G, S> add(StreamCodec<ByteBuf, V> packetCodec, SyncedDataGetter<G, V> getter, SyncedDataSetter<S, V> setter);
 
     @ApiStatus.Internal
     S createSyncStateForClient();

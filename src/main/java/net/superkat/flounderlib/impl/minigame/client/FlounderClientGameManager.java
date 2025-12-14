@@ -1,7 +1,7 @@
 package net.superkat.flounderlib.impl.minigame.client;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 public class FlounderClientGameManager {
-    public final ClientWorld world;
+    public final ClientLevel world;
 
     public final Map<FlounderGameType<?>, FlClientGameList> games = new Object2ObjectOpenHashMap<>();
 
-    public FlounderClientGameManager(ClientWorld world) {
+    public FlounderClientGameManager(ClientLevel world) {
         this.world = world;
     }
 

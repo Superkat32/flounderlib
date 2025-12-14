@@ -1,24 +1,24 @@
 package net.superkat.flounderlib.impl.text.client.builtin.renderer;
 
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.builtin.WipeoutText;
 import net.superkat.flounderlib.api.text.v1.client.FlounderTextRenderer;
 import net.superkat.flounderlib.api.util.v1.ease.Easings;
 
 public class WipeoutTextRenderer extends FlounderTextRenderer.Singleton<WipeoutText> {
-    public static final Identifier BACKGROUND_TEXTURE = Identifier.of(FlounderLib.MOD_ID, "text/wipeout/background");
+    public static final Identifier BACKGROUND_TEXTURE = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "text/wipeout/background");
 
     @Override
-    public void renderText(DrawContext context, RenderTickCounter tickCounter, WipeoutText text, int entry) {
+    public void renderText(GuiGraphics graphics, DeltaTracker deltaTracker, WipeoutText text, int entry) {
         float textAlpha = 1f;
         float backgroundAlpha = text.maxBackgroundAlpha;
         float backgroundHorizontalStretch = text.maxBackgroundHorizontal;
@@ -26,31 +26,31 @@ public class WipeoutTextRenderer extends FlounderTextRenderer.Singleton<WipeoutT
 
         // Fade in the background
         if(text.ticks < text.backgroundFadeIn) {
-            float delta = this.getTickAndDelta(text, tickCounter) / text.backgroundFadeIn;
-            backgroundAlpha = MathHelper.lerp(delta, 0f, text.maxBackgroundAlpha);
+            float delta = this.getTickAndDelta(text, deltaTracker) / text.backgroundFadeIn;
+            backgroundAlpha = Mth.lerp(delta, 0f, text.maxBackgroundAlpha);
         }
 
         // Stretch in the background
         if(text.ticks < text.backgroundStretchInTicks) { // Horizontal stretch in
-            float delta = this.getTickAndDelta(text, tickCounter) / text.backgroundStretchInTicks;
-            backgroundHorizontalStretch = MathHelper.lerp(Easings.easeOutCubic(delta), 0f, text.maxBackgroundHorizontal);
+            float delta = this.getTickAndDelta(text, deltaTracker) / text.backgroundStretchInTicks;
+            backgroundHorizontalStretch = Mth.lerp(Easings.easeOutCubic(delta), 0f, text.maxBackgroundHorizontal);
         } else if(text.ticks < text.maxTicks) {
-            float delta = (this.getTickAndDelta(text, tickCounter) - (text.backgroundStretchInTicks)) / (text.maxTicks - text.backgroundStretchInTicks);
-            backgroundVerticalStretch = MathHelper.lerp(delta, 2f, text.maxBackgroundVertical);
+            float delta = (this.getTickAndDelta(text, deltaTracker) - (text.backgroundStretchInTicks)) / (text.maxTicks - text.backgroundStretchInTicks);
+            backgroundVerticalStretch = Mth.lerp(delta, 2f, text.maxBackgroundVertical);
         }
 
         // Fade out the text and background
         if (text.ticks > text.maxTicks - text.fadeOutTicks) { // Stretch and fade out
-            float delta = (this.getTickAndDelta(text, tickCounter) - (text.maxTicks - text.fadeOutTicks) - 1) / text.fadeOutTicks;
-            backgroundAlpha = MathHelper.lerp(delta, text.maxBackgroundAlpha, 0f);
-            textAlpha = MathHelper.lerp(delta, 1f, 0f);
+            float delta = (this.getTickAndDelta(text, deltaTracker) - (text.maxTicks - text.fadeOutTicks) - 1) / text.fadeOutTicks;
+            backgroundAlpha = Mth.lerp(delta, text.maxBackgroundAlpha, 0f);
+            textAlpha = Mth.lerp(delta, 1f, 0f);
         }
 
         // Determine positions and color
-        int centerX = context.getScaledWindowWidth() / 2;
-        int centerY = context.getScaledWindowHeight() / 2;
-        int textWidth = this.textRenderer.getWidth(text.getText());
-        int textHeight = this.textRenderer.getWrappedLinesHeight(text.getText(), 216);
+        int centerX = graphics.guiWidth() / 2;
+        int centerY = graphics.guiHeight() / 2;
+        int textWidth = this.font.width(text.getText());
+        int textHeight = this.font.wordWrapHeight(text.getText(), 216);
 
         int textX = -textWidth / 2;
         int textY = -centerY / 4;
@@ -58,43 +58,43 @@ public class WipeoutTextRenderer extends FlounderTextRenderer.Singleton<WipeoutT
         int backgroundHeight = 16;
         int backgroundX = -textWidth / 2;
         int backgroundY = -backgroundHeight / 2;
-        int backgroundColor = ColorHelper.withAlpha(backgroundAlpha, text.color);
+        int backgroundColor = ARGB.color(backgroundAlpha, text.color);
 
         // Center to middle of screen, used by both background and text
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(centerX, centerY);
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(centerX, centerY);
 
         // Draw background (I really can't tell you why this works)
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(0, textY - backgroundHeight - textHeight + 4);
-        context.getMatrices().scale(backgroundHorizontalStretch, backgroundVerticalStretch);
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, backgroundX, backgroundY, textWidth, backgroundHeight, backgroundColor);
-        context.getMatrices().popMatrix();
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(0, textY - backgroundHeight - textHeight + 4);
+        graphics.pose().scale(backgroundHorizontalStretch, backgroundVerticalStretch);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURE, backgroundX, backgroundY, textWidth, backgroundHeight, backgroundColor);
+        graphics.pose().popMatrix();
 
         // Draw the normal text
         int letterX = textX;
-        int textColor = ColorHelper.withAlpha(backgroundAlpha, text.positive ? Colors.WHITE : Colors.DARK_GRAY);
+        int textColor = ARGB.color(backgroundAlpha, text.positive ? CommonColors.WHITE : CommonColors.DARK_GRAY);
 
         int textLength = text.getText().getString().length();
         float letterFadeInTicks = (float) text.textIntroTicks / textLength;
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().scale(2f, 2f); // Scale for text
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(2f, 2f); // Scale for text
 
         // Render each character of the text individually, to allow for the bouncing in effect
         for (int i = 0; i < textLength; i++) {
-            Text letter = Text.of(String.valueOf(text.getText().getString().charAt(i)));
-            letter = letter.copy().formatted(Formatting.BOLD);
-            drawLetter(context, tickCounter, text, letter, letterX, textY, letterFadeInTicks, textColor, textAlpha, i);
+            Component letter = Component.nullToEmpty(String.valueOf(text.getText().getString().charAt(i)));
+            letter = letter.copy().withStyle(ChatFormatting.BOLD);
+            drawLetter(graphics, deltaTracker, text, letter, letterX, textY, letterFadeInTicks, textColor, textAlpha, i);
 
-            letterX += this.textRenderer.getWidth(letter);
+            letterX += this.font.width(letter);
         }
 
-        context.getMatrices().popMatrix();
-        context.getMatrices().popMatrix();
+        graphics.pose().popMatrix();
+        graphics.pose().popMatrix();
     }
 
-    public void drawLetter(DrawContext context, RenderTickCounter tickCounter, WipeoutText text, Text letter, int x, int y, float fadeInTicks, int color, float alpha, int entry) {
+    public void drawLetter(GuiGraphics context, DeltaTracker tickCounter, WipeoutText text, Component letter, int x, int y, float fadeInTicks, int color, float alpha, int entry) {
         float ticks = this.getTickAndDelta(text, tickCounter);
         float startTicks = fadeInTicks * entry;
         if(ticks < startTicks) return;
@@ -102,13 +102,13 @@ public class WipeoutTextRenderer extends FlounderTextRenderer.Singleton<WipeoutT
         float bounceDelta = Easings.easeInBack(Math.min((ticks - startTicks) / fadeInTicks, 1f));
         float alphaDelta = Math.min((ticks - startTicks) / (fadeInTicks * 2f), 1f);
 
-        float yBounce = MathHelper.lerp(bounceDelta, text.letterBounceY, 0f);
-        float letterAlpha = MathHelper.lerp(alphaDelta, 0f, 1f) * alpha;
-        int letterColor = ColorHelper.withAlpha(letterAlpha, color);
+        float yBounce = Mth.lerp(bounceDelta, text.letterBounceY, 0f);
+        float letterAlpha = Mth.lerp(alphaDelta, 0f, 1f) * alpha;
+        int letterColor = ARGB.color(letterAlpha, color);
 
-        context.getMatrices().pushMatrix();
-        context.getMatrices().translate(x, y - yBounce);
-        context.drawTextWithShadow(this.textRenderer, letter, 0, 0, letterColor);
-        context.getMatrices().popMatrix();
+        context.pose().pushMatrix();
+        context.pose().translate(x, y - yBounce);
+        context.drawString(this.font, letter, 0, 0, letterColor);
+        context.pose().popMatrix();
     }
 }

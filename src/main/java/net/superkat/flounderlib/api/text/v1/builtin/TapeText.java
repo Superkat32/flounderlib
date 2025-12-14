@@ -3,10 +3,10 @@ package net.superkat.flounderlib.api.text.v1.builtin;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.ExtraCodecs;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
@@ -16,12 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TapeText extends FlounderText {
-    public static final Identifier ID = Identifier.of(FlounderLib.MOD_ID, "tape_text");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "tape_text");
     public static final MapCodec<TapeText> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     createTextCodec(),
-                    Codecs.RGB.optionalFieldOf("color", Colors.CYAN).forGetter(text -> text.color),
-                    Codecs.RGB.optionalFieldOf("text_color", Colors.DARK_GRAY).forGetter(text -> text.textColor),
+                    ExtraCodecs.RGB_COLOR_CODEC.optionalFieldOf("color", CommonColors.HIGH_CONTRAST_DIAMOND).forGetter(text -> text.color),
+                    ExtraCodecs.RGB_COLOR_CODEC.optionalFieldOf("text_color", CommonColors.DARK_GRAY).forGetter(text -> text.textColor),
                     Codec.BOOL.optionalFieldOf("text_shadow", true).forGetter(text -> text.textShadow)
             ).apply(instance, TapeText::new)
     );
@@ -31,7 +31,7 @@ public class TapeText extends FlounderText {
     public final boolean textShadow;
     public final List<TapeLine> lines = new ArrayList<>();
 
-    public TapeText(Text text, int color, int textColor, boolean textShadow) {
+    public TapeText(Component text, int color, int textColor, boolean textShadow) {
         super(text);
 
         this.color = color;

@@ -1,15 +1,15 @@
 package net.superkat.flounderlib.api.text.v1.builtin;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
 import net.superkat.flounderlib.impl.text.BuiltinFlounderTexts;
 
 public class SplatText extends FlounderText {
-    public static final Identifier ID = Identifier.of(FlounderLib.MOD_ID, "splat_text");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "splat_text");
     public static final MapCodec<SplatText> CODEC = createDefaultCodec(SplatText::new);
 
     public int textY;
@@ -24,7 +24,7 @@ public class SplatText extends FlounderText {
 
     public int backgroundId;
 
-    public SplatText(Text text) {
+    public SplatText(Component text) {
         super(text);
 
         this.backgroundY = 9; // fallback

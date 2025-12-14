@@ -2,14 +2,14 @@ package net.superkat.flounderlib.impl.minigame.game;
 
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Codec;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryOps;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.level.ServerLevel;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.minigame.v1.FlounderApi;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
@@ -24,16 +24,8 @@ public class FlounderNbtHandler {
     public static final String GAMES_LIST_ID = "games";
     public static final String GAME_INT_ID_ID = "id";
 
-//    public static final Codec<Box> BOX_CODEC = Codec.DOUBLE
-//            .listOf()
-//            .comapFlatMap(
-//                    values -> Util.decodeFixedLengthList(values, 6).map(list -> new Box(list.get(0), list.get(1), list.get(2), list.get(3), list.get(4), list.get(5))),
-//                    box -> List.of(box.minX, box.minY, box.minZ, box.maxX, box.maxY, box.maxZ)
-//            )
-//            .stable();
-
     @SuppressWarnings("unchecked")
-    public static void serializeMinigames(Map<Integer, FlounderableGame> games, ServerWorld world, NbtCompound nbt) {
+    public static void serializeMinigames(Map<Integer, FlounderableGame> games, ServerLevel world, CompoundTag nbt) {
         FlounderGameManager manager = FlounderApi.getGameManager(world);
         if(manager == null) {
             FlounderLib.LOGGER.warn("Could not serialize minigames - FlounderGameManager was null!");
@@ -41,14 +33,14 @@ public class FlounderNbtHandler {
         }
 
         // Loop through all games, find their FlounderGameType via their Identifier id, then serialize via their codec(if they should)
-        NbtList gameNbtList = new NbtList();
+        ListTag gameNbtList = new ListTag();
 
         for (Map.Entry<Integer, FlounderableGame> entry : games.entrySet()) {
             int intId = entry.getKey();
             FlounderableGame game = entry.getValue();
 
             Identifier gameId = game.getIdentifier();
-            FlounderGameType<?> gameType = FlounderRegistry.getRegistry().get(gameId);
+            FlounderGameType<?> gameType = FlounderRegistry.getRegistry().getValue(gameId);
 
             if(gameType == null) {
                 FlounderLib.LOGGER.warn("Could not serialize minigame {} - its FlounderGameType was null!", gameId);
@@ -64,13 +56,13 @@ public class FlounderNbtHandler {
                 continue;
             }
 
-            RegistryOps<NbtElement> registryOps = world.getRegistryManager().getOps(NbtOps.INSTANCE);
+            RegistryOps<Tag> registryOps = world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
             codec.encodeStart(registryOps, game)
                     .ifError(partial -> {
                         FlounderLib.LOGGER.warn("Could not serialize minigame {} - Error:", gameId);
                         FlounderLib.LOGGER.warn(partial.message());
                     }).ifSuccess(serialized -> {
-                        NbtCompound compound = new NbtCompound();
+                        CompoundTag compound = new CompoundTag();
                         compound.putInt(GAME_INT_ID_ID, intId);
                         compound.put(gameId.toString(), serialized);
                         gameNbtList.add(compound);
@@ -81,29 +73,29 @@ public class FlounderNbtHandler {
     }
 
     @Nullable
-    public static Map<Integer, FlounderableGame> deserializeMinigames(ServerWorld world, NbtCompound nbt) {
-        Optional<NbtList> optionalList = nbt.getList(GAMES_LIST_ID);
+    public static Map<Integer, FlounderableGame> deserializeMinigames(ServerLevel world, CompoundTag nbt) {
+        Optional<ListTag> optionalList = nbt.getList(GAMES_LIST_ID);
         if(optionalList.isEmpty()) return null;
 
         Registry<FlounderGameType<?>> registry = FlounderRegistry.getRegistry();
         Map<Integer, FlounderableGame> gameMap = Maps.newHashMap();
-        NbtList list = optionalList.get();
+        ListTag list = optionalList.get();
 
         // Loop through all entries - for each entry, loop through each key
         // (should only be the minigame's Identifier id and number int id)
         // If the key isn't the number int id, assume it's the Identifier
         // Find FlounderGameType from Identifier id, then deserialize from its codec
-        for (NbtCompound compound : list.streamCompounds().toList()) {
-            for (String key : compound.getKeys()) {
+        for (CompoundTag compound : list.compoundStream().toList()) {
+            for (String key : compound.keySet()) {
                 if(Objects.equals(key, GAME_INT_ID_ID)) continue;
 
-                Identifier gameId = Identifier.of(key);
-                if(!registry.containsId(gameId)) {
+                Identifier gameId = Identifier.parse(key);
+                if(!registry.containsKey(gameId)) {
                     FlounderLib.LOGGER.warn("Unknown minigame id {} found when deserializing - skipping", key);
                     continue;
                 }
 
-                FlounderGameType<?> type = registry.get(gameId);
+                FlounderGameType<?> type = registry.getValue(gameId);
                 if(type == null) {
                     FlounderLib.LOGGER.warn("Unknown minigame type {} found when deserializing - skipping", key);
                     continue;
@@ -117,13 +109,13 @@ public class FlounderNbtHandler {
                     continue;
                 }
 
-                RegistryOps<NbtElement> registryOps = world.getRegistryManager().getOps(NbtOps.INSTANCE);
+                RegistryOps<Tag> registryOps = world.registryAccess().createSerializationContext(NbtOps.INSTANCE);
                 codec.parse(registryOps, compound.get(key))
                         .ifError(partial -> {
                             FlounderLib.LOGGER.warn("Could not deserialize minigame {} - Error:", key);
                             FlounderLib.LOGGER.warn(partial.message());
                         }).ifSuccess(deserialized -> {
-                            int optionalIntId = compound.getInt(GAME_INT_ID_ID, 0);
+                            int optionalIntId = compound.getIntOr(GAME_INT_ID_ID, 0);
                             FlounderableGame game = (FlounderableGame) deserialized;
                             game.init(world, optionalIntId);
                             gameMap.put(optionalIntId, game);

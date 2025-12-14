@@ -1,41 +1,39 @@
 package net.superkat.flounderlib.impl.text.network.packets;
 
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
 import net.superkat.flounderlib.impl.text.registry.FlounderTextRegistry;
 
-// FIXME - FlounderText can't be on server because it's loading client classes
-//  i can't believe i didn't catch this earlier :(
-public record FlounderTextS2CPacket(Identifier textTypeId, FlounderText text) implements CustomPayload {
-    public static final Identifier FLOUNDER_TEXT_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_text_create_packet");
-    public static final CustomPayload.Id<FlounderTextS2CPacket> ID = new CustomPayload.Id<>(FLOUNDER_TEXT_ID);
-    public static final PacketCodec<RegistryByteBuf, FlounderTextS2CPacket> CODEC = PacketCodec.of(
+public record FlounderTextS2CPacket(Identifier textTypeId, FlounderText text) implements CustomPacketPayload {
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "flounder_text_create_packet");
+    public static final CustomPacketPayload.Type<FlounderTextS2CPacket> TYPE = new CustomPacketPayload.Type<>(ID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlounderTextS2CPacket> CODEC = StreamCodec.ofMember(
         FlounderTextS2CPacket::write, FlounderTextS2CPacket::fromBuf
     );
 
-    public static FlounderTextS2CPacket fromBuf(RegistryByteBuf buf) {
+    public static FlounderTextS2CPacket fromBuf(RegistryFriendlyByteBuf buf) {
         Identifier id = buf.readIdentifier();
 
-        NbtCompound nbt = buf.readNbt();
-        FlounderText text = nbt.get("text", FlounderTextRegistry.FLOUNDER_TEXT_CODEC).get();
+        CompoundTag nbt = buf.readNbt();
+        FlounderText text = nbt.read("text", FlounderTextRegistry.FLOUNDER_TEXT_CODEC).get();
         return new FlounderTextS2CPacket(id, text);
     }
 
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         buf.writeIdentifier(this.textTypeId);
 
-        NbtCompound nbt = new NbtCompound();
-        nbt.put("text", FlounderTextRegistry.FLOUNDER_TEXT_CODEC, this.text);
+        CompoundTag nbt = new CompoundTag();
+        nbt.store("text", FlounderTextRegistry.FLOUNDER_TEXT_CODEC, this.text);
         buf.writeNbt(nbt);
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

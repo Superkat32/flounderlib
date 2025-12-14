@@ -1,6 +1,6 @@
 package net.superkat.flounderlib.impl.minigame.sync;
 
-import net.minecraft.network.RegistryByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
@@ -48,13 +48,13 @@ public class FlSyncValue<G extends FlounderableGame, S extends FlounderSyncState
     }
 
     public static record Packed<V>(int keyId, FlSyncKey<?, ?, V> key, V value) {
-        public static <V> Packed<V> fromBuf(RegistryByteBuf buf, FlounderStateSyncer<?, ?> syncer, int keyId) {
+        public static <V> Packed<V> fromBuf(RegistryFriendlyByteBuf buf, FlounderStateSyncer<?, ?> syncer, int keyId) {
             FlSyncKey<?, ?, V> key = syncer.getKey(keyId);
             V value = key.read(buf);
             return new Packed<>(keyId, key, value);
         }
 
-        public void write(RegistryByteBuf buf) {
+        public void write(RegistryFriendlyByteBuf buf) {
             buf.writeByte(this.keyId);
             this.key.write(buf, this.value);
         }

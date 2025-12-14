@@ -1,7 +1,7 @@
 package net.superkat.flounderlib.impl.minigame.network.client;
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.text.Text;
+import net.minecraft.network.chat.Component;
 import net.superkat.flounderlib.api.minigame.v1.FlounderClientApi;
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameAddS2CPacket;
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameRemoveS2CPacket;
@@ -14,9 +14,9 @@ import java.util.List;
 public class FlounderMinigameClientNetworkHandler {
 
     public static void init() {
-        ClientPlayNetworking.registerGlobalReceiver(FlounderGameAddS2CPacket.ID, FlounderMinigameClientNetworkHandler::onMinigameAdd);
-        ClientPlayNetworking.registerGlobalReceiver(FlounderGameUpdateS2CPacket.ID, FlounderMinigameClientNetworkHandler::onMinigameUpdate);
-        ClientPlayNetworking.registerGlobalReceiver(FlounderGameRemoveS2CPacket.ID, FlounderMinigameClientNetworkHandler::onMinigameRemove);
+        ClientPlayNetworking.registerGlobalReceiver(FlounderGameAddS2CPacket.TYPE, FlounderMinigameClientNetworkHandler::onMinigameAdd);
+        ClientPlayNetworking.registerGlobalReceiver(FlounderGameUpdateS2CPacket.TYPE, FlounderMinigameClientNetworkHandler::onMinigameUpdate);
+        ClientPlayNetworking.registerGlobalReceiver(FlounderGameRemoveS2CPacket.TYPE, FlounderMinigameClientNetworkHandler::onMinigameRemove);
     }
 
     public static void onMinigameAdd(FlounderGameAddS2CPacket packet, ClientPlayNetworking.Context context) {
@@ -30,7 +30,7 @@ public class FlounderMinigameClientNetworkHandler {
         FlounderClientApi.getClientGameManager().updateMinigame(gameInfo, values);
 
         // Debug
-        context.player().sendMessage(Text.of(String.valueOf(values.size())), true);
+        context.player().displayClientMessage(Component.nullToEmpty(String.valueOf(values.size())), true);
     }
 
     public static void onMinigameRemove(FlounderGameRemoveS2CPacket packet, ClientPlayNetworking.Context context) {

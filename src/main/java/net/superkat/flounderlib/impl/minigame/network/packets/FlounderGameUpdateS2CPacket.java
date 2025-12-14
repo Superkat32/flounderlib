@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.impl.minigame.network.packets;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
@@ -13,14 +13,14 @@ import net.superkat.flounderlib.impl.minigame.sync.FlounderStateSyncerImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, FlounderStateSyncer<?, ?> syncer, List<FlSyncValue.Packed<?>> values) implements CustomPayload {
-    public static final Identifier GAME_ADD_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_game_update");
-    public static final CustomPayload.Id<FlounderGameUpdateS2CPacket> ID = new CustomPayload.Id<>(GAME_ADD_ID);
-    public static final PacketCodec<RegistryByteBuf, FlounderGameUpdateS2CPacket> CODEC = PacketCodec.of(
+public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, FlounderStateSyncer<?, ?> syncer, List<FlSyncValue.Packed<?>> values) implements CustomPacketPayload {
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "flounder_game_update");
+    public static final CustomPacketPayload.Type<FlounderGameUpdateS2CPacket> TYPE = new CustomPacketPayload.Type<>(ID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlounderGameUpdateS2CPacket> CODEC = StreamCodec.ofMember(
             FlounderGameUpdateS2CPacket::write, FlounderGameUpdateS2CPacket::fromBuf
     );
 
-    public static FlounderGameUpdateS2CPacket fromBuf(RegistryByteBuf buf) {
+    public static FlounderGameUpdateS2CPacket fromBuf(RegistryFriendlyByteBuf buf) {
         PackedFlGameInfo gameInfo = PackedFlGameInfo.PACKET_CODEC.decode(buf);
 
         int syncerId = buf.readByte();
@@ -35,7 +35,7 @@ public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, FlounderSta
         return new FlounderGameUpdateS2CPacket(gameInfo, syncer, list);
     }
 
-    public void write(RegistryByteBuf buf) {
+    public void write(RegistryFriendlyByteBuf buf) {
         PackedFlGameInfo.PACKET_CODEC.encode(buf, this.gameInfo);
 
         buf.writeByte(this.gameInfo.gameType().stateSyncer().getId());
@@ -47,7 +47,7 @@ public record FlounderGameUpdateS2CPacket(PackedFlGameInfo gameInfo, FlounderSta
     }
 
     @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

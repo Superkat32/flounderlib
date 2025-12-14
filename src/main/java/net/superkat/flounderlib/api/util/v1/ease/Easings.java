@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.api.util.v1.ease;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 
 /**
- * An interface with various functions for easing, all taking advantage of any Minecraft-specific {@link MathHelper} functions/values.<br><br>
+ * An interface with various functions for easing, all taking advantage of any Minecraft-specific {@link Mth} functions/values.<br><br>
  *
  * I use easings from this website so often with animations that I figured I'd just go on ahead and provide this.
  *
@@ -28,21 +28,21 @@ public interface Easings {
      * @see <a href="https://easings.net/#easeInSine">https://easings.net/#easeInSine</a>
      */
     static float easeInSine(float delta) {
-        return 1 - MathHelper.cos((delta * MathHelper.PI) / 2);
+        return 1 - Mth.cos((delta * Mth.PI) / 2);
     }
 
     /**
      * @see <a href="https://easings.net/#easeOutSine">https://easings.net/#easeOutSine</a>
      */
     static float easeOutSine(float delta) {
-        return MathHelper.sin((delta * MathHelper.PI) / 2);
+        return Mth.sin((delta * Mth.PI) / 2);
     }
 
     /**
      * @see <a href="https://easings.net/#easeInOutSine">https://easings.net/#easeInOutSine</a>
      */
     static float easeInOutSine(float delta) {
-        return -(MathHelper.cos(MathHelper.PI * delta) - 1) / 2;
+        return -(Mth.cos(Mth.PI * delta) - 1) / 2;
     }
 
 
@@ -171,14 +171,14 @@ public interface Easings {
      * @see <a href="https://easings.net/#easeInCirc">https://easings.net/#easeInCirc</a>
      */
     static float easeInCirc(float delta) {
-        return 1 - MathHelper.sqrt((float) (1 - Math.pow(delta, 2)));
+        return 1 - Mth.sqrt((float) (1 - Math.pow(delta, 2)));
     }
 
     /**
      * @see <a href="https://easings.net/#easeOutCirc">https://easings.net/#easeOutCirc</a>
      */
     static float easeOutCirc(float delta) {
-        return MathHelper.sqrt((float) (1 - Math.pow(delta - 1, 2)));
+        return Mth.sqrt((float) (1 - Math.pow(delta - 1, 2)));
     }
 
     /**
@@ -186,8 +186,8 @@ public interface Easings {
      */
     static float easeInOutCirc(float delta) {
         return delta < 0.5
-                ? (1 - MathHelper.sqrt((float) (1 - Math.pow(2 * delta, 2)))) / 2
-                : (MathHelper.sqrt((float) (1 - Math.pow(-2 * delta + 2, 2))) + 1) / 2;
+                ? (1 - Mth.sqrt((float) (1 - Math.pow(2 * delta, 2)))) / 2
+                : (Mth.sqrt((float) (1 - Math.pow(-2 * delta + 2, 2))) + 1) / 2;
    }
 
 
@@ -230,41 +230,41 @@ public interface Easings {
      * @see <a href="https://easings.net/#easeInElastic">https://easings.net/#easeInElastic</a>
      */
    static float easeInElastic(float delta) {
-        float c4 = (2 * MathHelper.PI) / 3;
+        float c4 = (2 * Mth.PI) / 3;
 
        return delta == 0
                ? 0
                : (float) (delta == 1
                ? 1
-               : -Math.pow(2, 10 * delta - 10) * MathHelper.sin((float) ((delta * 10 - 10.75) * c4)));
+               : -Math.pow(2, 10 * delta - 10) * Mth.sin((float) ((delta * 10 - 10.75) * c4)));
    }
 
     /**
      * @see <a href="https://easings.net/#easeOutElastic">https://easings.net/#easeOutElastic</a>
      */
    static float easeOutElastic(float delta) {
-        float c4 = (2 * MathHelper.PI) / 3;
+        float c4 = (2 * Mth.PI) / 3;
 
        return delta == 0
                ? 0
                : (float) (delta == 1
                ? 1
-               : Math.pow(2, -10 * delta) * MathHelper.sin((float) ((delta * 10 - 0.75) * c4)) + 1);
+               : Math.pow(2, -10 * delta) * Mth.sin((float) ((delta * 10 - 0.75) * c4)) + 1);
    }
 
     /**
      * @see <a href="https://easings.net/#easeInOutElastic">https://easings.net/#easeInOutElastic</a>
      */
    static float easeInOutElastic(float delta) {
-        float c5 = (2 * MathHelper.PI) / 4.5f;
+        float c5 = (2 * Mth.PI) / 4.5f;
 
        return delta == 0
                ? 0
                : (float) (delta == 1
                ? 1
                : delta < 0.5
-               ? -(Math.pow(2, 20 * delta - 10) * MathHelper.sin((float) ((20 * delta - 11.125) * c5))) / 2
-               : (Math.pow(2, -20 * delta + 10) * MathHelper.sin((float) ((20 * delta - 11.125) * c5))) / 2 + 1);
+               ? -(Math.pow(2, 20 * delta - 10) * Mth.sin((float) ((20 * delta - 11.125) * c5))) / 2
+               : (Math.pow(2, -20 * delta + 10) * Mth.sin((float) ((20 * delta - 11.125) * c5))) / 2 + 1);
    }
 
 

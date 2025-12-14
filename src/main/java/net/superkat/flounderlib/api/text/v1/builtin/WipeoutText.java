@@ -3,22 +3,22 @@ package net.superkat.flounderlib.api.text.v1.builtin;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.ExtraCodecs;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
 import net.superkat.flounderlib.impl.text.BuiltinFlounderTexts;
 
 public class WipeoutText extends FlounderText {
-    public static final Identifier ID = Identifier.of(FlounderLib.MOD_ID, "wipeout_text");
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "wipeout_text");
     public static final MapCodec<WipeoutText> CODEC = RecordCodecBuilder.mapCodec(
             instance -> instance.group(
                     createTextCodec(),
-                    Codecs.ARGB.optionalFieldOf("color", Colors.YELLOW).forGetter(text -> text.color),
+                    ExtraCodecs.ARGB_COLOR_CODEC.optionalFieldOf("color", CommonColors.YELLOW).forGetter(text -> text.color),
                     Codec.BOOL.optionalFieldOf("positive", true).forGetter(text -> text.positive)
             ).apply(instance, WipeoutText::new)
     );
@@ -37,8 +37,8 @@ public class WipeoutText extends FlounderText {
 
     public int fadeOutTicks;
 
-    public WipeoutText(Text text, int color, boolean positive) {
-        super(text.copy().formatted(Formatting.BOLD));
+    public WipeoutText(Component text, int color, boolean positive) {
+        super(text.copy().withStyle(ChatFormatting.BOLD));
         this.color = color;
         this.positive = positive;
 

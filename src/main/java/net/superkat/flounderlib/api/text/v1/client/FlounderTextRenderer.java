@@ -1,10 +1,10 @@
 package net.superkat.flounderlib.api.text.v1.client;
 
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
 
 import java.util.ArrayDeque;
@@ -28,18 +28,18 @@ import java.util.Queue;
  */
 public interface FlounderTextRenderer<T extends FlounderText> extends HudElement {
 
-    void renderText(DrawContext context, RenderTickCounter tickCounter, T text, int entry);
+    void renderText(GuiGraphics graphics, DeltaTracker deltaTracker, T text, int entry);
 
     default void init() {}
 
     @Override
-    default void render(DrawContext context, RenderTickCounter tickCounter) {
+    default void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
         int entry = 0;
 
         for (Iterator<T> iterator = this.getTexts().iterator(); iterator.hasNext(); ) {
             T text = iterator.next();
 
-            this.renderText(context, tickCounter, text, entry);
+            this.renderText(graphics, deltaTracker, text, entry);
             entry++;
 
             if(text.isFinishedRendering()) {
@@ -48,8 +48,8 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         }
     }
 
-    default float getTickAndDelta(T text, RenderTickCounter tickCounter) {
-        return text.getTicks() + tickCounter.getTickProgress(false);
+    default float getTickAndDelta(T text, DeltaTracker deltaTracker) {
+        return text.getTicks() + deltaTracker.getGameTimeDeltaPartialTick(false);
     }
 
     default void tick(boolean paused) {
@@ -81,16 +81,16 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
     Collection<T> getTexts();
 
     abstract class Abstract <T extends FlounderText> implements FlounderTextRenderer<T> {
-        public final MinecraftClient client;
-        public TextRenderer textRenderer = null;
+        public final Minecraft client;
+        public Font font = null;
 
         public Abstract() {
-            this.client = MinecraftClient.getInstance();
+            this.client = Minecraft.getInstance();
         }
 
         @Override
         public void init() {
-            this.textRenderer = this.client.textRenderer;
+            this.font = this.client.font;
         }
     }
 
@@ -116,9 +116,9 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         public T currentText = null;
 
         @Override
-        public void render(DrawContext context, RenderTickCounter tickCounter) {
+        public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
             if(this.currentText != null) {
-                this.renderText(context, tickCounter, this.currentText, 0);
+                this.renderText(graphics, deltaTracker, this.currentText, 0);
                 if(this.currentText.isFinishedRendering()) {
                     this.currentText = null;
                 }
@@ -146,7 +146,7 @@ public interface FlounderTextRenderer<T extends FlounderText> extends HudElement
         @Override
         public void addText(T text) {
             if(!this.canAddText(text)) return;
-            String[] words = text.getText().getLiteralString().split(" ");
+            String[] words = text.getText().tryCollapseToString().split(" ");
 
             for (String word : words) {
                 T wordText = this.createTextFromWord(text, word);

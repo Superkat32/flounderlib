@@ -1,12 +1,12 @@
 package net.superkat.flounderlib.impl.text.client.builtin.renderer;
 
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.util.Colors;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.text.v1.builtin.SplatText;
 import net.superkat.flounderlib.api.text.v1.client.FlounderTextRenderer;
@@ -18,7 +18,7 @@ public class SplatTextRenderer extends FlounderTextRenderer.Simple<SplatText> {
 
     @Override
     public void addText(SplatText text) {
-        text.backgroundY = this.getBackgroundY(this.client.getWindow().getScaledHeight(), 0);
+        text.backgroundY = this.getBackgroundY(this.client.getWindow().getGuiScaledHeight(), 0);
         text.prevBackgroundY = text.backgroundY;
         text.textY = text.backgroundY + (9 / 2);
         text.prevTextY = text.textY;
@@ -27,23 +27,23 @@ public class SplatTextRenderer extends FlounderTextRenderer.Simple<SplatText> {
     }
 
     @Override
-    public void renderText(DrawContext context, RenderTickCounter tickCounter, SplatText text, int entry) {
-        int windowWidth = context.getScaledWindowWidth();
-        int windowHeight = context.getScaledWindowHeight();
+    public void renderText(GuiGraphics graphics, DeltaTracker deltaTracker, SplatText text, int entry) {
+        int windowWidth = graphics.guiWidth();
+        int windowHeight = graphics.guiHeight();
         int centerX = windowWidth / 2;
 
         // Slide in
         int xOffset = 0;
         if(text.ticks < text.slideInTicks) {
-            xOffset = MathHelper.lerp(this.getTickAndDelta(text, tickCounter) / text.slideInTicks, text.startXOffset, 0);
+            xOffset = Mth.lerpInt(this.getTickAndDelta(text, deltaTracker) / text.slideInTicks, text.startXOffset, 0);
         }
 
         // Fading
         float alpha = 1f;
         if(text.ticks <= text.fadeInTicks) { // Fade in
-            alpha = MathHelper.lerp((float) text.ticks / text.fadeInTicks, 0f, 1f);
+            alpha = Mth.lerp((float) text.ticks / text.fadeInTicks, 0f, 1f);
         } else if (text.ticks >= text.maxTicks - text.fadeOutTicks) { // Fade out
-            alpha = MathHelper.lerp((float) (text.ticks - (text.maxTicks - text.fadeOutTicks)) / text.fadeOutTicks, 1f, 0f);
+            alpha = Mth.lerp((float) (text.ticks - (text.maxTicks - text.fadeOutTicks)) / text.fadeOutTicks, 1f, 0f);
         }
 
         // Center the text background
@@ -52,22 +52,22 @@ public class SplatTextRenderer extends FlounderTextRenderer.Simple<SplatText> {
         int backgroundX = centerX - (backgroundWidth / 2) + xOffset;
         // Slide up the text background
         text.backgroundY = this.getBackgroundY(windowHeight, entry);
-        text.prevBackgroundY = MathHelper.lerp(tickCounter.getTickProgress(false) / 2f, text.prevBackgroundY, text.backgroundY);;
+        text.prevBackgroundY = Mth.lerpInt(deltaTracker.getGameTimeDeltaPartialTick(false) / 2f, text.prevBackgroundY, text.backgroundY);;
 
         // Center the text
-        int textWidth = this.textRenderer.getWidth(text.getText());
+        int textWidth = this.font.width(text.getText());
         int textHeight = 9;
         int textX = centerX - (textWidth / 2) + xOffset;
         // Slide the text up
         text.textY = text.backgroundY + (textHeight / 2);
-        text.prevTextY = MathHelper.lerp(tickCounter.getTickProgress(false) / 2f, text.prevTextY, text.textY);;
+        text.prevTextY = Mth.lerpInt(deltaTracker.getGameTimeDeltaPartialTick(false) / 2f, text.prevTextY, text.textY);;
 
         // Apply fading effects (if any)
-        int textColor = ColorHelper.withAlpha(alpha, Colors.WHITE);
+        int textColor = ARGB.color(alpha, CommonColors.WHITE);
 
         // Draw the background and text
-        context.drawGuiTexture(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURES[text.backgroundId], backgroundX, text.prevBackgroundY, backgroundWidth, backgroundHeight, alpha);
-        context.drawTextWithShadow(this.textRenderer, text.getText(), textX, text.prevTextY, textColor);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, BACKGROUND_TEXTURES[text.backgroundId], backgroundX, text.prevBackgroundY, backgroundWidth, backgroundHeight, alpha);
+        graphics.drawString(this.font, text.getText(), textX, text.prevTextY, textColor);
     }
 
     public int getBackgroundY(int windowHeight, int entry) {
@@ -84,6 +84,6 @@ public class SplatTextRenderer extends FlounderTextRenderer.Simple<SplatText> {
     }
 
     private static Identifier bg(int id) {
-        return Identifier.of(FlounderLib.MOD_ID, "text/splat/splatted" + id);
+        return Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "text/splat/splatted" + id);
     }
 }

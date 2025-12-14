@@ -1,22 +1,22 @@
 package net.superkat.flounderlibtest.test.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.text.Text;
-import net.minecraft.util.Colors;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.phys.Vec3;
 import net.superkat.flounderlib.api.minigame.v1.FlounderClientApi;
 import net.superkat.flounderlibtest.FlounderLibTest;
 import net.superkat.flounderlibtest.test.TestSyncedMinigame;
 
 public class TestSyncedMinigameRenderer {
 
-    public static void renderSyncedMinigameHud(DrawContext context, RenderTickCounter tickCounter) {
+    public static void renderSyncedMinigameHud(GuiGraphics context, DeltaTracker tickCounter) {
         if(!FlounderClientApi.anyMinigames(FlounderLibTest.TEST_SYNCED_MINIGAME_TYPE)) return;
-        MinecraftClient client = MinecraftClient.getInstance();
-        TextRenderer textRenderer = client.textRenderer;
+        Minecraft client = Minecraft.getInstance();
+        Font textRenderer = client.font;
 
         TestRenderState renderState = TestRenderState.fromSyncState(
                 FlounderClientApi.getFirstSyncState(TestSyncedMinigame.STATE_SYNCER)
@@ -26,8 +26,8 @@ public class TestSyncedMinigameRenderer {
         boolean myBoolean = renderState.myBoolean();
         int myInteger = renderState.myInteger();
         String myString = renderState.myString();
-        Vec3d myVec3d = renderState.myVec3d();
-        Text myText = renderState.myText();
+        Vec3 myVec3d = renderState.myVec3d();
+        Component myText = renderState.myText();
         if(ticks == -1) return;
 
         int y = 0;
@@ -39,12 +39,12 @@ public class TestSyncedMinigameRenderer {
         y = render(context, textRenderer, myBoolean, y);
     }
 
-    private static int render(DrawContext context, TextRenderer textRenderer, Object value, int y) {
-        context.drawText(textRenderer, String.valueOf(value), 0, y, Colors.WHITE, true);
+    private static int render(GuiGraphics context, Font textRenderer, Object value, int y) {
+        context.drawString(textRenderer, String.valueOf(value), 0, y, CommonColors.WHITE, true);
         return y + 10;
     }
 
-    public record TestRenderState(int ticks, boolean myBoolean, int myInteger, String myString, Vec3d myVec3d, Text myText) {
+    public record TestRenderState(int ticks, boolean myBoolean, int myInteger, String myString, Vec3 myVec3d, Component myText) {
         public static TestRenderState fromSyncState(TestSyncedMinigame.SyncState syncState) {
             return new TestRenderState(
                     syncState.ticks,

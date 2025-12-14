@@ -8,9 +8,9 @@ import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameUpdate
 public class FlounderMinigamePackets {
 
     public static void init() {
-        PayloadTypeRegistry.playS2C().register(FlounderGameAddS2CPacket.ID, FlounderGameAddS2CPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(FlounderGameUpdateS2CPacket.ID, FlounderGameUpdateS2CPacket.CODEC);
-        PayloadTypeRegistry.playS2C().register(FlounderGameRemoveS2CPacket.ID, FlounderGameRemoveS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(FlounderGameAddS2CPacket.TYPE, FlounderGameAddS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(FlounderGameUpdateS2CPacket.TYPE, FlounderGameUpdateS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(FlounderGameRemoveS2CPacket.TYPE, FlounderGameRemoveS2CPacket.CODEC);
     }
 
 }

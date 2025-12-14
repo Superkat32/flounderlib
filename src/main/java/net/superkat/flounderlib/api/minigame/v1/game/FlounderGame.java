@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.api.minigame.v1.game;
 
 import com.google.common.collect.Sets;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public abstract class FlounderGame implements FlounderableGame {
-    public ServerWorld world;
+    public ServerLevel level;
     public BlockPos centerPos;
     private int minigameId;
 
@@ -41,8 +41,8 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     @Override
-    public void init(ServerWorld world, int minigameId) {
-        this.world = world;
+    public void init(ServerLevel world, int minigameId) {
+        this.level = world;
         this.minigameId = minigameId;
         this.updatePlayers();
     }
@@ -66,24 +66,24 @@ public abstract class FlounderGame implements FlounderableGame {
         return this.invalidated;
     }
 
-    public void addPlayer(ServerPlayerEntity player) {
-        this.addPlayerUuid(player.getUuid());
+    public void addPlayer(ServerPlayer player) {
+        this.addPlayerUuid(player.getUUID());
     }
 
     public void addPlayerUuid(UUID playerUuid) {
         this.playerUuids.add(playerUuid);
     }
 
-    public void removePlayer(ServerPlayerEntity player) {
-        this.removePlayerUuid(player.getUuid());
+    public void removePlayer(ServerPlayer player) {
+        this.removePlayerUuid(player.getUUID());
     }
 
     public void removePlayerUuid(UUID playerUuid) {
         this.playerUuids.remove(playerUuid);
     }
 
-    public boolean containsPlayer(ServerPlayerEntity player) {
-        return this.containsPlayerUuid(player.getUuid());
+    public boolean containsPlayer(ServerPlayer player) {
+        return this.containsPlayerUuid(player.getUUID());
     }
 
     public boolean containsPlayerUuid(UUID playerUuid) {
@@ -91,18 +91,18 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public void updatePlayers() {
-        Set<ServerPlayerEntity> currentPlayers = Sets.newHashSet(this.getPlayers());
-        List<ServerPlayerEntity> nearbyPlayers = this.world.getPlayers(this::playerWithinBounds);
+        Set<ServerPlayer> currentPlayers = Sets.newHashSet(this.getPlayers());
+        List<ServerPlayer> nearbyPlayers = this.level.getPlayers(this::playerWithinBounds);
 
         // Add new nearby players
-        for (ServerPlayerEntity nearbyPlayer : nearbyPlayers) {
+        for (ServerPlayer nearbyPlayer : nearbyPlayers) {
             if(!currentPlayers.contains(nearbyPlayer)) {
                 this.addPlayer(nearbyPlayer);
             }
         }
 
         // Remove old no longer nearby players
-        for (ServerPlayerEntity currentPlayer : currentPlayers) {
+        for (ServerPlayer currentPlayer : currentPlayers) {
             if(!nearbyPlayers.contains(currentPlayer)) {
                 this.removePlayer(currentPlayer);
             }
@@ -120,11 +120,11 @@ public abstract class FlounderGame implements FlounderableGame {
 
     @Override
     public boolean containsBlockPos(BlockPos pos) {
-        return pos.isWithinDistance(this.getCenterPos(), this.getGameType().distance());
+        return pos.closerThan(this.getCenterPos(), this.getGameType().distance());
     }
 
-    public boolean playerWithinBounds(ServerPlayerEntity player) {
-        return this.containsBlockPos(player.getBlockPos());
+    public boolean playerWithinBounds(ServerPlayer player) {
+        return this.containsBlockPos(player.blockPosition());
     }
 
     public int playerSearchDistance() {
@@ -136,7 +136,7 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     @Override
-    public List<ServerPlayerEntity> getPlayers() {
+    public List<ServerPlayer> getPlayers() {
         return this.playerUuids.stream().map(this::getPlayer).toList();
     }
 
@@ -149,8 +149,8 @@ public abstract class FlounderGame implements FlounderableGame {
         return this.playerUuids.size();
     }
 
-    public ServerPlayerEntity getPlayer(UUID playerUuid) {
-        return (ServerPlayerEntity) this.world.getPlayerByUuid(playerUuid);
+    public ServerPlayer getPlayer(UUID playerUuid) {
+        return (ServerPlayer) this.level.getPlayerByUUID(playerUuid);
     }
 
     @Override

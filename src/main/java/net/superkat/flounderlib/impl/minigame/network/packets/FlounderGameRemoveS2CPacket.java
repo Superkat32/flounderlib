@@ -1,22 +1,22 @@
 package net.superkat.flounderlib.impl.minigame.network.packets;
 
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.impl.minigame.packed.PackedFlGameInfo;
 
-public record FlounderGameRemoveS2CPacket(PackedFlGameInfo gameInfo) implements CustomPayload {
-    public static final Identifier FLOUNDER_GAME_REMOVE_ID = Identifier.of(FlounderLib.MOD_ID, "flounder_game_remove");
-    public static final CustomPayload.Id<FlounderGameRemoveS2CPacket> ID = new CustomPayload.Id<>(FLOUNDER_GAME_REMOVE_ID);
-    public static final PacketCodec<RegistryByteBuf, FlounderGameRemoveS2CPacket> CODEC = PacketCodec.tuple(
+public record FlounderGameRemoveS2CPacket(PackedFlGameInfo gameInfo) implements CustomPacketPayload {
+    public static final Identifier ID = Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "flounder_game_remove");
+    public static final CustomPacketPayload.Type<FlounderGameRemoveS2CPacket> TYPE = new CustomPacketPayload.Type<>(ID);
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlounderGameRemoveS2CPacket> CODEC = StreamCodec.composite(
             PackedFlGameInfo.PACKET_CODEC, FlounderGameRemoveS2CPacket::gameInfo,
             FlounderGameRemoveS2CPacket::new
     );
 
     @Override
-    public Id<? extends CustomPayload> getId() {
-        return ID;
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 }

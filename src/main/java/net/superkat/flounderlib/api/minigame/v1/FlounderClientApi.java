@@ -1,13 +1,13 @@
 package net.superkat.flounderlib.api.minigame.v1;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.superkat.flounderlib.api.minigame.v1.game.SyncableFlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState;
 import net.superkat.flounderlib.impl.minigame.client.FlounderClientGameManager;
-import net.superkat.flounderlib.impl.minigame.duck.FlounderClientWorld;
+import net.superkat.flounderlib.impl.minigame.duck.FlounderClientLevel;
 
 import java.util.List;
 
@@ -43,11 +43,11 @@ public class FlounderClientApi {
     }
 
     public static FlounderClientGameManager getClientGameManager() {
-        return getClientGameManager(MinecraftClient.getInstance().world);
+        return getClientGameManager(Minecraft.getInstance().level);
     }
 
-    public static FlounderClientGameManager getClientGameManager(ClientWorld world) {
-        return ((FlounderClientWorld) world).flounderlib$getClientGameManager();
+    public static FlounderClientGameManager getClientGameManager(ClientLevel world) {
+        return ((FlounderClientLevel) world).flounderlib$getClientGameManager();
     }
 
 }

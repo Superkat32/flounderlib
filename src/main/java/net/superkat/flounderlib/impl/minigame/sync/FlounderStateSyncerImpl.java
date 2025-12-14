@@ -2,7 +2,7 @@ package net.superkat.flounderlib.impl.minigame.sync;
 
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import net.minecraft.network.codec.PacketCodec;
+import net.minecraft.network.codec.StreamCodec;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
@@ -38,7 +38,7 @@ public class FlounderStateSyncerImpl<G extends FlounderableGame, S extends Floun
     }
 
     @Override
-    public <V> FlounderStateSyncer<G, S> add(PacketCodec<ByteBuf, V> packetCodec, SyncedDataGetter<G, V> getter, SyncedDataSetter<S, V> setter) {
+    public <V> FlounderStateSyncer<G, S> add(StreamCodec<ByteBuf, V> packetCodec, SyncedDataGetter<G, V> getter, SyncedDataSetter<S, V> setter) {
         int id = this.keys.size() + 1;
         FlSyncKey<G, S, V> value = new FlSyncKey<>(id, packetCodec, getter, setter);
         this.keys.put(id, value);

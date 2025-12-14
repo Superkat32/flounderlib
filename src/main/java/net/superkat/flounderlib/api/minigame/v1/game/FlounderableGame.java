@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.api.minigame.v1.game;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.superkat.flounderlib.api.minigame.v1.FlounderApi;
 import net.superkat.flounderlib.api.minigame.v1.registry.FlounderGameType;
 import net.superkat.flounderlib.impl.minigame.game.FlounderGameManager;
@@ -27,11 +27,11 @@ public interface FlounderableGame {
      * @param world The World to set the minigame world to.
      * @param minigameId The minigame's integer id for saving the minigame & syncing the minigame (if either are needed)
      */
-    void init(ServerWorld world, int minigameId);
+    void init(ServerLevel world, int minigameId);
 
     /**
      * Called every tick. This is your most important method, and where most of a minigame's processing is going to happen.<br><br>
-     * It <i>should</i> be safe to assume {@link FlounderableGame#init(ServerWorld, int)} has already been called.
+     * It <i>should</i> be safe to assume {@link FlounderableGame#init(ServerLevel, int)} has already been called.
      */
     void tick();
 
@@ -49,9 +49,9 @@ public interface FlounderableGame {
     boolean isInvalidated();
 
     /**
-     * @return List of participating players as {@link ServerPlayerEntity}s.
+     * @return List of participating players as {@link ServerPlayer}s.
      */
-    List<ServerPlayerEntity> getPlayers();
+    List<ServerPlayer> getPlayers();
 
     /**
      * @return Set of participating players as {@link UUID}s.
@@ -76,7 +76,7 @@ public interface FlounderableGame {
     /**
      * The minigame's given integer id during creation. This is used for saving the minigame(differentiating between saved minigames) and more importantly syncing minigames(if they are synced).
      *
-     * @return The minigame's given int id, given from {@link  FlounderableGame#init(ServerWorld, int)}.
+     * @return The minigame's given int id, given from {@link  FlounderableGame#init(ServerLevel, int)}.
      */
     int getMinigameId();
 

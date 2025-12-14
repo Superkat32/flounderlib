@@ -1,7 +1,7 @@
 package net.superkat.flounderlib.api.text.v1.registry;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
 
 /**

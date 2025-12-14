@@ -6,7 +6,7 @@ import net.superkat.flounderlib.impl.text.network.packets.FlounderTextS2CPacket;
 public class FlounderTextPackets {
 
     public static void init() {
-        PayloadTypeRegistry.playS2C().register(FlounderTextS2CPacket.ID, FlounderTextS2CPacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(FlounderTextS2CPacket.TYPE, FlounderTextS2CPacket.CODEC);
     }
 
 }

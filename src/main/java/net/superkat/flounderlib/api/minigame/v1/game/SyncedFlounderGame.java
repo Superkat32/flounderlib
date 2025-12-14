@@ -1,8 +1,8 @@
 package net.superkat.flounderlib.api.minigame.v1.game;
 
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameAddS2CPacket;
 import net.superkat.flounderlib.impl.minigame.network.packets.FlounderGameRemoveS2CPacket;
@@ -26,17 +26,11 @@ public abstract class SyncedFlounderGame extends FlounderGame implements Syncabl
         super(ticks, centerPos);
     }
 
-//    public abstract void addDataValues(FlounderSyncTracker.Builder builder);
-
     @SuppressWarnings("unchecked")
     public <G extends SyncableFlounderableGame> FlounderSyncTracker<G> createFlounderSyncState() {
         FlounderStateSyncer<G, ?> stateSyncer = (FlounderStateSyncer<G, ?>) this.getGameType().stateSyncer();
         G game = (G) this;
         return new FlounderSyncTracker<>(game, stateSyncer.createValues());
-//        FlounderSyncTracker.Builder builder = new FlounderSyncTracker.Builder();
-//        this.addDataValues(builder);
-//
-//        return builder.build();
     }
 
     @Override
@@ -52,7 +46,7 @@ public abstract class SyncedFlounderGame extends FlounderGame implements Syncabl
     public void addPlayerUuid(UUID playerUuid) {
         super.addPlayerUuid(playerUuid);
 
-        ServerPlayerEntity player = this.getPlayer(playerUuid);
+        ServerPlayer player = this.getPlayer(playerUuid);
         this.syncAdd(player);
     }
 
@@ -80,36 +74,31 @@ public abstract class SyncedFlounderGame extends FlounderGame implements Syncabl
         this.isDirty = dirty;
     }
 
-//    public List<FlDataValue.Packed<?>> getPackedValues(boolean sendAll) {
-//        return this.flounderSyncTracker.getValuesAndPackEmUp(sendAll);
-//    }
-
     public List<FlSyncValue.Packed<?>> getPackedValues(boolean includeAll) {
         return this.flounderSyncTracker.updateAndGetPackedValues(includeAll);
     }
 
     @Override
-    public CustomPayload createAddPacket() {
+    public CustomPacketPayload createAddPacket() {
         return new FlounderGameAddS2CPacket(this.packGameInfo());
     }
 
     @Override
-    public CustomPayload createUpdatePacket() {
-//        List<FlDataValue.Packed<?>> dirtyValues = getPackedValues(false);
+    public CustomPacketPayload createUpdatePacket() {
         List<FlSyncValue.Packed<?>> dirtyValues = this.getPackedValues(false);
         return new FlounderGameUpdateS2CPacket(this.packGameInfo(), this.getStateSyncer(), dirtyValues);
     }
 
 
     @Override
-    public CustomPayload createRemovePacket() {
+    public CustomPacketPayload createRemovePacket() {
         return new FlounderGameRemoveS2CPacket(this.packGameInfo());
     }
 
     @Override
-    public List<CustomPayload> createExtraAddPackets() {
+    public List<CustomPacketPayload> createExtraAddPackets() {
         List<FlSyncValue.Packed<?>> dirtyValues = getPackedValues(true);
-        CustomPayload valuesPacket = new FlounderGameUpdateS2CPacket(PackedFlGameInfo.fromGame(this), this.getStateSyncer(), dirtyValues);
+        CustomPacketPayload valuesPacket = new FlounderGameUpdateS2CPacket(PackedFlGameInfo.fromGame(this), this.getStateSyncer(), dirtyValues);
         return List.of(valuesPacket);
     }
 

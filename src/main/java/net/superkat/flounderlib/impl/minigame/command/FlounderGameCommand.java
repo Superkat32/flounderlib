@@ -6,23 +6,23 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.argument.BlockPosArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.Texts;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.synchronization.SuggestionProviders;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.superkat.flounderlib.FlounderLib;
 import net.superkat.flounderlib.api.minigame.v1.FlounderApi;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
@@ -41,21 +41,21 @@ import java.util.Set;
  */
 public class FlounderGameCommand {
 
-    public static final Map<Identifier, ArgumentBuilder<ServerCommandSource, ?>> MINIGAME_AUTOFILLS = new HashMap<>();
+    public static final Map<Identifier, ArgumentBuilder<CommandSourceStack, ?>> MINIGAME_AUTOFILLS = new HashMap<>();
 
-    public static final SuggestionProvider<ServerCommandSource> AVAILABLE_MINIGAME_IDS = SuggestionProviders.register(
-            Identifier.of(FlounderLib.MOD_ID, "available_minigame_ids"),
+    public static final SuggestionProvider<CommandSourceStack> AVAILABLE_MINIGAME_IDS = SuggestionProviders.register(
+            Identifier.fromNamespaceAndPath(FlounderLib.MOD_ID, "available_minigame_ids"),
             (commandContext, suggestionsBuilder) -> {
-                Set<Identifier> idSet = FlounderRegistry.getRegistry().getIds();
-                return CommandSource.suggestIdentifiers(idSet, suggestionsBuilder);
+                Set<Identifier> idSet = FlounderRegistry.getRegistry().keySet();
+                return SharedSuggestionProvider.suggestResource(idSet, suggestionsBuilder);
             }
     );
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess) {
         dispatcher.register(
-                CommandManager.literal("flounderlib")
-                    .requires(source -> source.hasPermissionLevel(3))
-                    .then(CommandManager.literal("minigames")
+                Commands.literal("flounderlib")
+                    .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                    .then(Commands.literal("minigames")
                                 .then(listCommand())
                                 .then(locateCommand())
                                 .then(highlightCommand())
@@ -66,69 +66,69 @@ public class FlounderGameCommand {
         );
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> listCommand() {
-        return CommandManager.literal("list")
+    private static LiteralArgumentBuilder<CommandSourceStack> listCommand() {
+        return Commands.literal("list")
                 .executes(context -> executeList(context.getSource()));
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> locateCommand() {
-        return CommandManager.literal("locate")
-                .executes(context -> executeLocate(context.getSource(), BlockPos.ofFloored(context.getSource().getPosition()), true))
-                .then(CommandManager.argument("position", BlockPosArgumentType.blockPos())
-                        .executes(context -> executeLocate(context.getSource(), BlockPosArgumentType.getBlockPos(context, "position"), false))
+    private static LiteralArgumentBuilder<CommandSourceStack> locateCommand() {
+        return Commands.literal("locate")
+                .executes(context -> executeLocate(context.getSource(), BlockPos.containing(context.getSource().getPosition()), true))
+                .then(Commands.argument("position", BlockPosArgument.blockPos())
+                        .executes(context -> executeLocate(context.getSource(), BlockPosArgument.getBlockPos(context, "position"), false))
                 );
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> highlightCommand() {
-        return CommandManager.literal("highlight")
+    private static LiteralArgumentBuilder<CommandSourceStack> highlightCommand() {
+        return Commands.literal("highlight")
                 .executes(context -> executeHighlight(context.getSource(), -1))
-                .then(CommandManager.argument("minigameIntId", IntegerArgumentType.integer(0))
+                .then(Commands.argument("minigameIntId", IntegerArgumentType.integer(0))
                         .executes(context -> executeHighlight(context.getSource(), IntegerArgumentType.getInteger(context, "minigameIntId")))
                 );
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> startCommand(CommandRegistryAccess registryAccess) {
+    private static LiteralArgumentBuilder<CommandSourceStack> startCommand(CommandBuildContext registryAccess) {
         return forAllMinigames(registryAccess, "start");
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> forAllMinigames(CommandRegistryAccess registryAccess, String name) {
-        LiteralArgumentBuilder<ServerCommandSource> command = CommandManager.literal(name);
+    private static LiteralArgumentBuilder<CommandSourceStack> forAllMinigames(CommandBuildContext registryAccess, String name) {
+        LiteralArgumentBuilder<CommandSourceStack> command = Commands.literal(name);
 
-        for (Identifier minigameId : FlounderRegistry.getRegistry().getIds()) {
+        for (Identifier minigameId : FlounderRegistry.getRegistry().keySet()) {
             if(MINIGAME_AUTOFILLS.containsKey(minigameId)) {
                 command.then(
-                        CommandManager.literal(minigameId.toString())
+                        Commands.literal(minigameId.toString())
                                 .then(MINIGAME_AUTOFILLS.get(minigameId))
                 );
             } else {
                 command.then(
-                        CommandManager.argument("minigame", FlounderMinigameArgumentType.flounderGame(registryAccess))
+                        Commands.argument("minigame", FlounderMinigameArgumentType.flounderGame(registryAccess))
                                 .suggests(AVAILABLE_MINIGAME_IDS)
                                 .executes(context -> executeStart(context.getSource(), FlounderMinigameArgumentType.getFlounderGame(context, "minigame")))
                 );
             }
-            command.then(CommandManager.literal(minigameId.toString()));
+            command.then(Commands.literal(minigameId.toString()));
         }
 
         return command;
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> stopCommand() {
-        return CommandManager.literal("stop")
-                .then(CommandManager.argument("minigameIntId", IntegerArgumentType.integer(0))
+    private static LiteralArgumentBuilder<CommandSourceStack> stopCommand() {
+        return Commands.literal("stop")
+                .then(Commands.argument("minigameIntId", IntegerArgumentType.integer(0))
                         .executes(context -> executeStop(context.getSource(), IntegerArgumentType.getInteger(context, "minigameIntId")))
                 );
     }
 
-    private static LiteralArgumentBuilder<ServerCommandSource> stopAllCommand() {
-        return CommandManager.literal("stopAll")
+    private static LiteralArgumentBuilder<CommandSourceStack> stopAllCommand() {
+        return Commands.literal("stopAll")
                 .executes(context -> executeStopAll(context.getSource()));
     }
 
 
 
-    public static int executeList(ServerCommandSource source) {
-        ServerWorld world = source.getWorld();
+    public static int executeList(CommandSourceStack source) {
+        ServerLevel world = source.getLevel();
         FlounderGameManager manager = FlounderApi.getGameManager(world);
         Map<Integer, FlounderableGame> games = manager.getGames();
 
@@ -140,22 +140,22 @@ public class FlounderGameCommand {
         return 1;
     }
 
-    public static int executeLocate(ServerCommandSource source, BlockPos searchPos, boolean playerLocation) {
-        ServerWorld world = source.getWorld();
+    public static int executeLocate(CommandSourceStack source, BlockPos searchPos, boolean playerLocation) {
+        ServerLevel world = source.getLevel();
 
         List<FlounderableGame> games = FlounderApi.findMinigamesAt(world, searchPos);
-        Text locationText = playerLocation ? Text.translatable("command.flounderlib.player_location") : getBlockPosText(searchPos, false);
+        Component locationText = playerLocation ? Component.translatable("command.flounderlib.player_location") : getBlockPosText(searchPos, false);
         if(games == null || games.isEmpty()) {
-            return noMinigameActive(source, Text.translatable("command.flounderlib.found_fail", locationText));
+            return noMinigameActive(source, Component.translatable("command.flounderlib.found_fail", locationText));
         }
 
-        locationText = Text.literal(" ").append(locationText); // cursed
+        locationText = Component.literal(" ").append(locationText); // cursed
         listMinigames(source, games, locationText);
         return 1;
     }
 
-    public static int executeHighlight(ServerCommandSource source, int highlightedMinigame) throws CommandSyntaxException {
-        ServerWorld world = source.getWorld();
+    public static int executeHighlight(CommandSourceStack source, int highlightedMinigame) throws CommandSyntaxException {
+        ServerLevel world = source.getLevel();
         FlounderGameManager manager = FlounderApi.getGameManager(world);
         Map<Integer, FlounderableGame> games = manager.getGames();
 
@@ -178,15 +178,15 @@ public class FlounderGameCommand {
         return 1;
     }
 
-    public static int executeStart(ServerCommandSource source, FlounderableGame minigame) {
-        ServerWorld world = source.getWorld();
+    public static int executeStart(CommandSourceStack source, FlounderableGame minigame) {
+        ServerLevel world = source.getLevel();
         FlounderGameStartResult gameStartResult = FlounderApi.startMinigame(world, minigame);
-        source.sendFeedback(() -> getMinigameStartResultText(minigame, gameStartResult), false);
+        source.sendSuccess(() -> getMinigameStartResultText(minigame, gameStartResult), false);
         return gameStartResult.isSuccessful() ? 1 : 0;
     }
 
-    public static int executeStop(ServerCommandSource source, int minigameId) {
-        ServerWorld world = source.getWorld();
+    public static int executeStop(CommandSourceStack source, int minigameId) {
+        ServerLevel world = source.getLevel();
         FlounderGameManager manager = FlounderApi.getGameManager(world);
         Map<Integer, FlounderableGame> games = manager.getGames();
 
@@ -200,12 +200,12 @@ public class FlounderGameCommand {
 
         FlounderableGame game = games.get(minigameId);
         FlounderApi.endMinigame(game);
-        source.sendFeedback(() -> Text.translatable("command.flounderlib.stop", getMinigameText(game)), false);
+        source.sendSuccess(() -> Component.translatable("command.flounderlib.stop", getMinigameText(game)), false);
         return 1;
     }
 
-    public static int executeStopAll(ServerCommandSource source) {
-        ServerWorld world = source.getWorld();
+    public static int executeStopAll(CommandSourceStack source) {
+        ServerLevel world = source.getLevel();
         FlounderGameManager manager = FlounderApi.getGameManager(world);
         Map<Integer, FlounderableGame> games = manager.getGames();
 
@@ -213,101 +213,101 @@ public class FlounderGameCommand {
             return noMinigameActive(source);
         }
 
-        source.sendFeedback(() -> Text.translatable("command.flounderlib.stop_all", games.size()), false);
+        source.sendSuccess(() -> Component.translatable("command.flounderlib.stop_all", games.size()), false);
         for (FlounderableGame game : games.values()) {
             FlounderApi.endMinigame(game);
-            source.sendFeedback(() -> Text.translatable("command.flounderlib.stop", getMinigameText(game)), false);
+            source.sendSuccess(() -> Component.translatable("command.flounderlib.stop", getMinigameText(game)), false);
         }
         return 1;
     }
 
-    public static void listMinigames(ServerCommandSource source, Collection<FlounderableGame> games) {
-        listMinigames(source, games, Text.empty());
+    public static void listMinigames(CommandSourceStack source, Collection<FlounderableGame> games) {
+        listMinigames(source, games, Component.empty());
     }
 
-    public static void listMinigames(ServerCommandSource source, Collection<FlounderableGame> games, Text location) {
-        Text message = Text.translatable("command.flounderlib.found", games.size())
+    public static void listMinigames(CommandSourceStack source, Collection<FlounderableGame> games, Component location) {
+        Component message = Component.translatable("command.flounderlib.found", games.size())
                 .append(location)
-                .append(Text.translatable("command.flounderlib.found_suffix"));
-        source.sendFeedback(() -> message, false);
+                .append(Component.translatable("command.flounderlib.found_suffix"));
+        source.sendSuccess(() -> message, false);
         for (FlounderableGame game : games) {
-            source.sendFeedback(() -> listMinigame(game), false);
+            source.sendSuccess(() -> listMinigame(game), false);
         }
     }
 
-    public static Text listMinigame(FlounderableGame game) {
+    public static Component listMinigame(FlounderableGame game) {
         return getMinigameText(game, true, true);
     }
 
-    public static void highlightMinigame(ServerCommandSource source, FlounderableGame game) throws CommandSyntaxException {
-        ServerWorld world = source.getWorld();
-        ServerPlayerEntity player = source.getPlayerOrThrow();
+    public static void highlightMinigame(CommandSourceStack source, FlounderableGame game) throws CommandSyntaxException {
+        ServerLevel world = source.getLevel();
+        ServerPlayer player = source.getPlayerOrException();
         BlockPos gamePos = game.getCenterPos();
 
-        world.spawnParticles(player, ParticleTypes.END_ROD, true, true, gamePos.getX(), gamePos.getY(), gamePos.getZ(), 10, 0.1, 0.1, 0.1, 0);
-        source.sendFeedback(() -> Text.translatable("command.flounderlib.highlight", getMinigameText(game)), false);
+        world.sendParticles(player, ParticleTypes.END_ROD, true, true, gamePos.getX(), gamePos.getY(), gamePos.getZ(), 10, 0.1, 0.1, 0.1, 0);
+        source.sendSuccess(() -> Component.translatable("command.flounderlib.highlight", getMinigameText(game)), false);
     }
 
-    public static Text getMinigameStartResultText(FlounderableGame game, FlounderGameStartResult result) {
+    public static Component getMinigameStartResultText(FlounderableGame game, FlounderGameStartResult result) {
         return switch (result) {
-            case SUCCESS -> Text.translatable("command.flounderlib.start_success", getMinigameText(game));
+            case SUCCESS -> Component.translatable("command.flounderlib.start_success", getMinigameText(game));
             case FAILED_SINGLETON -> {
-                Text gameText = getMinigameText(game, false, false);
-                Text errorText = Text.translatable("command.flounderlib.start_fail_singleton").formatted(Formatting.RED);
-                Text tooltipText = Text.translatable("command.flounderlib.start_fail_singleton_tooltip").formatted(Formatting.GRAY, Formatting.ITALIC);
-                yield Text.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
+                Component gameText = getMinigameText(game, false, false);
+                Component errorText = Component.translatable("command.flounderlib.start_fail_singleton").withStyle(ChatFormatting.RED);
+                Component tooltipText = Component.translatable("command.flounderlib.start_fail_singleton_tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+                yield Component.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
             }
             case FAILED_OVERLAP -> {
-                Text gameText = getMinigameText(game, false, false);
-                Text errorText = Text.translatable("command.flounderlib.start_fail_overlap").formatted(Formatting.RED);
-                Text tooltipText = Text.translatable("command.flounderlib.start_fail_overlap_tooltip").formatted(Formatting.GRAY, Formatting.ITALIC);
-                yield Text.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
+                Component gameText = getMinigameText(game, false, false);
+                Component errorText = Component.translatable("command.flounderlib.start_fail_overlap").withStyle(ChatFormatting.RED);
+                Component tooltipText = Component.translatable("command.flounderlib.start_fail_overlap_tooltip").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
+                yield Component.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
             }
             default -> {
-                Text gameText = getMinigameText(game, false, false);
-                Text errorText = Text.translatable("command.flounderlib.start_fail").formatted(Formatting.RED);
-                Text tooltipText = Text.empty();
-                yield Text.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
+                Component gameText = getMinigameText(game, false, false);
+                Component errorText = Component.translatable("command.flounderlib.start_fail").withStyle(ChatFormatting.RED);
+                Component tooltipText = Component.empty();
+                yield Component.translatable("command.flounderlib.could_not_start", gameText, errorText, tooltipText);
             }
         };
     }
 
-    public static Text getBlockPosText(BlockPos pos, boolean teleport) {
-        Text coords = Text.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ());
+    public static Component getBlockPosText(BlockPos pos, boolean teleport) {
+        Component coords = Component.translatable("chat.coordinates", pos.getX(), pos.getY(), pos.getZ());
         if(teleport) {
-            coords = Texts.bracketed(coords)
-                    .styled(style -> style.withColor(Formatting.GREEN)
+            coords = ComponentUtils.wrapInSquareBrackets(coords)
+                    .withStyle(style -> style.withColor(ChatFormatting.GREEN)
                             .withClickEvent(new ClickEvent.SuggestCommand("/tp @s " + pos.getX() + " " + pos.getY() + " " + pos.getZ()))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.translatable("chat.coordinates.tooltip")))
+                            .withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.coordinates.tooltip")))
                     );
         }
         return coords;
     }
 
-    public static Text getMinigameText(FlounderableGame game) {
+    public static Component getMinigameText(FlounderableGame game) {
         return getMinigameText(game, true, false);
     }
 
-    public static Text getMinigameText(FlounderableGame game, boolean includeIntId, boolean includeCoords) {
-        MutableText text = Text.literal(String.valueOf(game.getIdentifier())).formatted(Formatting.AQUA);
+    public static Component getMinigameText(FlounderableGame game, boolean includeIntId, boolean includeCoords) {
+        MutableComponent text = Component.literal(String.valueOf(game.getIdentifier())).withStyle(ChatFormatting.AQUA);
         if(includeIntId) {
-            text.append(Text.literal(" (Int ID: " + game.getMinigameId() + ")").formatted(Formatting.DARK_AQUA));
+            text.append(Component.literal(" (Int ID: " + game.getMinigameId() + ")").withStyle(ChatFormatting.DARK_AQUA));
         } if(includeCoords) {
-            text.append(Text.literal(" ").append(getBlockPosText(game.getCenterPos(), true)));
+            text.append(Component.literal(" ").append(getBlockPosText(game.getCenterPos(), true)));
         }
         return text;
     }
 
-    public static int noMinigameActive(ServerCommandSource source) {
-        return noMinigameActive(source, Text.translatable("command.flounderlib.none_active"));
+    public static int noMinigameActive(CommandSourceStack source) {
+        return noMinigameActive(source, Component.translatable("command.flounderlib.none_active"));
     }
 
-    public static int noMinigameActive(ServerCommandSource source, int minigameId) {
-        return noMinigameActive(source, Text.translatable("command.flounderlib.id_not_active", minigameId));
+    public static int noMinigameActive(CommandSourceStack source, int minigameId) {
+        return noMinigameActive(source, Component.translatable("command.flounderlib.id_not_active", minigameId));
     }
 
-    public static int noMinigameActive(ServerCommandSource source, MutableText message) {
-        source.sendFeedback(() -> message.formatted(Formatting.RED, Formatting.ITALIC), false);
+    public static int noMinigameActive(CommandSourceStack source, MutableComponent message) {
+        source.sendSuccess(() -> message.withStyle(ChatFormatting.RED, ChatFormatting.ITALIC), false);
         return 0;
     }
 

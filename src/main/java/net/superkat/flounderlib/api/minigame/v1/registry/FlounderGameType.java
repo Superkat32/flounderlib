@@ -1,9 +1,9 @@
 package net.superkat.flounderlib.api.minigame.v1.registry;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
 import net.superkat.flounderlib.api.minigame.v1.game.FlounderableGame;
 import net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer;
 import net.superkat.flounderlib.impl.minigame.game.FlounderRegistry;
@@ -27,9 +27,9 @@ public record FlounderGameType<T extends FlounderableGame>(
         FlounderStateSyncer<T, ?> stateSyncer
 ) {
 
-    public static final PacketCodec<RegistryByteBuf, FlounderGameType<?>> PACKET_CODEC = PacketCodec.of(
+    public static final StreamCodec<RegistryFriendlyByteBuf, FlounderGameType<?>> PACKET_CODEC = StreamCodec.ofMember(
             (value, buf) -> buf.writeIdentifier(value.id),
-            buf -> FlounderRegistry.getRegistry().get(buf.readIdentifier())
+            buf -> FlounderRegistry.getRegistry().getValue(buf.readIdentifier())
     );
 
     public static <T extends FlounderableGame> Builder<T> create(Identifier id) {
@@ -60,7 +60,6 @@ public record FlounderGameType<T extends FlounderableGame>(
 
         private boolean synced = false;
         private FlounderStateSyncer<T, ?> stateSyncer = null;
-//        private PacketCodec<RegistryByteBuf, ? extends FlounderSyncData> dataPacketCodec = null;
 
         protected Builder(Identifier id) {
             this.id = id;
