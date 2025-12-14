@@ -1,4 +1,4 @@
-package net.superkat.flounderlib.api.hud.v1.event.client;
+package net.superkat.flounderlib.api.gui.v1.event.client;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -12,7 +12,7 @@ public final class GuiEvents {
         }
     });
 
-    public static final Event<ClearGui> HUD_CLEAR = EventFactory.createArrayBacked(ClearGui.class, listeners -> (client, hud) -> {
+    public static final Event<ClearGui> GUI_CLEAR = EventFactory.createArrayBacked(ClearGui.class, listeners -> (client, hud) -> {
         for (ClearGui listener : listeners) {
             listener.onHudClear(client, hud);
         }

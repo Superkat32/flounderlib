@@ -1,8 +1,8 @@
-package net.superkat.flounderlib.mixin.hud.client;
+package net.superkat.flounderlib.mixin.gui.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.superkat.flounderlib.api.hud.v1.event.client.GuiEvents;
+import net.superkat.flounderlib.api.gui.v1.event.client.GuiEvents;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,6 +25,6 @@ public class GuiMixin {
     @Inject(method = "onDisconnected", at = @At("TAIL"))
     public void flounderlib$onHudClear(CallbackInfo ci) {
         Gui gui = (Gui) (Object) this;
-        GuiEvents.HUD_CLEAR.invoker().onHudClear(this.minecraft, gui);
+        GuiEvents.GUI_CLEAR.invoker().onHudClear(this.minecraft, gui);
     }
 }

@@ -3,7 +3,7 @@
   "package": "net.superkat.flounderlib.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "hud.client.GuiMixin",
+    "gui.client.GuiMixin",
     "minigame.ServerLevelMixin"
   ],
   "injectors": {

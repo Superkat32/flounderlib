@@ -2,7 +2,7 @@ package net.superkat.flounderlib.impl.text.client;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.superkat.flounderlib.api.hud.v1.event.client.GuiEvents;
+import net.superkat.flounderlib.api.gui.v1.event.client.GuiEvents;
 import net.superkat.flounderlib.api.text.v1.client.FlounderTextRenderer;
 import net.superkat.flounderlib.api.text.v1.registry.FlounderTextType;
 import net.superkat.flounderlib.api.text.v1.text.FlounderText;
@@ -19,7 +19,7 @@ public class FlounderTextRendererHandler {
             forRenderers(renderer -> renderer.tick(paused));
         });
 
-        GuiEvents.HUD_CLEAR.register((client, gui) -> {
+        GuiEvents.GUI_CLEAR.register((client, gui) -> {
             forRenderers(FlounderTextRenderer::clear);
         });
 
