@@ -67,6 +67,7 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public void addPlayer(ServerPlayer player) {
+        if(player == null) return;
         this.addPlayerUuid(player.getUUID());
     }
 
@@ -75,6 +76,7 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public void removePlayer(ServerPlayer player) {
+        if(player == null) return;
         this.removePlayerUuid(player.getUUID());
     }
 
@@ -83,6 +85,7 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public boolean containsPlayer(ServerPlayer player) {
+        if(player == null) return false;
         return this.containsPlayerUuid(player.getUUID());
     }
 
@@ -150,7 +153,7 @@ public abstract class FlounderGame implements FlounderableGame {
     }
 
     public ServerPlayer getPlayer(UUID playerUuid) {
-        return (ServerPlayer) this.level.getPlayerByUUID(playerUuid);
+        return this.level.getServer().getPlayerList().getPlayer(playerUuid);
     }
 
     @Override

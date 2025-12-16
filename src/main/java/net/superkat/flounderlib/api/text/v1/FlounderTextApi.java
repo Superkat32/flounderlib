@@ -19,6 +19,7 @@ public class FlounderTextApi {
     }
 
     public static <T extends FlounderText> void send(T text, ServerPlayer player) {
+        if(player == null) return;
         CustomPacketPayload payload = createSendPacket(text.getFlounderTextType().id(), text);
         ServerPlayNetworking.send(player, payload);
     }

@@ -100,13 +100,13 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
         super.addPlayer(player);
 
         // Send the player a joining message
-        FlounderTextApi.send(new ColoredObjectiveText(Component.nullToEmpty("Joined minigame!"), CommonColors.SOFT_YELLOW), player);
+        FlounderTextApi.send(new ColoredObjectiveText(Component.literal("Joined minigame!"), CommonColors.SOFT_YELLOW), player);
     }
 
     @Override
     public void removePlayer(ServerPlayer player) {
         super.removePlayer(player);
-        FlounderTextApi.send(new ColoredObjectiveText(Component.nullToEmpty("Left minigame!"), CommonColors.DARK_PURPLE), player);
+        FlounderTextApi.send(new ColoredObjectiveText(Component.literal("Left minigame!"), CommonColors.DARK_PURPLE), player);
     }
 
     @Override
@@ -114,7 +114,7 @@ public class TestSyncedMinigame extends SyncedFlounderGame {
         // Send all in the minigame players a message that the game has ended
         for (ServerPlayer player : this.getPlayers()) {
             player.displayClientMessage(Component.literal("Minigame ended!"), true);
-            FlounderTextApi.send(new ColoredObjectiveText(Component.nullToEmpty("Minigame ended!"), CommonColors.HIGH_CONTRAST_DIAMOND), player);
+            FlounderTextApi.send(new ColoredObjectiveText(Component.literal("Minigame ended!"), CommonColors.HIGH_CONTRAST_DIAMOND), player);
         }
         super.invalidate();
     }
