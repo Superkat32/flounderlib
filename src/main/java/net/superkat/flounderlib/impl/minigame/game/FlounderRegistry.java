@@ -22,4 +22,8 @@ public class FlounderRegistry {
     public static Registry<FlounderGameType<?>> getRegistry() {
         return GAME_TYPE_REGISTRY;
     }
+
+    public static void init() {
+        // NO-OP
+    }
 }
