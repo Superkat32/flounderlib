@@ -7,6 +7,12 @@ import net.minecraft.server.network.ServerPlayerConnection;
 
 import java.util.List;
 
+/**
+ * A barebones syncable {@link FlounderableGame} which provides creating packets, marketing dirty, and methods to sync to all players.<br><br>
+ *
+ * It's recommended you extend {@link SyncedFlounderGame} instead, as it'll automatically handle syncing dirty values from your {@link net.superkat.flounderlib.api.minigame.v1.sync.FlounderStateSyncer}.
+ * @see SyncedFlounderGame
+ */
 public interface SyncableFlounderableGame extends FlounderableGame {
 
     boolean isDirty();

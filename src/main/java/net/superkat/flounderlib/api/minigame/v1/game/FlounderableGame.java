@@ -17,6 +17,9 @@ import java.util.UUID;
  * The absolute bare minimum methods required for a minigame.<br><br>
  *
  * It is recommended that you extend {@link FlounderGame} instead of just implementing this. However, this is visible in case you wish to do it all yourself.
+ * @see FlounderGame
+ * @see SyncableFlounderableGame
+ * @see SyncedFlounderGame
  */
 public interface FlounderableGame {
 

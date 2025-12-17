@@ -28,6 +28,14 @@ import java.util.Queue;
  */
 public interface FlounderTextRenderer<T extends FlounderText> extends HudElement {
 
+    /**
+     * Method to render each individual text currently stored on the client.
+     *
+     * @param graphics The GuiGraphics
+     * @param deltaTracker The DeltaTracker
+     * @param text The FlounderText of your renderer
+     * @param entry The int index of this text in the stored list
+     */
     void renderText(GuiGraphics graphics, DeltaTracker deltaTracker, T text, int entry);
 
     default void init() {}

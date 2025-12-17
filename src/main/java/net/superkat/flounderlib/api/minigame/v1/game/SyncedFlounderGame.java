@@ -14,6 +14,9 @@ import net.superkat.flounderlib.impl.minigame.sync.FlounderSyncTracker;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Abstract class of {@link SyncableFlounderableGame} which automatically handles syncing your {@link net.superkat.flounderlib.api.minigame.v1.sync.FlounderSyncState FlounderSyncState} via your {@link FlounderStateSyncer}.
+ */
 public abstract class SyncedFlounderGame extends FlounderGame implements SyncableFlounderableGame {
     protected FlounderSyncTracker<? extends SyncableFlounderableGame> flounderSyncTracker = this.createFlounderSyncState();
     protected boolean isDirty;

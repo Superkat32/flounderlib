@@ -26,6 +26,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * This acts similar to a Codec, but allows you to define getters and setters for each value.<br><br>
+ *
+ * {@link SyncedDataGetter} - Allows you to get a value from your FlounderGame<br>
+ * {@link SyncedDataSetter} - Allows you to set the gathered value on your FlounderSyncState
+ *
+ * @see SyncableFlounderableGame
+ * @see FlounderSyncState
+ *
+ * @param <G> Your FlounderGame
+ * @param <S> Your FlounderSyncState
+ */
 public interface FlounderStateSyncer<G extends FlounderableGame, S extends FlounderSyncState> {
 
     static <G extends SyncableFlounderableGame, S extends FlounderSyncState> FlounderStateSyncer<G, S> create(

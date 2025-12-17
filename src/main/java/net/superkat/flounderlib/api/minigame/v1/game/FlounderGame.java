@@ -10,6 +10,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Abstract FlounderGame which handles player management by default (along with other helpful default things, like incrementing the tick int and storing the Level)
+ *
+ * @see FlounderableGame
+ * @see SyncedFlounderGame
+ */
 public abstract class FlounderGame implements FlounderableGame {
     public ServerLevel level;
     public BlockPos centerPos;
